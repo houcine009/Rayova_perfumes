@@ -161,7 +161,7 @@ const AdminCategories = () => {
               Ajouter une catégorie
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingId ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
