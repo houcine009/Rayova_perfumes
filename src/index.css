@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode - Clean White Luxury */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    /* Gold Primary */
+    --primary: 42 65% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Warm Beige Secondary */
+    --secondary: 35 20% 95%;
+    --secondary-foreground: 0 0% 10%;
+
+    /* Muted tones */
+    --muted: 35 10% 95%;
+    --muted-foreground: 0 0% 45%;
+
+    /* Gold Accent */
+    --accent: 42 70% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 35 15% 88%;
+    --input: 35 10% 95%;
+    --ring: 42 65% 45%;
+
+    --radius: 0.25rem;
+
+    /* Custom Luxury Tokens */
+    --gold: 42 65% 45%;
+    --gold-light: 42 55% 60%;
+    --gold-dark: 42 70% 35%;
+    --champagne: 42 30% 85%;
+    --cream: 42 20% 97%;
+    --noir: 0 0% 10%;
+    --noir-light: 0 0% 20%;
+    --charcoal: 0 0% 30%;
+
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(42 65% 45%) 0%, hsl(42 70% 35%) 100%);
+    --gradient-light: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(35 10% 97%) 100%);
+    --gradient-hero-overlay: linear-gradient(180deg, hsla(0 0% 0% / 0.5) 0%, hsla(0 0% 0% / 0.3) 50%, hsla(0 0% 0% / 0.6) 100%);
+
+    /* Shadows */
+    --shadow-gold: 0 4px 30px -5px hsla(42 65% 45% / 0.2);
+    --shadow-luxury: 0 25px 50px -12px hsla(0 0% 0% / 0.1);
+    --shadow-card: 0 10px 40px -15px hsla(0 0% 0% / 0.1);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 42 65% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 35 10% 95%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 35 15% 88%;
+    --sidebar-ring: 42 65% 45%;
+  }
+
+  .dark {
+    /* Dark Mode - Luxury Black & Gold */
+    --background: 0 0% 5%;
+    --foreground: 42 20% 95%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 42 20% 95%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 42 20% 95%;
+
+    /* Gold Primary */
+    --primary: 42 65% 55%;
+    --primary-foreground: 0 0% 5%;
+
+    /* Warm Beige Secondary */
+    --secondary: 35 25% 15%;
+    --secondary-foreground: 42 20% 95%;
+
+    /* Muted tones */
+    --muted: 0 0% 15%;
+    --muted-foreground: 42 10% 60%;
+
+    /* Gold Accent */
+    --accent: 42 70% 50%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 42 20% 95%;
+
+    --border: 42 20% 20%;
+    --input: 0 0% 15%;
+    --ring: 42 65% 55%;
+
+    /* Custom Luxury Tokens */
+    --gold: 42 65% 55%;
+    --gold-light: 42 55% 70%;
+    --gold-dark: 42 70% 40%;
+    --champagne: 42 30% 85%;
+    --cream: 42 20% 95%;
+    --noir: 0 0% 5%;
+    --noir-light: 0 0% 10%;
+    --charcoal: 0 0% 18%;
+
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(42 65% 55%) 0%, hsl(42 70% 40%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 5%) 0%, hsl(0 0% 10%) 100%);
+    --gradient-hero-overlay: linear-gradient(180deg, hsla(0 0% 0% / 0.7) 0%, hsla(0 0% 0% / 0.4) 50%, hsla(0 0% 0% / 0.8) 100%);
+
+    /* Shadows */
+    --shadow-gold: 0 4px 30px -5px hsla(42 65% 55% / 0.3);
+    --shadow-luxury: 0 25px 50px -12px hsla(0 0% 0% / 0.8);
+    --shadow-card: 0 10px 40px -15px hsla(0 0% 0% / 0.5);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 42 20% 95%;
+    --sidebar-primary: 42 65% 55%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 42 20% 95%;
+    --sidebar-border: 42 20% 20%;
+    --sidebar-ring: 42 65% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .text-gold-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--gold-light)) 0%, hsl(var(--gold)) 50%, hsl(var(--gold-dark)) 100%);
+  }
+
+  .border-gold-gradient {
+    border-image: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-dark))) 1;
+  }
+
+  .bg-gold-gradient {
+    background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-dark)) 100%);
+  }
+
+  .bg-hero-overlay {
+    background: var(--gradient-hero-overlay);
+  }
+
+  .luxury-card {
+    @apply bg-card border border-border rounded-sm transition-all duration-500;
+    box-shadow: var(--shadow-card);
+  }
+
+  .luxury-card:hover {
+    @apply border-primary/50;
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-4px);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 30px -5px hsla(var(--gold) / 0.4);
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  .container-luxury {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}
