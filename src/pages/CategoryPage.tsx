@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { ProductCard } from "@/components/products/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
 import { Loader2 } from "lucide-react";
 import collectionHomme from "@/assets/collection-homme.jpg";
 import collectionFemme from "@/assets/collection-femme.jpg";
@@ -29,7 +30,17 @@ const categoryData: Record<string, { name: string; description: string; image: s
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const categoryInfo = categoryData[slug || ""] || categoryData.niche;
+  const { data: allCategories } = useCategories();
+  const currentCategory = allCategories?.find(c => c.slug === slug);
+
+  // Fallback to static data if not found or loading, but prefer database data
+  const categoryInfo = currentCategory ? {
+    name: currentCategory.name,
+    description: currentCategory.description || "",
+    image: currentCategory.image_url || categoryData[slug || "niche"]?.image || categoryData.niche.image
+  } : (categoryData[slug || ""] || categoryData.niche);
+
+  const isVideo = categoryInfo.image?.match(/\.(mp4|webm|ogg)$/i);
 
   const { data: products, isLoading } = useProducts({
     category: slug === 'all' ? undefined : slug
@@ -43,11 +54,23 @@ const CategoryPage = () => {
       <main className="pt-20 lg:pt-24">
         {/* Category Hero */}
         <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${categoryInfo.image})` }}
-          />
-          <div className="absolute inset-0 bg-background/70" />
+          {isVideo ? (
+            <video
+              className="absolute inset-0 w-full h-full object-cover"
+              src={categoryInfo.image}
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          ) : (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${categoryInfo.image})` }}
+            />
+          )}
+
+          <div className="absolute inset-0 bg-background/60" />
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

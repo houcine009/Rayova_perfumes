@@ -1,24 +1,28 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useCategories } from "@/hooks/useCategories";
 import collectionHomme from "@/assets/collection-homme.jpg";
 import collectionFemme from "@/assets/collection-femme.jpg";
 import collectionNiche from "@/assets/collection-niche.jpg";
 
-const collections = [
+const defaultCollections = [
   {
+    slug: "niche",
     name: "Niche",
     description: "Créations exclusives et avant-gardistes",
     image: collectionNiche,
     href: "/categorie/niche",
   },
   {
+    slug: "homme",
     name: "Homme",
     description: "Élégance masculine raffinée",
     image: collectionHomme,
     href: "/categorie/homme",
   },
   {
+    slug: "femme",
     name: "Femme",
     description: "Féminité et sophistication",
     image: collectionFemme,
@@ -27,6 +31,21 @@ const collections = [
 ];
 
 export function CollectionsSection() {
+  const { data: categories } = useCategories();
+
+  const collections = defaultCollections.map(defaultColl => {
+    const category = categories?.find(c => c.slug === defaultColl.slug);
+    if (category) {
+      return {
+        ...defaultColl,
+        name: category.name,
+        description: category.description || defaultColl.description,
+        image: category.image_url || defaultColl.image,
+      };
+    }
+    return defaultColl;
+  });
+
   return (
     <section className="section-padding bg-background">
       <div className="container-luxury">
@@ -60,11 +79,22 @@ export function CollectionsSection() {
                 to={collection.href}
                 className="group block relative overflow-hidden aspect-[3/4]"
               >
-                {/* Image */}
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                  style={{ backgroundImage: `url(${collection.image})` }}
-                />
+                {/* Image or Video */}
+                {collection.image?.match(/\.(mp4|webm|ogg)$/i) ? (
+                  <video
+                    src={collection.image}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                    style={{ backgroundImage: `url(${collection.image})` }}
+                  />
+                )}
 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />

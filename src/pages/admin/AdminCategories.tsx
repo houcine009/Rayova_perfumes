@@ -203,15 +203,24 @@ const AdminCategories = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">Image de la catégorie</Label>
+                <Label htmlFor="image">Média de la catégorie (Image ou Vidéo)</Label>
                 <div className="flex flex-col gap-4">
                   {formData.image_url && (
                     <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
-                      <img
-                        src={formData.image_url}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
+                      {formData.image_url.match(/\.(mp4|webm|ogg)$/i) ? (
+                        <video
+                          src={formData.image_url}
+                          className="w-full h-full object-cover"
+                          controls
+                        />
+                      ) : (
+                        <img
+                          src={formData.image_url}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+
                       <Button
                         type="button"
                         variant="destructive"
@@ -226,25 +235,25 @@ const AdminCategories = () => {
                   <Input
                     id="image"
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
 
                       const loadingToast = toast({
                         title: "Chargement...",
-                        description: "L'image est en cours d'envoi",
+                        description: "Le média est en cours d'envoi",
                       });
 
                       try {
                         const { api } = await import('@/lib/api');
                         const response: any = await api.upload('/admin/media/upload', file, { folder: 'categories' });
                         setFormData({ ...formData, image_url: response.url });
-                        toast({ title: "Succès", description: "Image envoyée avec succès" });
+                        toast({ title: "Succès", description: "Média envoyé avec succès" });
                       } catch (error: any) {
                         toast({
                           title: "Erreur",
-                          description: "Échec de l'envoi de l'image",
+                          description: "Échec de l'envoi du média",
                           variant: "destructive",
                         });
                       }
@@ -252,7 +261,7 @@ const AdminCategories = () => {
                   />
                   {!formData.image_url && (
                     <p className="text-xs text-muted-foreground">
-                      Formats acceptés : JPG, PNG, GIF, WebP. Taille max : 5MB.
+                      Formats acceptés : Images (JPG, PNG) ou Vidéos (MP4, WebM). Taille max : 50MB.
                     </p>
                   )}
                 </div>
