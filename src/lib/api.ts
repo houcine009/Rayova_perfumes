@@ -45,7 +45,8 @@ class ApiClient {
 
     this.axiosInstance = axios.create({
       baseURL: API_BASE_URL,
-      withCredentials: true,
+      baseURL: API_BASE_URL,
+      withCredentials: false,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
