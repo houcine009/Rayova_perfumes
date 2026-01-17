@@ -13,7 +13,10 @@ else
 fi
 
 echo "🔗 Linking storage..."
+rm -rf public/storage
 php artisan storage:link
+chown -R www-data:www-data storage public/storage
+chmod -R 775 storage bootstrap/cache
 
 echo "🔥 Starting Apache"
 exec apache2-foreground
