@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
 import { useToast } from '@/hooks/use-toast';
 
 type ProductGender = 'homme' | 'femme' | 'unisexe' | 'niche';
@@ -61,6 +62,7 @@ interface ProductFormData {
   is_featured: boolean;
   is_new: boolean;
   is_active: boolean;
+  category_ids: string[];
 }
 
 const defaultFormData: ProductFormData = {
@@ -79,6 +81,7 @@ const defaultFormData: ProductFormData = {
   is_featured: false,
   is_new: false,
   is_active: true,
+  category_ids: [],
 };
 
 const AdminProducts = () => {
@@ -89,6 +92,7 @@ const AdminProducts = () => {
   const [formData, setFormData] = useState<ProductFormData>(defaultFormData);
 
   const { data: products, isLoading } = useProducts();
+  const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
@@ -131,6 +135,7 @@ const AdminProducts = () => {
       is_featured: !!product.is_featured,
       is_new: !!product.is_new,
       is_active: product.is_active !== false,
+      category_ids: product.categories?.map(c => c.id) || [],
     });
     setIsDialogOpen(true);
   };

@@ -31,9 +31,21 @@ class ProductController extends Controller
         }
 
         if ($request->has('category')) {
-            $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('slug', $request->category);
-            });
+            $categorySlug = $request->category;
+            
+            if (in_array($categorySlug, ['homme', 'femme'])) {
+                $query->where(function($q) use ($categorySlug) {
+                    $q->whereHas('categories', function ($subQ) use ($categorySlug) {
+                        $subQ->where('slug', $categorySlug);
+                    })
+                    ->orWhere('gender', $categorySlug)
+                    ->orWhere('gender', 'unisexe');
+                });
+            } else {
+                $query->whereHas('categories', function ($q) use ($categorySlug) {
+                    $q->where('slug', $categorySlug);
+                });
+            }
         }
 
         if ($request->has('search')) {
