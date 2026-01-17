@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductMedia;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -190,7 +191,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'url' => 'nullable|string',
-            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv|max:20480', // 20MB max
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv|max:51200', // 50MB max
             'alt_text' => 'nullable|string|max:255',
             'is_primary' => 'nullable|boolean',
             'display_order' => 'nullable|integer',
@@ -201,7 +202,7 @@ class ProductController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $path = $file->store('products', 'public');
-            $url = asset('storage/' . $path);
+            $url = Storage::url($path);
         }
 
         if (!$url) {
