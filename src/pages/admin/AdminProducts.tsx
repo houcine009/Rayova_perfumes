@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Plus, Pencil, Trash2, Search, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -85,6 +86,7 @@ const defaultFormData: ProductFormData = {
 };
 
 const AdminProducts = () => {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -170,17 +172,34 @@ const AdminProducts = () => {
     const file = e.target.files?.[0];
     if (!file || !editingId) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
+    // Use a loading toast
+    const loadingToast = toast({
+      title: 'Chargement...',
+      description: "Envoi du média en cours",
+    });
 
     try {
-      // We need a hook for adding media or use the one from useProducts
-      // For now, I'll assume we hit the API directly or use useAddProductMedia if available
-      const response = await api.post(`/admin/products/${editingId}/media`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      // 1. Upload file to get URL (using common upload endpoint if distinct, or direct product media endpoint)
+      // Actually, useAddProductMedia expects JSON { product_id, url ... } usually, 
+      // but let's check the hook definition in useProducts.ts.
+      // Wait, the hook calls `productService.addMedia`. 
+      // `productService.addMedia` calls `api.post('/admin/products/${productId}/media', data)`.
+      // BUT `api.post` sends JSON. We need `api.upload` or FormData for files.
+      // The current controller expects `file` in FormData.
+      // The `productService.addMedia` signature is: 
+      // addMedia(productId, data: { url: string... }) 
+      // It DOES NOT support File object directly based on Step 563.
+
+      // FIX: We must use api.upload explicitly AND invalidate queries.
+      // Since useAddProductMedia might not be set up for file uploads yet.
+
+      const { api } = await import('@/lib/api');
+      await api.upload(`/admin/products/${editingId}/media`, file);
+
       toast({ title: 'Média ajouté avec succès' });
-      // Invalidate queries to refresh product logic is handled by hook normally
+
+      // Force refresh of products list
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     } catch (error: any) {
       toast({
         title: 'Erreur d\'upload',
@@ -189,6 +208,7 @@ const AdminProducts = () => {
       });
     }
   };
+
 
   const handleDeleteMedia = async (mediaId: string) => {
     try {
