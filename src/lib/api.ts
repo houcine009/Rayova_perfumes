@@ -43,89 +43,87 @@ class ApiClient {
   constructor() {
     this.token = localStorage.getItem('auth_token');
 
-    this.axiosInstance = axios.create({
-      baseURL: API_BASE_URL,
-      baseURL: API_BASE_URL,
+    baseURL: API_BASE_URL,
       withCredentials: false,
-      headers: {
-        'Accept': 'application/json',
+        headers: {
+      'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-    });
+  });
 
     // Request interceptor for auth token
     this.axiosInstance.interceptors.request.use(
-      (config) => {
-        if (this.token) {
-          config.headers.Authorization = `Bearer ${this.token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    // Response interceptor for error handling
-    this.axiosInstance.interceptors.response.use(
-      (response) => response.data,
-      (error) => {
-        console.error('[API Error]', {
-          url: error.config?.url,
-          status: error.response?.status,
-          message: error.response?.data?.message || error.message,
-          data: error.response?.data
-        });
-        const message = error.response?.data?.message || error.message || 'Une erreur est survenue';
-        const customError = new Error(message);
-        (customError as any).response = error.response;
-        (customError as any).status = error.response?.status;
-        return Promise.reject(customError);
+    (config) => {
+      if (this.token) {
+        config.headers.Authorization = `Bearer ${this.token}`;
       }
-    );
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+// Response interceptor for error handling
+this.axiosInstance.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    console.error('[API Error]', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      data: error.response?.data
+    });
+    const message = error.response?.data?.message || error.message || 'Une erreur est survenue';
+    const customError = new Error(message);
+    (customError as any).response = error.response;
+    (customError as any).status = error.response?.status;
+    return Promise.reject(customError);
+  }
+);
   }
 
-  setToken(token: string | null) {
-    this.token = token;
-    if (token) {
-      localStorage.setItem('auth_token', token);
-    } else {
-      localStorage.removeItem('auth_token');
-    }
+setToken(token: string | null) {
+  this.token = token;
+  if (token) {
+    localStorage.setItem('auth_token', token);
+  } else {
+    localStorage.removeItem('auth_token');
   }
+}
 
-  getToken(): string | null {
-    return this.token;
-  }
+getToken(): string | null {
+  return this.token;
+}
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    return this.axiosInstance.get<any, T>(endpoint, { params });
-  }
+  async get<T>(endpoint: string, params ?: Record<string, any>): Promise < T > {
+  return this.axiosInstance.get<any, T>(endpoint, { params });
+}
 
-  async post<T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return this.axiosInstance.post<any, T>(endpoint, data, config);
-  }
+  async post<T>(endpoint: string, data ?: unknown, config ?: AxiosRequestConfig): Promise < T > {
+  return this.axiosInstance.post<any, T>(endpoint, data, config);
+}
 
-  async put<T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return this.axiosInstance.put<any, T>(endpoint, data, config);
-  }
+  async put<T>(endpoint: string, data ?: unknown, config ?: AxiosRequestConfig): Promise < T > {
+  return this.axiosInstance.put<any, T>(endpoint, data, config);
+}
 
-  async delete<T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> {
-    return this.axiosInstance.delete<any, T>(endpoint, config);
-  }
+  async delete <T>(endpoint: string, config ?: AxiosRequestConfig): Promise < T > {
+  return this.axiosInstance.delete<any, T>(endpoint, config);
+}
 
-  async upload<T>(endpoint: string, file: File, additionalData?: Record<string, string>): Promise<T> {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (additionalData) {
-      Object.entries(additionalData).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-    }
-    return this.post<T>(endpoint, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+  async upload<T>(endpoint: string, file: File, additionalData ?: Record<string, string>): Promise < T > {
+  const formData = new FormData();
+  formData.append('file', file);
+  if(additionalData) {
+    Object.entries(additionalData).forEach(([key, value]) => {
+      formData.append(key, value);
     });
   }
+    return this.post<T>(endpoint, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}
 }
 
 // Export singleton instance
