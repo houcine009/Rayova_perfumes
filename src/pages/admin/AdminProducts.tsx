@@ -381,6 +381,37 @@ const AdminProducts = () => {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label>Catégories</Label>
+                <div className="grid grid-cols-2 gap-2 border rounded-lg p-4 max-h-40 overflow-y-auto">
+                  {categories?.map((category) => (
+                    <div key={category.id} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={`cat-${category.id}`}
+                        checked={formData.category_ids.includes(category.id)}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setFormData(prev => ({
+                            ...prev,
+                            category_ids: checked
+                              ? [...prev.category_ids, category.id]
+                              : prev.category_ids.filter(id => id !== category.id)
+                          }));
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <label
+                        htmlFor={`cat-${category.id}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {category.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="notes_top">Notes de tête</Label>
