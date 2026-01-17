@@ -133,6 +133,9 @@ class ProductController extends Controller
             $categoryIds = $validated['category_ids'] ?? [];
             unset($validated['category_ids']);
 
+            // Ensure stock_quantity is not null (DB requires integer, defaults to 0)
+            $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+
             $product = Product::create($validated);
 
             // Attach categories
@@ -179,6 +182,10 @@ class ProductController extends Controller
 
         $categoryIds = $validated['category_ids'] ?? null;
         unset($validated['category_ids']);
+
+        if (array_key_exists('stock_quantity', $validated)) {
+             $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+        }
 
         $product->update($validated);
 
