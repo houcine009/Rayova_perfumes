@@ -273,15 +273,7 @@ export function Navbar() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex gap-4">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => navigate("/auth")}
-                    >
-                      Connexion
-                    </Button>
-                  </div>
+                  null
                 )}
               </div>
             </nav>

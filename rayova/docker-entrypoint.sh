@@ -12,5 +12,8 @@ else
     php artisan migrate --force
 fi
 
-echo "🔥 Starting Apache..."
+echo "🔗 Linking storage..."
+php artisan storage:link
+
+echo "🔥 Starting Apache"
 exec apache2-foreground
