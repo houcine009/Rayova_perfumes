@@ -27,7 +27,7 @@ class MediaController extends Controller
         // Store file
         $path = $file->storeAs($folder, $filename, 'public');
 
-        $url = Storage::url($path);
+        $url = asset(Storage::url($path));
 
         return response()->json([
             'url' => $url,

@@ -202,7 +202,7 @@ class ProductController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $path = $file->store('products', 'public');
-            $url = Storage::url($path);
+            $url = asset(Storage::url($path));
         }
 
         if (!$url) {
