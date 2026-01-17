@@ -94,55 +94,61 @@ class ProductController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|unique:products,slug',
-            'description' => 'nullable|string',
-            'short_description' => 'nullable|string|max:500',
-            'price' => 'required|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'sku' => 'nullable|string|unique:products,sku',
-            'stock_quantity' => 'nullable|integer|min:0',
-            'gender' => 'required|in:homme,femme,unisexe,niche',
-            'is_featured' => 'nullable|boolean',
-            'is_new' => 'nullable|boolean',
-            'is_active' => 'nullable|boolean',
-            'volume_ml' => 'nullable|integer|min:0',
-            'notes_top' => 'nullable|string',
-            'notes_heart' => 'nullable|string',
-            'notes_base' => 'nullable|string',
-            'brand' => 'nullable|string|max:255',
-            'category_ids' => 'nullable|array',
-            'category_ids.*' => 'uuid|exists:categories,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'slug' => 'nullable|string|unique:products,slug',
+                'description' => 'nullable|string',
+                'short_description' => 'nullable|string|max:500',
+                'price' => 'required|numeric|min:0',
+                'original_price' => 'nullable|numeric|min:0',
+                'sku' => 'nullable|string|unique:products,sku',
+                'stock_quantity' => 'nullable|integer|min:0',
+                'gender' => 'required|in:homme,femme,unisexe,niche',
+                'is_featured' => 'nullable|boolean',
+                'is_new' => 'nullable|boolean',
+                'is_active' => 'nullable|boolean',
+                'volume_ml' => 'nullable|integer|min:0',
+                'notes_top' => 'nullable|string',
+                'notes_heart' => 'nullable|string',
+                'notes_base' => 'nullable|string',
+                'brand' => 'nullable|string|max:255',
+                'category_ids' => 'nullable|array',
+                'category_ids.*' => 'uuid|exists:categories,id',
+            ]);
 
-        // Generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
+            // Generate slug if not provided
+            if (empty($validated['slug'])) {
+                $validated['slug'] = Str::slug($validated['name']);
+            }
+
+            // Make slug unique
+            $baseSlug = $validated['slug'];
+            $counter = 1;
+            while (Product::where('slug', $validated['slug'])->exists()) {
+                $validated['slug'] = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+
+            $categoryIds = $validated['category_ids'] ?? [];
+            unset($validated['category_ids']);
+
+            $product = Product::create($validated);
+
+            // Attach categories
+            if (!empty($categoryIds)) {
+                $product->categories()->attach($categoryIds);
+            }
+
+            return response()->json([
+                'data' => $product->load('media', 'categories'),
+                'message' => 'Produit créé avec succès',
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la création du produit: ' . $e->getMessage()
+            ], 500);
         }
-
-        // Make slug unique
-        $baseSlug = $validated['slug'];
-        $counter = 1;
-        while (Product::where('slug', $validated['slug'])->exists()) {
-            $validated['slug'] = $baseSlug . '-' . $counter;
-            $counter++;
-        }
-
-        $categoryIds = $validated['category_ids'] ?? [];
-        unset($validated['category_ids']);
-
-        $product = Product::create($validated);
-
-        // Attach categories
-        if (!empty($categoryIds)) {
-            $product->categories()->attach($categoryIds);
-        }
-
-        return response()->json([
-            'data' => $product->load('media', 'categories'),
-            'message' => 'Produit créé avec succès',
-        ], 201);
     }
 
     public function update(Request $request, string $id): JsonResponse
