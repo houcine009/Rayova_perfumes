@@ -3,10 +3,11 @@ set -e
 
 echo "🚀 Starting application setup..."
 
-# Run migrations and seed ONLY if RUN_SEED environment variable is true
+# Run migrations safely. NEVER use migrate:fresh in production!
 if [ "$RUN_SEED" = "true" ]; then
-    echo "🌱 Scaling database: Migrating fresh and seeding..."
-    php artisan migrate:fresh --seed --force
+    echo "🌱 Scaling database: Running migrations and seeding..."
+    php artisan migrate --force
+    php artisan db:seed --force
 else
     echo "📦 Running normal migrations..."
     php artisan migrate --force

@@ -1,4 +1,13 @@
-import { Loader2, Save, Cloud, AlertTriangle, CheckCircle2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Loader2,
+  Save,
+  Cloud,
+  AlertTriangle,
+  CheckCircle2,
+  AlertCircle,
+  AlertCircle as AlertCircleIcon
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +21,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 const AdminSettings = () => {
   const { data: settings, isLoading } = useSiteSettings();
   const updateSetting = useUpdateSetting();
+  const { toast } = useToast();
+
   const [isSaving, setIsSaving] = useState(false);
   const [storageStatus, setStorageStatus] = useState<{
     type: 'cloudinary' | 'local';
@@ -20,17 +31,49 @@ const AdminSettings = () => {
     message: string;
   } | null>(null);
 
+  const [heroSettings, setHeroSettings] = useState<HeroSettings>({
+    title: 'Rayova',
+    subtitle: "L'Art du Parfum",
+    cta_primary: 'Découvrir',
+    cta_secondary: 'Acheter',
+    video_url: null,
+    image_url: null,
+  });
+
+  const [contactSettings, setContactSettings] = useState<ContactSettings>({
+    email: 'contact@rayova.ma',
+    phone: '+212 5XX-XXXXXX',
+    address: 'Casablanca, Maroc',
+  });
+
+  // Fetch storage status on mount
   useEffect(() => {
     const fetchStorageStatus = async () => {
       try {
         const response = await api.get('/admin/storage/status');
-        setStorageStatus(response.data);
+        if (response && (response as any).data) {
+          setStorageStatus((response as any).data);
+        } else {
+          setStorageStatus(response as any);
+        }
       } catch (error) {
         console.error('Erreur status stockage:', error);
       }
     };
     fetchStorageStatus();
   }, []);
+
+  // Initialize form data from settings
+  useEffect(() => {
+    if (settings) {
+      if (settings.hero) {
+        setHeroSettings(prev => ({ ...prev, ...(settings.hero as HeroSettings) }));
+      }
+      if (settings.contact) {
+        setContactSettings(prev => ({ ...prev, ...(settings.contact as ContactSettings) }));
+      }
+    }
+  }, [settings]);
 
   const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: 'hero_background_url' | 'hero_video_url') => {
     const file = e.target.files?.[0];
@@ -42,7 +85,7 @@ const AdminSettings = () => {
 
     setIsSaving(true);
     try {
-      const response = await api.post('/admin/settings/upload', formData, {
+      const response: any = await api.post('/admin/settings/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -64,34 +107,6 @@ const AdminSettings = () => {
       setIsSaving(false);
     }
   };
-
-  const [heroSettings, setHeroSettings] = useState<HeroSettings>({
-    title: 'Rayova',
-    subtitle: "L'Art du Parfum",
-    cta_primary: 'Découvrir',
-    cta_secondary: 'Acheter',
-    video_url: null,
-    image_url: null,
-  });
-
-  const [contactSettings, setContactSettings] = useState<ContactSettings>({
-    email: 'contact@rayova.ma',
-    phone: '+212 5XX-XXXXXX',
-    address: 'Casablanca, Maroc',
-  });
-
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (settings) {
-      if (settings.hero) {
-        setHeroSettings(settings.hero as HeroSettings);
-      }
-      if (settings.contact) {
-        setContactSettings(settings.contact as ContactSettings);
-      }
-    }
-  }, [settings]);
 
   const handleSaveHero = async () => {
     setIsSaving(true);
@@ -165,7 +180,7 @@ const AdminSettings = () => {
                   <Label htmlFor="hero_title">Titre</Label>
                   <Input
                     id="hero_title"
-                    value={heroSettings.title}
+                    value={heroSettings?.title || ''}
                     onChange={(e) =>
                       setHeroSettings({ ...heroSettings, title: e.target.value })
                     }
@@ -175,7 +190,7 @@ const AdminSettings = () => {
                   <Label htmlFor="hero_subtitle">Sous-titre</Label>
                   <Input
                     id="hero_subtitle"
-                    value={heroSettings.subtitle}
+                    value={heroSettings?.subtitle || ''}
                     onChange={(e) =>
                       setHeroSettings({ ...heroSettings, subtitle: e.target.value })
                     }
@@ -188,7 +203,7 @@ const AdminSettings = () => {
                   <Label htmlFor="cta_primary">Bouton principal</Label>
                   <Input
                     id="cta_primary"
-                    value={heroSettings.cta_primary}
+                    value={heroSettings?.cta_primary || ''}
                     onChange={(e) =>
                       setHeroSettings({ ...heroSettings, cta_primary: e.target.value })
                     }
@@ -198,7 +213,7 @@ const AdminSettings = () => {
                   <Label htmlFor="cta_secondary">Bouton secondaire</Label>
                   <Input
                     id="cta_secondary"
-                    value={heroSettings.cta_secondary}
+                    value={heroSettings?.cta_secondary || ''}
                     onChange={(e) =>
                       setHeroSettings({ ...heroSettings, cta_secondary: e.target.value })
                     }
@@ -212,7 +227,7 @@ const AdminSettings = () => {
                   <div className="flex gap-2">
                     <Input
                       id="video_url"
-                      value={heroSettings.video_url || ''}
+                      value={heroSettings?.video_url || ''}
                       onChange={(e) =>
                         setHeroSettings({ ...heroSettings, video_url: e.target.value || null })
                       }
@@ -230,11 +245,12 @@ const AdminSettings = () => {
                       />
                     </label>
                   </div>
-                  {heroSettings.video_url && (
+                  {heroSettings?.video_url && (
                     <video
                       src={heroSettings.video_url}
                       className="w-full h-32 object-cover rounded-lg border border-border"
                       muted
+                      controls
                     />
                   )}
                 </div>
@@ -244,7 +260,7 @@ const AdminSettings = () => {
                   <div className="flex gap-2">
                     <Input
                       id="image_url"
-                      value={heroSettings.image_url || ''}
+                      value={heroSettings?.image_url || ''}
                       onChange={(e) =>
                         setHeroSettings({ ...heroSettings, image_url: e.target.value || null })
                       }
@@ -262,7 +278,7 @@ const AdminSettings = () => {
                       />
                     </label>
                   </div>
-                  {heroSettings.image_url && (
+                  {heroSettings?.image_url && (
                     <img
                       src={heroSettings.image_url}
                       alt="Hero background"
@@ -298,7 +314,7 @@ const AdminSettings = () => {
                 <Input
                   id="contact_email"
                   type="email"
-                  value={contactSettings.email}
+                  value={contactSettings?.email || ''}
                   onChange={(e) =>
                     setContactSettings({ ...contactSettings, email: e.target.value })
                   }
@@ -309,7 +325,7 @@ const AdminSettings = () => {
                 <Label htmlFor="contact_phone">Téléphone</Label>
                 <Input
                   id="contact_phone"
-                  value={contactSettings.phone}
+                  value={contactSettings?.phone || ''}
                   onChange={(e) =>
                     setContactSettings({ ...contactSettings, phone: e.target.value })
                   }
@@ -320,7 +336,7 @@ const AdminSettings = () => {
                 <Label htmlFor="contact_address">Adresse</Label>
                 <Input
                   id="contact_address"
-                  value={contactSettings.address}
+                  value={contactSettings?.address || ''}
                   onChange={(e) =>
                     setContactSettings({ ...contactSettings, address: e.target.value })
                   }
@@ -351,8 +367,8 @@ const AdminSettings = () => {
               {storageStatus ? (
                 <div className="space-y-4">
                   <div className={`p-4 rounded-xl border flex items-start gap-4 ${storageStatus.is_configured
-                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
-                      : 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400'
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                    : 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400'
                     }`}>
                     {storageStatus.is_configured ? (
                       <CheckCircle2 className="h-6 w-6 shrink-0" />
@@ -371,7 +387,7 @@ const AdminSettings = () => {
 
                   {!storageStatus.is_configured && (
                     <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
-                      <AlertCircle className="h-4 w-4" />
+                      <AlertCircleIcon className="h-4 w-4" />
                       <AlertTitle className="font-bold">Attention : Risque de perte de données</AlertTitle>
                       <AlertDescription>
                         L'environnement de production utilise un système de fichiers éphémère. Sans Cloudinary, tous vos médias (images de produits, bannières, etc.) seront <strong>supprimés</strong> à chaque nouveau déploiement ou redémarrage du serveur.

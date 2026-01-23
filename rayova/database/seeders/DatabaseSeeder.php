@@ -97,38 +97,44 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Create default site settings
-        SiteSetting::create([
-            'key' => 'hero',
-            'value' => [
-                'title' => 'Rayova',
-                'subtitle' => "L'Art du Parfum",
-                'cta_primary' => 'Découvrir',
-                'cta_secondary' => 'Acheter',
-                'video_url' => null,
-                'image_url' => null,
-            ],
-        ]);
+        // Create default site settings if they don't exist
+        SiteSetting::updateOrCreate(
+            ['key' => 'hero'],
+            [
+                'value' => [
+                    'title' => 'Rayova',
+                    'subtitle' => "L'Art du Parfum",
+                    'cta_primary' => 'Découvrir',
+                    'cta_secondary' => 'Acheter',
+                    'video_url' => null,
+                    'image_url' => null,
+                ],
+            ]
+        );
 
-        SiteSetting::create([
-            'key' => 'contact',
-            'value' => [
-                'email' => 'contact@rayova.ma',
-                'phone' => '+212 5XX-XXXXXX',
-                'address' => 'Casablanca, Maroc',
-                'whatsapp' => '+212 6XX-XXXXXX',
-            ],
-        ]);
+        SiteSetting::updateOrCreate(
+            ['key' => 'contact'],
+            [
+                'value' => [
+                    'email' => 'contact@rayova.ma',
+                    'phone' => '+212 5XX-XXXXXX',
+                    'address' => 'Casablanca, Maroc',
+                    'whatsapp' => '+212 6XX-XXXXXX',
+                ],
+            ]
+        );
 
-        SiteSetting::create([
-            'key' => 'social',
-            'value' => [
-                'facebook' => 'https://facebook.com/rayova',
-                'instagram' => 'https://instagram.com/rayova',
-                'twitter' => null,
-                'tiktok' => null,
-            ],
-        ]);
+        SiteSetting::updateOrCreate(
+            ['key' => 'social'],
+            [
+                'value' => [
+                    'facebook' => 'https://facebook.com/rayova',
+                    'instagram' => 'https://instagram.com/rayova',
+                    'twitter' => null,
+                    'tiktok' => null,
+                ],
+            ]
+        );
 
         $this->command->info('✅ Database seeded successfully!');
     }
