@@ -33,18 +33,18 @@ const defaultCollections = [
 export function CollectionsSection() {
   const { data: categories } = useCategories();
 
-  const collections = defaultCollections.map(defaultColl => {
-    const category = categories?.find(c => c.slug === defaultColl.slug);
-    if (category) {
-      return {
-        ...defaultColl,
-        name: category.name,
-        description: category.description || defaultColl.description,
-        image: category.image_url || defaultColl.image,
-      };
-    }
-    return defaultColl;
-  });
+  // Show all active categories, possibly limited to 3 or 6 for UI
+  const activeCategories = categories?.filter(c => c.is_active) || [];
+
+  const collections = activeCategories.length > 0
+    ? activeCategories.map(cat => ({
+      slug: cat.slug,
+      name: cat.name,
+      description: cat.description || "Découvrez notre collection exclusive",
+      image: cat.image_url || collectionNiche, // Fallback if no image
+      href: `/categorie/${cat.slug}`,
+    }))
+    : defaultCollections;
 
   return (
     <section className="section-padding bg-background">

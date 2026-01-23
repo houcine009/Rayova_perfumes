@@ -14,14 +14,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-rayova.png";
 
-const navLinks = [
-  { name: "Accueil", href: "/" },
-  { name: "Boutique", href: "/boutique" },
-  { name: "Niche", href: "/categorie/niche" },
-  { name: "Homme", href: "/categorie/homme" },
-  { name: "Femme", href: "/categorie/femme" },
-  { name: "À Propos", href: "/a-propos" },
-];
+import { useCategories } from "@/hooks/useCategories";
+
+const logoHeight = "h-12 lg:h-16"; // Pre-calculating for consistency
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -76,6 +71,18 @@ export function Navbar() {
     navigate("/");
   };
 
+  const { data: categories } = useCategories();
+
+  const dynamicNavLinks = [
+    { name: "Accueil", href: "/" },
+    { name: "Boutique", href: "/boutique" },
+    ...(categories?.filter(c => c.is_active).map(c => ({
+      name: c.name,
+      href: `/categorie/${c.slug}`
+    })) || []),
+    { name: "À Propos", href: "/a-propos" },
+  ];
+
   return (
     <>
       <motion.header
@@ -100,7 +107,7 @@ export function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-8">
-              {navLinks.map((link) => (
+              {dynamicNavLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
@@ -225,7 +232,7 @@ export function Navbar() {
           >
             <nav className="container-luxury py-8">
               <div className="flex flex-col gap-6">
-                {navLinks.map((link, index) => (
+                {dynamicNavLinks.map((link, index) => (
                   <motion.div
                     key={link.name}
                     initial={{ opacity: 0, x: -20 }}

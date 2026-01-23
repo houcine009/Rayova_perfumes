@@ -1,27 +1,35 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 import logo from "@/assets/logo-rayova.png";
+import { useCategories } from "@/hooks/useCategories";
 
-const footerLinks = {
-  boutique: [
-    { name: "Tous les parfums", href: "/boutique" },
-    { name: "Collection Niche", href: "/categorie/niche" },
-    { name: "Pour Homme", href: "/categorie/homme" },
-    { name: "Pour Femme", href: "/categorie/femme" },
-  ],
-  informations: [
-    { name: "À Propos", href: "/a-propos" },
-    { name: "Livraison", href: "/livraison" },
-    { name: "Politique de retour", href: "/retours" },
-  ],
-  legal: [
-    { name: "Mentions légales", href: "/mentions-legales" },
-    { name: "Politique de confidentialité", href: "/confidentialite" },
-    { name: "CGV", href: "/cgv" },
-  ],
-};
+const informationsLinks = [
+  { name: "À Propos", href: "/a-propos" },
+  { name: "Livraison", href: "/livraison" },
+  { name: "Politique de retour", href: "/retours" },
+];
+
+const legalLinks = [
+  { name: "Mentions légales", href: "/mentions-legales" },
+  { name: "Politique de confidentialité", href: "/confidentialite" },
+  { name: "CGV", href: "/cgv" },
+];
 
 export function Footer() {
+  const { data: categories } = useCategories();
+
+  const boutiqueLinks = [
+    { name: "Tous les parfums", href: "/boutique" },
+    ...(categories?.filter(c => c.is_active).map(c => ({
+      name: c.name,
+      href: `/categorie/${c.slug}`
+    })) || [
+        { name: "Collection Niche", href: "/categorie/niche" },
+        { name: "Pour Homme", href: "/categorie/homme" },
+        { name: "Pour Femme", href: "/categorie/femme" },
+      ]),
+  ];
+
   return (
     <footer className="bg-card border-t border-border">
       <div className="container-luxury section-padding">
@@ -63,7 +71,7 @@ export function Footer() {
           <div>
             <h4 className="font-display text-lg mb-6 text-primary">Boutique</h4>
             <ul className="space-y-3">
-              {footerLinks.boutique.map((link) => (
+              {boutiqueLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
@@ -82,7 +90,7 @@ export function Footer() {
               Informations
             </h4>
             <ul className="space-y-3">
-              {footerLinks.informations.map((link) => (
+              {informationsLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
@@ -135,7 +143,7 @@ export function Footer() {
               © {new Date().getFullYear()} Rayova Parfums. Tous droits réservés.
             </p>
             <div className="flex gap-6">
-              {footerLinks.legal.map((link) => (
+              {legalLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}

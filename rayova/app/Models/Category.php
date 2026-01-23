@@ -27,7 +27,9 @@ class Category extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'product_categories');
+        return $this->belongsToMany(Product::class, 'product_categories')
+            ->using(ProductCategory::class)
+            ->withTimestamps();
     }
 
     public function scopeActive($query)
