@@ -60,20 +60,37 @@ class MediaController extends Controller
             }
         }
         
-        // Fallback: Local storage (for development or if Cloudinary not configured)
+        // Fallback: Database storage (ensures persistence on ephemeral hosts)
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs($folder, $filename, 'public');
-        $url = asset(Storage::url($path));
+        $mimeType = $file->getMimeType();
+        $fileData = base64_encode(file_get_contents($file->getRealPath()));
 
         return response()->json([
-            'url' => $url,
-            'path' => $path,
+            'url' => null, // Frontend will need to handle this or we return a temp URL
+            'path' => 'db',
             'filename' => $filename,
             'original_name' => $file->getClientOriginalName(),
             'size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
-            'storage' => 'local',
+            'mime_type' => $mimeType,
+            'file_data' => $fileData, // Send back so ProductController can store it
+            'storage' => 'database',
         ], 201);
+    }
+
+    public function serve(string $id)
+    {
+        $media = ProductMedia::findOrFail($id);
+        
+        if (!$media->file_data) {
+            return response()->json(['message' => 'Média non trouvé ou non stocké en base'], 404);
+        }
+
+        $data = base64_decode($media->file_data);
+        
+        return response($data)
+            ->header('Content-Type', $media->mime_type ?? 'application/octet-stream')
+            ->header('Cache-Control', 'public, max-age=31536000')
+            ->header('Content-Disposition', 'inline; filename="' . ($media->alt_text ?: 'media') . '"');
     }
 
     public function delete(Request $request): JsonResponse

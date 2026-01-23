@@ -252,15 +252,13 @@ class ProductController extends Controller
                     
                     $url = $result->getSecurePath();
                 } catch (\Exception $e) {
-                    // Fall back to local storage if Cloudinary fails
-                    \Log::warning('Cloudinary upload failed, falling back to local: ' . $e->getMessage());
-                    $path = $file->store('products', 'public');
-                    $url = asset(Storage::url($path));
+                    // Fall back to DB storage if Cloudinary fails
+                    \Log::warning('Cloudinary upload failed, falling back to database: ' . $e->getMessage());
+                    $url = 'pending_db_storage';
                 }
             } else {
-                // Local storage fallback
-                $path = $file->store('products', 'public');
-                $url = asset(Storage::url($path));
+                // Database storage fallback
+                $url = 'pending_db_storage';
             }
         }
 
@@ -275,6 +273,26 @@ class ProductController extends Controller
             'is_primary' => $validated['is_primary'] ?? false,
             'display_order' => $validated['display_order'] ?? 0,
         ];
+
+        if ($url === 'pending_db_storage' && $request->hasFile('file')) {
+            $file = $request->file('file');
+            $mediaData['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
+            $mediaData['mime_type'] = $file->getMimeType();
+            // We'll update the URL after creation since we need the ID
+            $mediaData['url'] = ''; 
+        }
+
+        if (!empty($mediaData['is_primary'])) {
+            $product->media()->update(['is_primary' => false]);
+        }
+
+        $media = ProductMedia::create($mediaData);
+
+        // Update URL if it was stored in DB
+        if (empty($media->url) && $media->isStoredInDb()) {
+            $media->url = url('/api/media/db/' . $media->id);
+            $media->save();
+        }
 
         if (!empty($mediaData['is_primary'])) {
             $product->media()->update(['is_primary' => false]);

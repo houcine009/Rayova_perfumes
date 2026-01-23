@@ -85,10 +85,11 @@ class SettingsController extends Controller
             }
         }
         
-        // Fallback to local storage
+        // Fallback to Base64 storage (ensures persistence on ephemeral hosts)
         if (!$url) {
-            $path = $file->store('settings', 'public');
-            $url = asset('storage/' . $path);
+            $mimeType = $file->getMimeType();
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $url = 'data:' . $mimeType . ';base64,' . $base64;
         }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
@@ -107,12 +108,12 @@ class SettingsController extends Controller
 
         return response()->json([
             'data' => [
-                'type' => $isConfigured ? 'cloudinary' : 'local',
-                'is_configured' => $isConfigured,
+                'type' => $isConfigured ? 'cloudinary' : 'database',
+                'is_configured' => true, // Now always true because we have DB fallback
                 'cloud_name' => $cloudinaryName ? substr($cloudinaryName, 0, 3) . '***' : null,
                 'message' => $isConfigured 
                     ? 'Cloudinary est configuré et actif.' 
-                    : 'Cloudinary n\'est pas configuré. Les fichiers sont stockés localement et seront supprimés à chaque redéploiement.',
+                    : 'Le stockage en base de données est actif. Vos fichiers sont désormais persistants et ne seront pas supprimés.',
             ]
         ]);
     }

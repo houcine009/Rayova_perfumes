@@ -19,6 +19,8 @@ class ProductMedia extends Model
         'alt_text',
         'is_primary',
         'display_order',
+        'file_data',
+        'mime_type',
     ];
 
     protected $casts = [
@@ -29,5 +31,10 @@ class ProductMedia extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function isStoredInDb(): bool
+    {
+        return !empty($this->file_data);
     }
 }

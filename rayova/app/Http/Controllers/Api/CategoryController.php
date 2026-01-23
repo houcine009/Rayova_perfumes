@@ -38,6 +38,7 @@ class CategoryController extends Controller
             'slug' => 'nullable|string|unique:categories,slug',
             'description' => 'nullable|string',
             'image_url' => 'nullable|string',
+            'image_file' => 'nullable|file|image|max:10240', // 10MB max
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
@@ -47,6 +48,15 @@ class CategoryController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
 
+        // Handle image upload if file is provided
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $mimeType = $file->getMimeType();
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $validated['image_url'] = 'data:' . $mimeType . ';base64,' . $base64;
+        }
+
+        unset($validated['image_file']);
         $category = Category::create($validated);
 
         return response()->json([
@@ -64,10 +74,20 @@ class CategoryController extends Controller
             'slug' => 'sometimes|string|unique:categories,slug,' . $id,
             'description' => 'nullable|string',
             'image_url' => 'nullable|string',
+            'image_file' => 'nullable|file|image|max:10240', // 10MB max
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
 
+        // Handle image upload if file is provided
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $mimeType = $file->getMimeType();
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $validated['image_url'] = 'data:' . $mimeType . ';base64,' . $base64;
+        }
+
+        unset($validated['image_file']);
         $category->update($validated);
 
         return response()->json([
