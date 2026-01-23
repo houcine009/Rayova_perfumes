@@ -8,9 +8,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class MediaController extends Controller
 {
+    /**
+     * Check if Cloudinary is configured
+     */
+    private function isCloudinaryConfigured(): bool
+    {
+        return !empty(config('cloudinary.cloud_name')) || !empty(config('cloudinary.cloud_url'));
+    }
+
     public function upload(Request $request): JsonResponse
     {
         $request->validate([
@@ -21,12 +30,39 @@ class MediaController extends Controller
         $file = $request->file('file');
         $folder = $request->get('folder', 'uploads');
         
-        // Generate unique filename
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        // Check if Cloudinary is configured
+        if ($this->isCloudinaryConfigured()) {
+            try {
+                // Upload to Cloudinary
+                $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
+                
+                $result = Cloudinary::upload($file->getRealPath(), [
+                    'folder' => 'rayova/' . $folder,
+                    'resource_type' => $resourceType,
+                    'public_id' => Str::uuid()->toString(),
+                ]);
+                
+                $url = $result->getSecurePath();
+                $publicId = $result->getPublicId();
+                
+                return response()->json([
+                    'url' => $url,
+                    'path' => $publicId, // Store public_id as path for deletion
+                    'filename' => basename($url),
+                    'original_name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'storage' => 'cloudinary',
+                ], 201);
+            } catch (\Exception $e) {
+                // Fall back to local storage if Cloudinary fails
+                \Log::warning('Cloudinary upload failed, falling back to local: ' . $e->getMessage());
+            }
+        }
         
-        // Store file
+        // Fallback: Local storage (for development or if Cloudinary not configured)
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs($folder, $filename, 'public');
-
         $url = asset(Storage::url($path));
 
         return response()->json([
@@ -36,6 +72,7 @@ class MediaController extends Controller
             'original_name' => $file->getClientOriginalName(),
             'size' => $file->getSize(),
             'mime_type' => $file->getMimeType(),
+            'storage' => 'local',
         ], 201);
     }
 
@@ -47,6 +84,17 @@ class MediaController extends Controller
 
         $path = $request->path;
 
+        // Check if this is a Cloudinary public_id (contains 'rayova/')
+        if ($this->isCloudinaryConfigured() && str_contains($path, 'rayova/')) {
+            try {
+                Cloudinary::destroy($path);
+                return response()->json(['message' => 'Fichier supprimé']);
+            } catch (\Exception $e) {
+                \Log::warning('Cloudinary delete failed: ' . $e->getMessage());
+            }
+        }
+
+        // Fallback: Local storage delete
         if (Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
             return response()->json(['message' => 'Fichier supprimé']);
@@ -59,10 +107,23 @@ class MediaController extends Controller
     {
         $media = ProductMedia::findOrFail($id);
         
-        // Delete file from storage if it exists
-        $path = str_replace('/storage/', '', $media->url);
-        if (Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        // Check if URL is from Cloudinary
+        if ($this->isCloudinaryConfigured() && str_contains($media->url, 'cloudinary.com')) {
+            try {
+                // Extract public_id from Cloudinary URL
+                preg_match('/\/v\d+\/(.+)\.\w+$/', $media->url, $matches);
+                if (!empty($matches[1])) {
+                    Cloudinary::destroy($matches[1]);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Cloudinary delete failed: ' . $e->getMessage());
+            }
+        } else {
+            // Local storage delete
+            $path = str_replace('/storage/', '', $media->url);
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
         }
 
         $media->delete();
@@ -70,3 +131,4 @@ class MediaController extends Controller
         return response()->json(['message' => 'Média supprimé']);
     }
 }
+

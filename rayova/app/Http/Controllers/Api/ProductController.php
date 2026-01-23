@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductController extends Controller
 {
@@ -237,8 +238,30 @@ class ProductController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $path = $file->store('products', 'public');
-            $url = asset(Storage::url($path));
+            
+            // Check if Cloudinary is configured
+            if (!empty(config('cloudinary.cloud_name')) || !empty(config('cloudinary.cloud_url'))) {
+                try {
+                    $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
+                    
+                    $result = Cloudinary::upload($file->getRealPath(), [
+                        'folder' => 'rayova/products',
+                        'resource_type' => $resourceType,
+                        'public_id' => Str::uuid()->toString(),
+                    ]);
+                    
+                    $url = $result->getSecurePath();
+                } catch (\Exception $e) {
+                    // Fall back to local storage if Cloudinary fails
+                    \Log::warning('Cloudinary upload failed, falling back to local: ' . $e->getMessage());
+                    $path = $file->store('products', 'public');
+                    $url = asset(Storage::url($path));
+                }
+            } else {
+                // Local storage fallback
+                $path = $file->store('products', 'public');
+                $url = asset(Storage::url($path));
+            }
         }
 
         if (!$url) {

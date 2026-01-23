@@ -66,8 +66,30 @@ class SettingsController extends Controller
         ]);
 
         $file = $request->file('file');
-        $path = $file->store('settings', 'public');
-        $url = asset('storage/' . $path);
+        $url = null;
+
+        // Check if Cloudinary is configured
+        if (!empty(config('cloudinary.cloud_name')) || !empty(config('cloudinary.cloud_url'))) {
+            try {
+                $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
+                
+                $result = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::upload($file->getRealPath(), [
+                    'folder' => 'rayova/settings',
+                    'resource_type' => $resourceType,
+                    'public_id' => \Illuminate\Support\Str::uuid()->toString(),
+                ]);
+                
+                $url = $result->getSecurePath();
+            } catch (\Exception $e) {
+                \Log::warning('Cloudinary upload failed, falling back to local: ' . $e->getMessage());
+            }
+        }
+        
+        // Fallback to local storage
+        if (!$url) {
+            $path = $file->store('settings', 'public');
+            $url = asset('storage/' . $path);
+        }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
 
