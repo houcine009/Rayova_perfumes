@@ -133,6 +133,11 @@ class ProductController extends Controller
             $categoryIds = $validated['category_ids'] ?? [];
             unset($validated['category_ids']);
 
+            // Convert empty SKU to null to avoid unique constraint violations
+            if (empty($validated['sku'])) {
+                $validated['sku'] = null;
+            }
+
             // Ensure stock_quantity is not null (DB requires integer, defaults to 0)
             $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
 
@@ -156,48 +161,54 @@ class ProductController extends Controller
 
     public function update(Request $request, string $id): JsonResponse
     {
-        $product = Product::findOrFail($id);
+        try {
+            $product = Product::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'slug' => 'sometimes|string|unique:products,slug,' . $id,
-            'description' => 'nullable|string',
-            'short_description' => 'nullable|string|max:500',
-            'price' => 'sometimes|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'sku' => 'nullable|string|unique:products,sku,' . $id,
-            'stock_quantity' => 'nullable|integer|min:0',
-            'gender' => 'sometimes|in:homme,femme,unisexe,niche',
-            'is_featured' => 'nullable|boolean',
-            'is_new' => 'nullable|boolean',
-            'is_active' => 'nullable|boolean',
-            'volume_ml' => 'nullable|integer|min:0',
-            'notes_top' => 'nullable|string',
-            'notes_heart' => 'nullable|string',
-            'notes_base' => 'nullable|string',
-            'brand' => 'nullable|string|max:255',
-            'category_ids' => 'nullable|array',
-            'category_ids.*' => 'uuid|exists:categories,id',
-        ]);
+            $validated = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'slug' => 'sometimes|string|unique:products,slug,' . $id,
+                'description' => 'nullable|string',
+                'short_description' => 'nullable|string|max:500',
+                'price' => 'sometimes|numeric|min:0',
+                'original_price' => 'nullable|numeric|min:0',
+                'sku' => 'nullable|string|unique:products,sku,' . $id,
+                'stock_quantity' => 'nullable|integer|min:0',
+                'gender' => 'sometimes|in:homme,femme,unisexe,niche',
+                'is_featured' => 'nullable|boolean',
+                'is_new' => 'nullable|boolean',
+                'is_active' => 'nullable|boolean',
+                'volume_ml' => 'nullable|integer|min:0',
+                'notes_top' => 'nullable|string',
+                'notes_heart' => 'nullable|string',
+                'notes_base' => 'nullable|string',
+                'brand' => 'nullable|string|max:255',
+                'category_ids' => 'nullable|array',
+                'category_ids.*' => 'uuid|exists:categories,id',
+            ]);
 
-        $categoryIds = $validated['category_ids'] ?? null;
-        unset($validated['category_ids']);
+            $categoryIds = $validated['category_ids'] ?? null;
+            unset($validated['category_ids']);
 
-        if (array_key_exists('stock_quantity', $validated)) {
-             $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+            if (array_key_exists('stock_quantity', $validated)) {
+                 $validated['stock_quantity'] = $validated['stock_quantity'] ?? 0;
+            }
+
+            $product->update($validated);
+
+            // Sync categories if provided
+            if ($categoryIds !== null) {
+                $product->categories()->sync($categoryIds);
+            }
+
+            return response()->json([
+                'data' => $product->fresh()->load('media', 'categories'),
+                'message' => 'Produit mis à jour',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de la modification du produit: ' . $e->getMessage()
+            ], 500);
         }
-
-        $product->update($validated);
-
-        // Sync categories if provided
-        if ($categoryIds !== null) {
-            $product->categories()->sync($categoryIds);
-        }
-
-        return response()->json([
-            'data' => $product->fresh()->load('media', 'categories'),
-            'message' => 'Produit mis à jour',
-        ]);
     }
 
     public function destroy(string $id): JsonResponse
