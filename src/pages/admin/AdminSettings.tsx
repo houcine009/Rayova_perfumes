@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Cloud, AlertTriangle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,11 +7,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSiteSettings, useUpdateSetting, type HeroSettings, type ContactSettings } from '@/hooks/useSiteSettings';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/lib/api';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const AdminSettings = () => {
   const { data: settings, isLoading } = useSiteSettings();
   const updateSetting = useUpdateSetting();
   const [isSaving, setIsSaving] = useState(false);
+  const [storageStatus, setStorageStatus] = useState<{
+    type: 'cloudinary' | 'local';
+    is_configured: boolean;
+    cloud_name: string | null;
+    message: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchStorageStatus = async () => {
+      try {
+        const response = await api.get('/admin/storage/status');
+        setStorageStatus(response.data);
+      } catch (error) {
+        console.error('Erreur status stockage:', error);
+      }
+    };
+    fetchStorageStatus();
+  }, []);
 
   const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: 'hero_background_url' | 'hero_video_url') => {
     const file = e.target.files?.[0];
@@ -130,6 +148,7 @@ const AdminSettings = () => {
         <TabsList>
           <TabsTrigger value="hero">Section Hero</TabsTrigger>
           <TabsTrigger value="contact">Coordonnées</TabsTrigger>
+          <TabsTrigger value="storage">Stockage</TabsTrigger>
         </TabsList>
 
         <TabsContent value="hero">
@@ -316,6 +335,93 @@ const AdminSettings = () => {
                 )}
                 Sauvegarder
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="storage">
+          <Card>
+            <CardHeader>
+              <CardTitle>État du Stockage</CardTitle>
+              <CardDescription>
+                Vérifiez si vos fichiers sont sauvegardés de manière permanente
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {storageStatus ? (
+                <div className="space-y-4">
+                  <div className={`p-4 rounded-xl border flex items-start gap-4 ${storageStatus.is_configured
+                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                      : 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400'
+                    }`}>
+                    {storageStatus.is_configured ? (
+                      <CheckCircle2 className="h-6 w-6 shrink-0" />
+                    ) : (
+                      <AlertTriangle className="h-6 w-6 shrink-0" />
+                    )}
+                    <div>
+                      <h4 className="font-bold flex items-center gap-2 font-display">
+                        {storageStatus.type === 'cloudinary' ? 'Stockage Cloud (Cloudinary)' : 'Stockage Local (Temporaire)'}
+                      </h4>
+                      <p className="text-sm mt-1 opacity-90">
+                        {storageStatus.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  {!storageStatus.is_configured && (
+                    <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle className="font-bold">Attention : Risque de perte de données</AlertTitle>
+                      <AlertDescription>
+                        L'environnement de production utilise un système de fichiers éphémère. Sans Cloudinary, tous vos médias (images de produits, bannières, etc.) seront <strong>supprimés</strong> à chaque nouveau déploiement ou redémarrage du serveur.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="bg-muted/30 border-none">
+                      <CardHeader className="py-4">
+                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Type de Driver</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <span className="text-xl font-bold uppercase text-foreground">{storageStatus.type}</span>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-muted/30 border-none">
+                      <CardHeader className="py-4">
+                        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Cloud Name</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <span className="text-xl font-bold text-foreground">{storageStatus.cloud_name || 'Non configuré'}</span>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <div className="bg-primary/5 border border-primary/10 p-5 rounded-xl">
+                    <h5 className="font-bold text-sm mb-3 flex items-center gap-2 text-primary">
+                      <Cloud className="h-4 w-4" />
+                      Comment activer le stockage permanent ?
+                    </h5>
+                    <ol className="text-xs space-y-3 text-muted-foreground list-decimal pl-4">
+                      <li>Créez un compte gratuit sur <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-bold">Cloudinary.com</a></li>
+                      <li>Récupérez votre <strong>Cloud Name</strong>, <strong>API Key</strong> et <strong>API Secret</strong> sur votre tableau de bord</li>
+                      <li>Ajoutez ces variables d'environnement dans votre tableau de bord de déploiement (Render, Railway, etc.) :
+                        <div className="mt-2 p-3 bg-card rounded border border-border/50 font-mono text-[10px] space-y-1">
+                          <div>CLOUDINARY_CLOUD_NAME=votre_nom</div>
+                          <div>CLOUDINARY_API_KEY=votre_cle</div>
+                          <div>CLOUDINARY_API_SECRET=votre_secret</div>
+                        </div>
+                      </li>
+                      <li>Le projet se redéploiera automatiquement et vos fichiers seront désormais en sécurité !</li>
+                    </ol>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-center p-12">
+                  <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

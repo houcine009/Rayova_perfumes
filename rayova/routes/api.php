@@ -114,8 +114,9 @@ Route::middleware('auth:sanctum')->group(function () {
             // Settings management
             Route::put('/settings/{key}', [SettingsController::class, 'update']);
             Route::get('/settings', [SettingsController::class, 'index']);
-        Route::post('/settings/upload', [SettingsController::class, 'uploadBackground']);
-        Route::post('/settings/bulk', [SettingsController::class, 'bulkUpdate']);
+            Route::post('/settings/upload', [SettingsController::class, 'uploadBackground']);
+            Route::post('/settings/bulk', [SettingsController::class, 'bulkUpdate']);
+            Route::get('/storage/status', [SettingsController::class, 'storageStatus']);
         });
     });
 });

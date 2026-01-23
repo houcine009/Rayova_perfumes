@@ -98,4 +98,22 @@ class SettingsController extends Controller
             'message' => 'Fond d\'écran mis à jour',
         ]);
     }
+
+    public function storageStatus(): JsonResponse
+    {
+        $cloudinaryName = config('cloudinary.cloud_name');
+        $cloudinaryUrl = config('cloudinary.cloud_url');
+        $isConfigured = !empty($cloudinaryName) || !empty($cloudinaryUrl);
+
+        return response()->json([
+            'data' => [
+                'type' => $isConfigured ? 'cloudinary' : 'local',
+                'is_configured' => $isConfigured,
+                'cloud_name' => $cloudinaryName ? substr($cloudinaryName, 0, 3) . '***' : null,
+                'message' => $isConfigured 
+                    ? 'Cloudinary est configuré et actif.' 
+                    : 'Cloudinary n\'est pas configuré. Les fichiers sont stockés localement et seront supprimés à chaque redéploiement.',
+            ]
+        ]);
+    }
 }
