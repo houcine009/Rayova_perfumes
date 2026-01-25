@@ -2,30 +2,23 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
-import collectionHomme from "@/assets/collection-homme.jpg";
-import collectionFemme from "@/assets/collection-femme.jpg";
-import collectionNiche from "@/assets/collection-niche.jpg";
-
 const defaultCollections = [
   {
     slug: "niche",
     name: "Niche",
     description: "Créations exclusives et avant-gardistes",
-    image: collectionNiche,
     href: "/categorie/niche",
   },
   {
     slug: "homme",
     name: "Homme",
     description: "Élégance masculine raffinée",
-    image: collectionHomme,
     href: "/categorie/homme",
   },
   {
     slug: "femme",
     name: "Femme",
     description: "Féminité et sophistication",
-    image: collectionFemme,
     href: "/categorie/femme",
   },
 ];
@@ -41,7 +34,7 @@ export function CollectionsSection() {
       slug: cat.slug,
       name: cat.name,
       description: cat.description || "Découvrez notre collection exclusive",
-      image: cat.image_url || collectionNiche, // Fallback if no image
+      image: cat.image_url || null,
       href: `/categorie/${cat.slug}`,
     }))
     : defaultCollections;
@@ -89,11 +82,13 @@ export function CollectionsSection() {
                     muted
                     playsInline
                   />
-                ) : (
+                ) : collection.image ? (
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                     style={{ backgroundImage: `url(${collection.image})` }}
                   />
+                ) : (
+                  <div className="absolute inset-0 bg-muted" />
                 )}
 
                 {/* Overlay */}

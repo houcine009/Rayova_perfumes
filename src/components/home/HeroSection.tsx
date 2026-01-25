@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useHeroSettings } from "@/hooks/useSiteSettings";
-import heroBg from "@/assets/hero-bg.jpg";
 
 export function HeroSection() {
   const { data: heroSettings, isLoading } = useHeroSettings();
@@ -39,11 +38,13 @@ export function HeroSection() {
           >
             <source src={videoUrl} type="video/mp4" />
           </video>
-        ) : (
+        ) : imageUrl ? (
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${imageUrl || heroBg})` }}
+            style={{ backgroundImage: `url(${imageUrl})` }}
           />
+        ) : (
+          <div className="absolute inset-0 bg-background" />
         )}
       </div>
 

@@ -110,26 +110,25 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <span className="text-muted-foreground text-sm">
-                  123 Avenue Mohammed V<br />
-                  Casablanca, Maroc
+                  Morocco, Casablanca
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-primary flex-shrink-0" />
                 <a
-                  href="tel:+212600000000"
+                  href="tel:0612993152"
                   className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm"
                 >
-                  +212 6 00 00 00 00
+                  0612993152
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary flex-shrink-0" />
                 <a
-                  href="mailto:contact@rayova.ma"
+                  href="mailto:Rayovamaroc@gmail.com"
                   className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm"
                 >
-                  contact@rayova.ma
+                  Rayovamaroc@gmail.com
                 </a>
               </li>
             </ul>
