@@ -278,7 +278,6 @@ class ProductController extends Controller
             $file = $request->file('file');
             $mediaData['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
             $mediaData['mime_type'] = $file->getMimeType();
-            // We'll update the URL after creation since we need the ID
             $mediaData['url'] = ''; 
         }
 
