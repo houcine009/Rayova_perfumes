@@ -102,30 +102,45 @@ class MediaController extends Controller
 
     public function serve(string $type, string $id)
     {
-        $media = null;
-        if ($type === 'product') {
-            $media = \App\Models\ProductMedia::findOrFail($id);
-        } elseif ($type === 'category') {
-            $media = \App\Models\Category::findOrFail($id);
-        } elseif ($type === 'site') {
-            $media = \App\Models\SiteMedia::findOrFail($id);
-        } else {
-            return response()->json(['message' => 'Type de média invalide'], 400);
-        }
-        
-        if (!$media->file_data) {
-            \Log::warning("Media Not Found [V7.1]: Type=$type, ID=$id");
-            return response()->json(['message' => 'Média non trouvé [V7.1]'], 404);
-        }
+        try {
+            $media = null;
+            if ($type === 'product') {
+                $media = \App\Models\ProductMedia::findOrFail($id);
+            } elseif ($type === 'category') {
+                $media = \App\Models\Category::findOrFail($id);
+            } elseif ($type === 'site') {
+                $media = \App\Models\SiteMedia::findOrFail($id);
+            } else {
+                return response()->json(['message' => 'Type invalide'], 400);
+            }
+            
+            if (!$media->file_data) {
+                return response()->json(['message' => 'Média vide'], 404);
+            }
 
-        $data = base64_decode($media->file_data);
-        
-        return response($data)
-            ->header('Content-Type', $media->mime_type ?? 'application/octet-stream')
-            ->header('Cache-Control', 'public, max-age=31536000')
-            ->header('Access-Control-Allow-Origin', '*') 
-            ->header('X-Content-Type-Options', 'nosniff')
-            ->header('Content-Disposition', 'inline; filename="' . ($media->name ?? $media->alt_text ?? 'media') . '"');
+            // Cleanup potential prefix data (data:image/png;base64,...)
+            $rawData = $media->file_data;
+            if (str_contains($rawData, ',')) {
+                $rawData = explode(',', $rawData)[1];
+            }
+
+            $decoded = base64_decode($rawData, true);
+            if (!$decoded) {
+                \Log::error("Media Decode Failed [V8.1]: $type, $id");
+                return response()->json(['message' => 'Erreur de lecture binaire'], 500);
+            }
+
+            return response($decoded)
+                ->header('Content-Type', $media->mime_type ?? 'application/octet-stream')
+                ->header('Content-Length', strlen($decoded))
+                ->header('Cache-Control', 'public, max-age=31536000')
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('X-Content-Type-Options', 'nosniff')
+                ->header('Content-Disposition', 'inline');
+        } catch (\Exception $e) {
+            \Log::error("Media Serve Error [V8.1]: " . $e->getMessage());
+            return response()->json(['message' => 'Erreur fatale media'], 500);
+        }
     }
 
     public function delete(Request $request): JsonResponse
