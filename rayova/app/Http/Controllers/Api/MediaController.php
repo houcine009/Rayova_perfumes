@@ -28,35 +28,33 @@ class MediaController extends Controller
         ]);
 
         $file = $request->file('file');
+        if (!$file || !$file->isValid()) {
+             return response()->json(['message' => 'Le fichier est invalide ou corrompu.'], 422);
+        }
+
         $folder = $request->get('folder', 'uploads');
         
-        // Check if Cloudinary is configured
+        // ... (Check if Cloudinary is configured - keeping current logic) ...
         if ($this->isCloudinaryConfigured()) {
             try {
-                // Upload to Cloudinary
                 $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
-                
                 $result = Cloudinary::upload($file->getRealPath(), [
                     'folder' => 'rayova/' . $folder,
                     'resource_type' => $resourceType,
                     'public_id' => Str::uuid()->toString(),
                 ]);
                 
-                $url = $result->getSecurePath();
-                $publicId = $result->getPublicId();
-                
                 return response()->json([
-                    'url' => $url,
-                    'path' => $publicId, // Store public_id as path for deletion
-                    'filename' => basename($url),
+                    'url' => $result->getSecurePath(),
+                    'path' => $result->getPublicId(),
+                    'filename' => basename($result->getSecurePath()),
                     'original_name' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
                     'storage' => 'cloudinary',
                 ], 201);
             } catch (\Exception $e) {
-                // Fall back to local storage if Cloudinary fails
-                \Log::warning('Cloudinary upload failed, falling back to local: ' . $e->getMessage());
+                \Log::warning('Cloudinary upload failed: ' . $e->getMessage());
             }
         }
         
@@ -88,19 +86,26 @@ class MediaController extends Controller
                     'storage' => 'database',
                 ], 201);
             }
+
+            return response()->json([
+                'url' => $url,
+                'path' => $path,
+                'filename' => $file->getClientOriginalName(),
+                'original_name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'storage' => 'database',
+            ], 201);
+
         } catch (\Exception $e) {
             \Log::error('Database media upload failed: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur de stockage en base de données : ' . $e->getMessage()], 500);
+            $errorMsg = 'Erreur de stockage : ';
+            if (str_contains($e->getMessage(), "column 'file_data' not found") || str_contains($e->getMessage(), "Unknown column")) {
+                $errorMsg .= 'La base de données n\'est pas à jour (Colonnes manquantes). Veuillez lancer les migrations.';
+            } else {
+                $errorMsg .= $e->getMessage();
+            }
+            return response()->json(['message' => $errorMsg], 500);
         }
-
-        return response()->json([
-            'url' => $url,
-            'path' => $path,
-            'filename' => $file->getClientOriginalName(),
-            'original_name' => $file->getClientOriginalName(),
-            'size' => $file->getSize(),
-            'storage' => 'database',
-        ], 201);
     }
 
     public function serve(string $type, string $id)
