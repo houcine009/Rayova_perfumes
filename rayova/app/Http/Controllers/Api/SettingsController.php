@@ -115,11 +115,13 @@ class SettingsController extends Controller
         return response()->json([
             'data' => [
                 'type' => $isConfigured ? 'cloudinary' : 'database',
-                'is_configured' => true, // Now always true because we have DB fallback
+                'is_configured' => true,
                 'cloud_name' => $cloudinaryName ? substr($cloudinaryName, 0, 3) . '***' : null,
+                'app_url' => config('app.url'),
+                'version' => 'V5.0',
                 'message' => $isConfigured 
-                    ? 'Cloudinary est configuré et actif.' 
-                    : 'Le stockage en base de données est actif. Vos fichiers sont désormais persistants et ne seront pas supprimés.',
+                    ? 'Cloudinary est prêt.' 
+                    : 'Le coffre-fort de données est ACTIF. Les photos sont enregistrées dans la base de données.',
             ]
         ]);
     }
