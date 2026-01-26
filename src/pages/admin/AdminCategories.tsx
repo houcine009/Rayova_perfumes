@@ -92,23 +92,38 @@ const AdminCategories = () => {
     setIsDialogOpen(true);
   };
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      let dataToSubmit: any = formData;
+      if (selectedFile) {
+        const payload = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+          payload.append(key, String(value));
+        });
+        payload.append('image_file', selectedFile);
+        dataToSubmit = payload;
+      }
+
       if (editingId) {
         await updateCategory.mutateAsync({
           id: editingId,
-          updates: formData,
+          updates: dataToSubmit,
         });
         toast({ title: 'Catégorie mise à jour avec succès' });
       } else {
-        await createCategory.mutateAsync(formData);
+        await createCategory.mutateAsync(dataToSubmit);
         toast({ title: 'Catégorie créée avec succès' });
       }
       setIsDialogOpen(false);
       setEditingId(null);
       setFormData(defaultFormData);
+      setSelectedFile(null);
+      setPreviewUrl(null);
     } catch (error: any) {
       toast({
         title: 'Erreur',
@@ -205,17 +220,17 @@ const AdminCategories = () => {
               <div className="space-y-2">
                 <Label htmlFor="image">Média de la catégorie (Image ou Vidéo)</Label>
                 <div className="flex flex-col gap-4">
-                  {formData.image_url && (
+                  {(previewUrl || formData.image_url) && (
                     <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
-                      {formData.image_url.match(/\.(mp4|webm|ogg)$/i) ? (
+                      {(previewUrl || formData.image_url)?.match(/\.(mp4|webm|ogg)$/i) || (selectedFile?.type.startsWith('video/')) ? (
                         <video
-                          src={formData.image_url}
+                          src={previewUrl || formData.image_url}
                           className="w-full h-full object-cover"
                           controls
                         />
                       ) : (
                         <img
-                          src={formData.image_url}
+                          src={previewUrl || formData.image_url}
                           alt="Preview"
                           className="w-full h-full object-cover"
                         />
@@ -226,7 +241,11 @@ const AdminCategories = () => {
                         variant="destructive"
                         size="icon"
                         className="absolute top-2 right-2 h-8 w-8"
-                        onClick={() => setFormData({ ...formData, image_url: '' })}
+                        onClick={() => {
+                          setFormData({ ...formData, image_url: '' });
+                          setSelectedFile(null);
+                          setPreviewUrl(null);
+                        }}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -236,27 +255,11 @@ const AdminCategories = () => {
                     id="image"
                     type="file"
                     accept="image/*,video/*"
-                    onChange={async (e) => {
+                    onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-
-                      const loadingToast = toast({
-                        title: "Chargement...",
-                        description: "Le média est en cours d'envoi",
-                      });
-
-                      try {
-                        const { api } = await import('@/lib/api');
-                        const response: any = await api.upload('/admin/media/upload', file, { folder: 'categories' });
-                        setFormData({ ...formData, image_url: response.url });
-                        toast({ title: "Succès", description: "Média envoyé avec succès" });
-                      } catch (error: any) {
-                        toast({
-                          title: "Erreur",
-                          description: "Échec de l'envoi du média",
-                          variant: "destructive",
-                        });
-                      }
+                      setSelectedFile(file);
+                      setPreviewUrl(URL.createObjectURL(file));
                     }}
                   />
                   {!formData.image_url && (

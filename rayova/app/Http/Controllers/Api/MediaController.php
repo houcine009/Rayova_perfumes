@@ -61,6 +61,7 @@ class MediaController extends Controller
         }
         
         // Fallback to Database storage (ensures persistence on ephemeral hosts)
+        $key = $request->get('key');
         if ($key) {
             // If a key is provided, store in SiteMedia
             $siteMedia = \App\Models\SiteMedia::updateOrCreate(

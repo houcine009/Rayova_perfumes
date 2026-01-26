@@ -38,6 +38,13 @@ export const categoryService = {
     },
 
     async update(id: string, data: CategoryUpdateData): Promise<{ data: Category; message: string }> {
+        // If updating an image, handle multipart
+        if (data instanceof FormData) {
+            data.append('_method', 'PUT');
+            return api.post(`/admin/categories/${id}`, data);
+        }
+
+        // Standard update
         return api.put(`/admin/categories/${id}`, data);
     },
 
