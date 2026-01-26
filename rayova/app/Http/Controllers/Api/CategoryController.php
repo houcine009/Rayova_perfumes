@@ -33,68 +33,79 @@ class CategoryController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-            'slug' => 'nullable|string|unique:categories,slug',
-            'image_file' => 'nullable|file|max:30720', // Explicitly marked as file, up to 30MB
-            'display_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name',
+                'slug' => 'nullable|string|unique:categories,slug',
+                'description' => 'nullable|string',
+                'image_file' => 'nullable|file|max:30720', // Explicitly marked as file, up to 30MB
+                'display_order' => 'nullable|integer',
+                'is_active' => 'nullable|boolean',
+            ]);
 
-        // Generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
+            // Generate slug if not provided
+            if (empty($validated['slug'])) {
+                $validated['slug'] = Str::slug($validated['name']);
+            }
+
+            if ($request->hasFile('image_file')) {
+                $file = $request->file('image_file');
+                if (!$file->isValid()) {
+                    return response()->json(['message' => 'Fichier de catégorie invalide.'], 422);
+                }
+                $validated['mime_type'] = $file->getMimeType();
+                $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
+                // Valid placeholder for non-null DB constraint
+                $validated['image_url'] = 'db_location';
+            }
+
+            unset($validated['image_file']);
+            $category = Category::create($validated);
+
+            if ($category->image_url === 'db_location') {
+                $category->image_url = url('/api/media/db/category/' . $category->id);
+                $category->save();
+            }
+
+            return response()->json(['data' => $category, 'message' => 'Catégorie créée'], 201);
+        } catch (\Exception $e) {
+            \Log::error('Category Store Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur de création : ' . $e->getMessage()], 500);
         }
-
-        if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            $validated['mime_type'] = $file->getMimeType();
-            $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-            // Valid placeholder for non-null DB constraint
-            $validated['image_url'] = 'db_location';
-        }
-
-        unset($validated['image_file']);
-        $category = Category::create($validated);
-
-        if ($category->file_data) {
-            $category->image_url = url('/api/media/db/category/' . $category->id);
-            $category->save();
-        }
-
-        return response()->json([
-            'data' => $category,
-            'message' => 'Catégorie créée avec succès',
-        ], 201);
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
-        $category = Category::findOrFail($id);
+        try {
+            $category = Category::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255|unique:categories,name,' . $id,
-            'slug' => 'sometimes|string|unique:categories,slug,' . $id,
-            'description' => 'nullable|string',
-            'image_file' => 'nullable|max:20480', // Relaxed for phone compatibility
-            'display_order' => 'nullable|integer',
-            'is_active' => 'nullable|boolean',
-        ]);
+            $validated = $request->validate([
+                'name' => 'sometimes|string|max:255|unique:categories,name,' . $id,
+                'slug' => 'sometimes|string|unique:categories,slug,' . $id,
+                'description' => 'nullable|string',
+                'image_file' => 'nullable|file|max:30720', // Explicitly marked as file, up to 30MB
+                'display_order' => 'nullable|integer',
+                'is_active' => 'nullable|boolean',
+            ]);
 
-        if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            $validated['mime_type'] = $file->getMimeType();
-            $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-            $validated['image_url'] = url('/api/media/db/category/' . $category->id);
+            if ($request->hasFile('image_file')) {
+                $file = $request->file('image_file');
+                if (!$file->isValid()) {
+                    return response()->json(['message' => 'Fichier de mise à jour invalide.'], 422);
+                }
+                $validated['mime_type'] = $file->getMimeType();
+                $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
+                $validated['image_url'] = url('/api/media/db/category/' . $category->id);
+            }
+
+            unset($validated['image_file']);
+            $category->update($validated);
+
+            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour']);
+        } catch (\Exception $e) {
+            \Log::error('Category Update Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur mise à jour : ' . $e->getMessage()], 500);
         }
-
-        unset($validated['image_file']);
-        $category->update($validated);
-
-        return response()->json([
-            'data' => $category,
-            'message' => 'Catégorie mise à jour',
-        ]);
     }
 
     public function destroy(string $id): JsonResponse

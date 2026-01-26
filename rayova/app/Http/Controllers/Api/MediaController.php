@@ -22,47 +22,46 @@ class MediaController extends Controller
 
     public function upload(Request $request): JsonResponse
     {
-        $request->validate([
-            'file' => 'required|max:51200', // 50MB max, relaxed for phones
-            'folder' => 'nullable|string|max:50',
-        ]);
-
-        $file = $request->file('file');
-        if (!$file || !$file->isValid()) {
-             return response()->json(['message' => 'Le fichier est invalide ou corrompu.'], 422);
-        }
-
-        $folder = $request->get('folder', 'uploads');
-        
-        // ... (Check if Cloudinary is configured - keeping current logic) ...
-        if ($this->isCloudinaryConfigured()) {
-            try {
-                $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
-                $result = Cloudinary::upload($file->getRealPath(), [
-                    'folder' => 'rayova/' . $folder,
-                    'resource_type' => $resourceType,
-                    'public_id' => Str::uuid()->toString(),
-                ]);
-                
-                return response()->json([
-                    'url' => $result->getSecurePath(),
-                    'path' => $result->getPublicId(),
-                    'filename' => basename($result->getSecurePath()),
-                    'original_name' => $file->getClientOriginalName(),
-                    'size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                    'storage' => 'cloudinary',
-                ], 201);
-            } catch (\Exception $e) {
-                \Log::warning('Cloudinary upload failed: ' . $e->getMessage());
-            }
-        }
-        
-        // Fallback to Database storage (ensures persistence on ephemeral hosts)
         try {
+            $request->validate([
+                'file' => 'required|max:51200', 
+                'folder' => 'nullable|string|max:50',
+                'key' => 'nullable|string|max:255',
+            ]);
+
+            $file = $request->file('file');
+            if (!$file || !$file->isValid()) {
+                return response()->json(['message' => 'Le fichier est invalide.'], 422);
+            }
+
+            $folder = $request->get('folder', 'uploads');
             $key = $request->get('key');
+
+            // 1. Try Cloudinary if available
+            if ($this->isCloudinaryConfigured()) {
+                try {
+                    $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
+                    $result = Cloudinary::upload($file->getRealPath(), [
+                        'folder' => 'rayova/' . $folder,
+                        'resource_type' => $resourceType,
+                        'public_id' => \Illuminate\Support\Str::uuid()->toString(),
+                    ]);
+                    
+                    return response()->json([
+                        'url' => $result->getSecurePath(),
+                        'path' => $result->getPublicId(),
+                        'filename' => $file->getClientOriginalName(),
+                        'original_name' => $file->getClientOriginalName(),
+                        'size' => $file->getSize(),
+                        'storage' => 'cloudinary',
+                    ], 201);
+                } catch (\Exception $e) {
+                    \Log::warning('Cloudinary upload failed: ' . $e->getMessage());
+                }
+            }
+
+            // 2. Fallback to Database storage
             if ($key) {
-                // If a key is provided, store in SiteMedia
                 $siteMedia = \App\Models\SiteMedia::updateOrCreate(
                     ['key' => $key],
                     [
@@ -74,15 +73,14 @@ class MediaController extends Controller
                 $url = url('/api/media/db/site/' . $siteMedia->id);
                 $path = 'db_site_' . $siteMedia->id;
             } else {
-                // General database storage placeholder (Products handle their own DB storage)
-                $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                 return response()->json([
                     'url' => null, 
                     'path' => 'db',
-                    'filename' => $filename,
+                    'filename' => $file->getClientOriginalName(),
                     'original_name' => $file->getClientOriginalName(),
                     'size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
+                    'file_data' => base64_encode(file_get_contents($file->getRealPath())), 
                     'storage' => 'database',
                 ], 201);
             }
@@ -97,14 +95,8 @@ class MediaController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            \Log::error('Database media upload failed: ' . $e->getMessage());
-            $errorMsg = 'Erreur de stockage : ';
-            if (str_contains($e->getMessage(), "column 'file_data' not found") || str_contains($e->getMessage(), "Unknown column")) {
-                $errorMsg .= 'La base de données n\'est pas à jour (Colonnes manquantes). Veuillez lancer les migrations.';
-            } else {
-                $errorMsg .= $e->getMessage();
-            }
-            return response()->json(['message' => $errorMsg], 500);
+            \Log::error('Upload Crash: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur Serveur : ' . $e->getMessage()], 500);
         }
     }
 

@@ -224,85 +224,80 @@ class ProductController extends Controller
 
     public function addMedia(Request $request, string $id): JsonResponse
     {
-        $product = Product::findOrFail($id);
+        try {
+            $product = Product::findOrFail($id);
 
-        $validated = $request->validate([
-            'url' => 'nullable|string',
-            'file' => 'nullable|max:51200', // 50MB max, relaxed for phones
-            'alt_text' => 'nullable|string|max:255',
-            'is_primary' => 'nullable|boolean',
-            'display_order' => 'nullable|integer',
-        ]);
+            $validated = $request->validate([
+                'url' => 'nullable|string',
+                'file' => 'nullable|max:51200',
+                'alt_text' => 'nullable|string|max:255',
+                'is_primary' => 'nullable|boolean',
+                'display_order' => 'nullable|integer',
+            ]);
 
-        $url = $validated['url'] ?? null;
+            $url = $validated['url'] ?? null;
 
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            
-            // Check if Cloudinary is configured
-            if (!empty(config('cloudinary.cloud_name')) || !empty(config('cloudinary.cloud_url'))) {
-                try {
-                    $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
-                    
-                    $result = Cloudinary::upload($file->getRealPath(), [
-                        'folder' => 'rayova/products',
-                        'resource_type' => $resourceType,
-                        'public_id' => Str::uuid()->toString(),
-                    ]);
-                    
-                    $url = $result->getSecurePath();
-                } catch (\Exception $e) {
-                    // Fall back to DB storage if Cloudinary fails
-                    \Log::warning('Cloudinary upload failed, falling back to database: ' . $e->getMessage());
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                if (!$file->isValid()) {
+                     return response()->json(['message' => 'Le fichier est invalide.'], 422);
+                }
+                
+                // Cloudinary check
+                if (!empty(config('cloudinary.cloud_name'))) {
+                    try {
+                        $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
+                        $result = Cloudinary::upload($file->getRealPath(), [
+                            'folder' => 'rayova/products',
+                            'resource_type' => $resourceType,
+                            'public_id' => \Illuminate\Support\Str::uuid()->toString(),
+                        ]);
+                        $url = $result->getSecurePath();
+                    } catch (\Exception $e) {
+                        \Log::warning('Cloudinary fail in Product: ' . $e->getMessage());
+                        $url = 'pending_db_storage';
+                    }
+                } else {
                     $url = 'pending_db_storage';
                 }
-            } else {
-                // Database storage fallback
-                $url = 'pending_db_storage';
             }
-        }
 
-        if (!$url) {
-            return response()->json(['message' => 'L\'URL ou un fichier est requis'], 422);
-        }
+            if (!$url) {
+                return response()->json(['message' => 'Média requis'], 422);
+            }
 
-        $mediaData = [
-            'product_id' => $product->id,
-            'url' => $url,
-            'alt_text' => $validated['alt_text'] ?? null,
-            'is_primary' => $validated['is_primary'] ?? false,
-            'display_order' => $validated['display_order'] ?? 0,
-        ];
+            $mediaData = [
+                'product_id' => $product->id,
+                'url' => $url,
+                'alt_text' => $validated['alt_text'] ?? null,
+                'is_primary' => $validated['is_primary'] ?? false,
+                'display_order' => $validated['display_order'] ?? 0,
+            ];
 
-        if ($url === 'pending_db_storage' && $request->hasFile('file')) {
-            $file = $request->file('file');
-            $mediaData['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-            $mediaData['mime_type'] = $file->getMimeType();
-            // Use a valid placeholder to satisfy non-null DB constraint
-            $mediaData['url'] = 'db_location'; 
-        }
+            if ($url === 'pending_db_storage' && $request->hasFile('file')) {
+                $file = $request->file('file');
+                $mediaData['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
+                $mediaData['mime_type'] = $file->getMimeType();
+                $mediaData['url'] = 'db_location'; 
+            }
 
-        if (!empty($mediaData['is_primary'])) {
-            $product->media()->update(['is_primary' => false]);
-        }
+            if (!empty($mediaData['is_primary'])) {
+                $product->media()->update(['is_primary' => false]);
+            }
 
-        try {
             $media = ProductMedia::create($mediaData);
+
+            if ($media->url === 'db_location') {
+                $media->url = url('/api/media/db/product/' . $media->id);
+                $media->save();
+            }
+
+            return response()->json(['data' => $media, 'message' => 'Succès'], 201);
+
         } catch (\Exception $e) {
-            \Log::error('Erreur creation media: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur database: ' . $e->getMessage()], 500);
+            \Log::error('ProductMedia Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur Produit : ' . $e->getMessage()], 500);
         }
-
-        // Update URL if it was stored in DB
-        if (empty($media->url) && $media->isStoredInDb()) {
-            $media->url = url('/api/media/db/product/' . $media->id);
-            $media->save();
-        }
-
-        return response()->json([
-            'data' => $media,
-            'message' => 'Média ajouté',
-        ], 201);
     }
 
     public function deleteMedia(string $id): JsonResponse
