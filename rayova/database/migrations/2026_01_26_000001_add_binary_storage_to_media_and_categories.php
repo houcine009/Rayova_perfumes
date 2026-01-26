@@ -18,6 +18,13 @@ return new class extends Migration
                 if (!Schema::hasColumn('product_media', 'mime_type')) {
                     $table->string('mime_type')->nullable();
                 }
+                
+                // Safe modify for url
+                try {
+                    $table->longText('url')->nullable()->change();
+                } catch (\Exception $e) {
+                    \Log::info('Product Media URL modify skipped: ' . $e->getMessage());
+                }
             });
         }
 
@@ -35,7 +42,7 @@ return new class extends Migration
                 try {
                     $table->longText('image_url')->nullable()->change();
                 } catch (\Exception $e) {
-                    \Log::info('Image URL modify skipped: ' . $e->getMessage());
+                    \Log::info('Category Image URL modify skipped: ' . $e->getMessage());
                 }
             });
         }
