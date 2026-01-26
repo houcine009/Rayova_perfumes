@@ -75,20 +75,20 @@ class CategoryController extends Controller
             $category = Category::create($validated);
 
             if ($category->image_url === 'db_location') {
-                $category->image_url = url('/api/media/db/category/' . $category->id);
+                $category->image_url = '/api/media/db/category/' . $category->id;
                 $category->save();
             }
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V4.1]'], 201);
+            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V5.1]'], 201);
         } catch (\Exception $e) {
-            \Log::error('Category Store Error [V4.1]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V4.1] : ' . $e->getMessage()], 500);
+            \Log::error('Category Store Error [V5.1]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V5.1] : ' . $e->getMessage()], 500);
         }
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
-        \Log::info('Category Update [V4.1] for ID ' . $id . ':', $request->all());
+        \Log::info('Category Update [V5.1] for ID ' . $id . ':', $request->all());
         try {
             $category = Category::findOrFail($id);
 
@@ -98,20 +98,20 @@ class CategoryController extends Controller
                 'description' => 'nullable|string',
                 'image_file' => 'nullable|max:51200', // 50MB Max
                 'display_order' => 'nullable|integer',
-                'is_active' => 'nullable', // Permissive for V4.1
+                'is_active' => 'nullable', // Permissive for V5.1
             ]);
 
             if ($validator->fails()) {
-                \Log::warning('Category Update Validation Failed [V4.1]:', $validator->errors()->toArray());
+                \Log::warning('Category Update Validation Failed [V5.1]:', $validator->errors()->toArray());
                 return response()->json([
-                    'message' => '[V4.1 Debug] Erreur de validation : ' . $validator->errors()->first(),
+                    'message' => '[V5.1 Debug] Erreur de validation : ' . $validator->errors()->first(),
                     'errors' => $validator->errors()
                 ], 422);
             }
 
             $validated = $validator->validated();
 
-            // Explicit cast for V4.1 multipart safety
+            // Explicit cast for V5.1 multipart safety
             if ($request->has('is_active')) {
                 $validated['is_active'] = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
             }
@@ -120,16 +120,16 @@ class CategoryController extends Controller
                 $file = $request->file('image_file');
                 $validated['mime_type'] = $file->getMimeType();
                 $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-                $validated['image_url'] = url('/api/media/db/category/' . $category->id);
+                $validated['image_url'] = '/api/media/db/category/' . $category->id;
             }
 
             unset($validated['image_file']);
             $category->update($validated);
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V4.1]']);
+            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V5.1]']);
         } catch (\Exception $e) {
-            \Log::error('Category Update Error [V4.1]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V4.1] : ' . $e->getMessage()], 500);
+            \Log::error('Category Update Error [V5.1]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V5.1] : ' . $e->getMessage()], 500);
         }
     }
 

@@ -292,7 +292,7 @@ class ProductController extends Controller
             $media = ProductMedia::create($mediaData);
 
             if ($media->url === 'db_location') {
-                $media->url = url('/api/media/db/product/' . $media->id);
+                $media->url = '/api/media/db/product/' . $media->id;
                 $media->save();
             }
 
