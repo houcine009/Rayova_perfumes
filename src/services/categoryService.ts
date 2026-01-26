@@ -34,6 +34,13 @@ export const categoryService = {
     },
 
     async create(data: CategoryCreateData): Promise<{ data: Category; message: string }> {
+        if (data instanceof FormData) {
+            return api.post('/admin/categories', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+        }
         return api.post('/admin/categories', data);
     },
 
@@ -41,7 +48,11 @@ export const categoryService = {
         // If updating an image, handle multipart
         if (data instanceof FormData) {
             data.append('_method', 'PUT');
-            return api.post(`/admin/categories/${id}`, data);
+            return api.post(`/admin/categories/${id}`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
         }
 
         // Standard update
