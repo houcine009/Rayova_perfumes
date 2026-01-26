@@ -33,19 +33,26 @@ class CategoryController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        \Log::info('Category Store Request:', [
-            'all' => $request->all(),
-            'files' => array_keys($request->allFiles())
-        ]);
+        \Log::info('Category Store [V3.0]:', $request->all());
         try {
-            $validated = $request->validate([
+            $validator = \Validator::make($request->all(), [
                 'name' => 'required|string|max:255|unique:categories,name',
                 'slug' => 'nullable|string|unique:categories,slug',
                 'description' => 'nullable|string',
-                'image_file' => 'nullable|max:30720', // Alpha Permissive
+                'image_file' => 'nullable|max:40960', // 40MB Max, NO file rule
                 'display_order' => 'nullable|integer',
                 'is_active' => 'nullable|boolean',
             ]);
+
+            if ($validator->fails()) {
+                \Log::warning('Category Store Validation Failed [V3.0]:', $validator->errors()->toArray());
+                return response()->json([
+                    'message' => '[V3.0 Debug] Erreur de validation : ' . $validator->errors()->first(),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $validated = $validator->validated();
 
             // Generate slug if not provided
             if (empty($validated['slug'])) {
@@ -54,12 +61,8 @@ class CategoryController extends Controller
 
             if ($request->hasFile('image_file')) {
                 $file = $request->file('image_file');
-                if (!$file->isValid()) {
-                    return response()->json(['message' => 'Fichier de catégorie invalide.'], 422);
-                }
                 $validated['mime_type'] = $file->getMimeType();
                 $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-                // Valid placeholder for non-null DB constraint
                 $validated['image_url'] = 'db_location';
             }
 
@@ -71,36 +74,40 @@ class CategoryController extends Controller
                 $category->save();
             }
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie créée'], 201);
+            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V3.0]'], 201);
         } catch (\Exception $e) {
-            \Log::error('Category Store Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur de création : ' . $e->getMessage()], 500);
+            \Log::error('Category Store Error [V3.0]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V3.0] : ' . $e->getMessage()], 500);
         }
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
-        \Log::info('Category Update Request for ID ' . $id . ':', [
-            'all' => $request->all(),
-            'files' => array_keys($request->allFiles())
-        ]);
+        \Log::info('Category Update [V3.0] for ID ' . $id . ':', $request->all());
         try {
             $category = Category::findOrFail($id);
 
-            $validated = $request->validate([
+            $validator = \Validator::make($request->all(), [
                 'name' => 'sometimes|string|max:255|unique:categories,name,' . $id,
                 'slug' => 'sometimes|string|unique:categories,slug,' . $id,
                 'description' => 'nullable|string',
-                'image_file' => 'nullable|max:30720', // Alpha Permissive
+                'image_file' => 'nullable|max:40960', // 40MB Max, NO file rule
                 'display_order' => 'nullable|integer',
                 'is_active' => 'nullable|boolean',
             ]);
 
+            if ($validator->fails()) {
+                \Log::warning('Category Update Validation Failed [V3.0]:', $validator->errors()->toArray());
+                return response()->json([
+                    'message' => '[V3.0 Debug] Erreur de validation : ' . $validator->errors()->first(),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $validated = $validator->validated();
+
             if ($request->hasFile('image_file')) {
                 $file = $request->file('image_file');
-                if (!$file->isValid()) {
-                    return response()->json(['message' => 'Fichier de mise à jour invalide.'], 422);
-                }
                 $validated['mime_type'] = $file->getMimeType();
                 $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
                 $validated['image_url'] = url('/api/media/db/category/' . $category->id);
@@ -109,10 +116,10 @@ class CategoryController extends Controller
             unset($validated['image_file']);
             $category->update($validated);
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour']);
+            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V3.0]']);
         } catch (\Exception $e) {
-            \Log::error('Category Update Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur mise à jour : ' . $e->getMessage()], 500);
+            \Log::error('Category Update Error [V3.0]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V3.0] : ' . $e->getMessage()], 500);
         }
     }
 
