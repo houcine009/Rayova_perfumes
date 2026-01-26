@@ -42,7 +42,7 @@ class CategoryController extends Controller
                 'name' => 'required|string|max:255|unique:categories,name',
                 'slug' => 'nullable|string|unique:categories,slug',
                 'description' => 'nullable|string',
-                'image_file' => 'nullable|file|max:30720', // Explicitly marked as file, up to 30MB
+                'image_file' => 'nullable|max:30720', // Alpha Permissive
                 'display_order' => 'nullable|integer',
                 'is_active' => 'nullable|boolean',
             ]);
@@ -91,7 +91,7 @@ class CategoryController extends Controller
                 'name' => 'sometimes|string|max:255|unique:categories,name,' . $id,
                 'slug' => 'sometimes|string|unique:categories,slug,' . $id,
                 'description' => 'nullable|string',
-                'image_file' => 'nullable|file|max:30720', // Explicitly marked as file, up to 30MB
+                'image_file' => 'nullable|max:30720', // Alpha Permissive
                 'display_order' => 'nullable|integer',
                 'is_active' => 'nullable|boolean',
             ]);
