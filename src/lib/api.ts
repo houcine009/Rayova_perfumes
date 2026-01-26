@@ -114,11 +114,34 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return this.axiosInstance.post<any, T>(endpoint, data, config);
+    const isFormData = data instanceof FormData;
+    const requestConfig = { ...config };
+
+    if (isFormData) {
+      requestConfig.headers = {
+        ...requestConfig.headers,
+        'Content-Type': 'multipart/form-data', // Optional, usually better to let browser set it, but explicit ensures axios doesn't use json
+      };
+      // Actually, safest way with Axios is to delete Content-Type and let browser set boundary
+      if (requestConfig.headers['Content-Type']) {
+        delete requestConfig.headers['Content-Type'];
+      }
+    }
+
+    return this.axiosInstance.post<any, T>(endpoint, data, requestConfig);
   }
 
   async put<T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    return this.axiosInstance.put<any, T>(endpoint, data, config);
+    const isFormData = data instanceof FormData;
+    const requestConfig = { ...config };
+
+    if (isFormData) {
+      if (requestConfig.headers && requestConfig.headers['Content-Type']) {
+        delete requestConfig.headers['Content-Type'];
+      }
+    }
+
+    return this.axiosInstance.put<any, T>(endpoint, data, requestConfig);
   }
 
   async delete<T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> {
@@ -133,9 +156,10 @@ class ApiClient {
         formData.append(key, value);
       });
     }
+    // For upload method, we also want browser to set boundary
     return this.post<T>(endpoint, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'multipart/form-data', // Will be stripped by post logic above
       },
     });
   }
