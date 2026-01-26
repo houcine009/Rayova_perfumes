@@ -280,9 +280,8 @@ class ProductController extends Controller
 
             if ($url === 'pending_db_storage' && $request->hasFile('file')) {
                 $file = $request->file('file');
-                $mediaData['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-                $mediaData['mime_type'] = $file->getMimeType();
-                $mediaData['url'] = 'db_location'; 
+                $path = $file->store('products', 'public');
+                $mediaData['url'] = Storage::disk('public')->url($path);
             }
 
             if (!empty($mediaData['is_primary'])) {
@@ -291,12 +290,7 @@ class ProductController extends Controller
 
             $media = ProductMedia::create($mediaData);
 
-            if ($media->url === 'db_location') {
-                $media->url = url('/api/media/db/product/' . $media->id);
-                $media->save();
-            }
-
-            return response()->json(['data' => $media, 'message' => 'Succès'], 201);
+            return response()->json(['data' => $media, 'message' => 'Succès [V9.1]'], 201);
 
         } catch (\Exception $e) {
             \Log::error('ProductMedia Error: ' . $e->getMessage());

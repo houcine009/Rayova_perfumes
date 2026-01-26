@@ -51,6 +51,7 @@ try {
     echo " [+] Repaired $countSettings links in settings.\n";
 
     echo "3. Flushing all caches...\n";
+    \Artisan::call('storage:link');
     \Artisan::call('optimize:clear');
     \Artisan::call('config:cache');
     if (function_exists('opcache_reset')) {

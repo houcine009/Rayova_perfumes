@@ -58,31 +58,24 @@ class CategoryController extends Controller
             }
 
             if ($request->hasFile('image_file')) {
-                $validated['image_url'] = 'vault_pending';
+                $file = $request->file('image_file');
+                $path = $file->store('categories', 'public');
+                $validated['image_url'] = Storage::disk('public')->url($path);
             }
 
             unset($validated['image_file']);
             $category = Category::create($validated);
 
-            if (($validated['image_url'] ?? '') === 'vault_pending') {
-                $file = $request->file('image_file');
-                $category->update([
-                    'file_data' => base64_encode(file_get_contents($file->getRealPath())),
-                    'mime_type' => $file->getMimeType(),
-                    'image_url' => url('/api/media/db/category/' . $category->id)
-                ]);
-            }
-
-            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V6.2]'], 201);
+            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V9.1]'], 201);
         } catch (\Exception $e) {
-            \Log::error('Category Store Error [V6.2]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V6.2] : ' . $e->getMessage()], 500);
+            \Log::error('Category Store Error [V9.1]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V9.1] : ' . $e->getMessage()], 500);
         }
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
-        \Log::info('Category Update [V6.2] for ID ' . $id . ':', $request->all());
+        \Log::info('Category Update [V9.1] for ID ' . $id . ':', $request->all());
         try {
             $category = Category::findOrFail($id);
 
@@ -96,7 +89,7 @@ class CategoryController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['message' => '[V6.2] Erreur : ' . $validator->errors()->first()], 422);
+                return response()->json(['message' => '[V9.1] Erreur : ' . $validator->errors()->first()], 422);
             }
 
             $validated = $validator->validated();
@@ -106,18 +99,17 @@ class CategoryController extends Controller
 
             if ($request->hasFile('image_file')) {
                 $file = $request->file('image_file');
-                $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-                $validated['mime_type'] = $file->getMimeType();
-                $validated['image_url'] = url('/api/media/db/category/' . $category->id);
+                $path = $file->store('categories', 'public');
+                $validated['image_url'] = Storage::disk('public')->url($path);
             }
 
             unset($validated['image_file']);
             $category->update($validated);
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V6.2]']);
+            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V9.1]']);
         } catch (\Exception $e) {
-            \Log::error('Category Update Error [V6.2]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V6.2] : ' . $e->getMessage()], 500);
+            \Log::error('Category Update Error [V9.1]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V9.1] : ' . $e->getMessage()], 500);
         }
     }
 
