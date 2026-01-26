@@ -103,7 +103,12 @@ const AdminCategories = () => {
       if (selectedFile) {
         const payload = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
-          payload.append(key, String(value));
+          // Convert booleans to 1/0 for Laravel multipart compatibility
+          if (typeof value === 'boolean') {
+            payload.append(key, value ? '1' : '0');
+          } else {
+            payload.append(key, String(value));
+          }
         });
         payload.append('image_file', selectedFile);
         dataToSubmit = payload;

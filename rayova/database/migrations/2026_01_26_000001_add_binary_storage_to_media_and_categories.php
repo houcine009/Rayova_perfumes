@@ -11,14 +11,22 @@ return new class extends Migration
     {
         // Add binary storage to product_media
         Schema::table('product_media', function (Blueprint $table) {
-            $table->longText('file_data')->nullable(); // Using longText for base64 storage
-            $table->string('mime_type')->nullable();
+            if (!Schema::hasColumn('product_media', 'file_data')) {
+                $table->longText('file_data')->nullable(); // Using longText for base64 storage
+            }
+            if (!Schema::hasColumn('product_media', 'mime_type')) {
+                $table->string('mime_type')->nullable();
+            }
         });
 
         // Add binary storage to categories
         Schema::table('categories', function (Blueprint $table) {
-            $table->longText('file_data')->nullable();
-            $table->string('mime_type')->nullable();
+            if (!Schema::hasColumn('categories', 'file_data')) {
+                $table->longText('file_data')->nullable();
+            }
+            if (!Schema::hasColumn('categories', 'mime_type')) {
+                $table->string('mime_type')->nullable();
+            }
         });
         
         // Change image_url to allow longer values in case we store small base64 directly

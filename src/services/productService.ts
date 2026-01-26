@@ -100,6 +100,10 @@ export const productService = {
     },
 
     async update(id: string, data: ProductUpdateData): Promise<{ data: Product; message: string }> {
+        if (data instanceof FormData) {
+            data.append('_method', 'PUT');
+            return api.post(`/admin/products/${id}`, data);
+        }
         return api.put(`/admin/products/${id}`, data);
     },
 
