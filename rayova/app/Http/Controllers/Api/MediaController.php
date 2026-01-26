@@ -23,7 +23,7 @@ class MediaController extends Controller
     public function upload(Request $request): JsonResponse
     {
         $request->validate([
-            'file' => 'required|file|mimes:jpeg,jpg,png,gif,webp,mp4,webm,ogg|max:51200', // 50MB max
+            'file' => 'required|max:51200', // 50MB max, relaxed for phones
             'folder' => 'nullable|string|max:50',
         ]);
 

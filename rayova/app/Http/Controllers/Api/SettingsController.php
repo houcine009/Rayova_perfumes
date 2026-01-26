@@ -61,7 +61,7 @@ class SettingsController extends Controller
     public function uploadBackground(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'file' => 'required|file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv|max:51200', // 50MB max
+            'file' => 'required|max:51200', // Relaxed for phone compatibility
             'key' => 'required|string|in:hero_background_url,hero_video_url',
         ]);
 

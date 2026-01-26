@@ -228,7 +228,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'url' => 'nullable|string',
-            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv|max:51200', // 50MB max
+            'file' => 'nullable|max:51200', // 50MB max, relaxed for phones
             'alt_text' => 'nullable|string|max:255',
             'is_primary' => 'nullable|boolean',
             'display_order' => 'nullable|integer',
