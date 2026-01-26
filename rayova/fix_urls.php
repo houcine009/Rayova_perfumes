@@ -49,6 +49,13 @@ foreach ($categories as $cat) {
         $cat->save();
         echo "<br><strong style='color:green'>FIXED Localhost -> Production</strong>";
         $fixedCats++;
+    // Fix HTTP -> HTTPS
+    elseif (str_starts_with($cat->image_url, 'http://')) {
+        $newUrl = str_replace('http://', 'https://', $cat->image_url);
+        $cat->image_url = $newUrl;
+        $cat->save();
+        echo "<br><strong style='color:green'>FIXED HTTP -> HTTPS</strong>";
+        $fixedCats++;
     } else {
         echo "<br><span style='color:blue'>OK</span>";
     }
@@ -76,6 +83,13 @@ foreach ($media as $m) {
         $m->url = $newUrl;
         $m->save();
         echo "<br><strong style='color:green'>FIXED Localhost -> Production</strong>";
+        $fixedMedia++;
+    }
+    elseif (str_starts_with($m->url, 'http://')) {
+        $newUrl = str_replace('http://', 'https://', $m->url);
+        $m->url = $newUrl;
+        $m->save();
+        echo "<br><strong style='color:green'>FIXED HTTP -> HTTPS</strong>";
         $fixedMedia++;
     } else {
         echo "<br><span style='color:blue'>OK</span>";
