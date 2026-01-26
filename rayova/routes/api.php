@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public routes
+Route::options('/{any}', function() {
+    return response()->json(['status' => 'ok']);
+})->where('any', '.*');
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
