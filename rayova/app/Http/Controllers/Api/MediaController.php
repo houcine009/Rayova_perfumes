@@ -61,34 +61,36 @@ class MediaController extends Controller
         }
         
         // Fallback to Database storage (ensures persistence on ephemeral hosts)
-        $key = $request->get('key');
-        if ($key) {
-            // If a key is provided, store in SiteMedia
-            $siteMedia = \App\Models\SiteMedia::updateOrCreate(
-                ['key' => $key],
-                [
-                    'file_data' => base64_encode(file_get_contents($file->getRealPath())),
+        try {
+            $key = $request->get('key');
+            if ($key) {
+                // If a key is provided, store in SiteMedia
+                $siteMedia = \App\Models\SiteMedia::updateOrCreate(
+                    ['key' => $key],
+                    [
+                        'file_data' => base64_encode(file_get_contents($file->getRealPath())),
+                        'mime_type' => $file->getMimeType(),
+                        'filename' => $file->getClientOriginalName(),
+                    ]
+                );
+                $url = url('/api/media/db/site/' . $siteMedia->id);
+                $path = 'db_site_' . $siteMedia->id;
+            } else {
+                // General database storage placeholder (Products handle their own DB storage)
+                $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                return response()->json([
+                    'url' => null, 
+                    'path' => 'db',
+                    'filename' => $filename,
+                    'original_name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
-                    'filename' => $file->getClientOriginalName(),
-                ]
-            );
-            $url = url('/api/media/db/site/' . $siteMedia->id);
-            $path = 'db_site_' . $siteMedia->id; // Unique path for site media
-        } else {
-            // General database storage for other media types
-            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-            $mimeType = $file->getMimeType();
-            $fileData = base64_encode(file_get_contents($file->getRealPath()));
-
-            return response()->json([
-                'url' => null, 
-                'path' => 'db',
-                'filename' => $filename,
-                'original_name' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime_type' => $mimeType,
-                'storage' => 'database',
-            ], 201);
+                    'storage' => 'database',
+                ], 201);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Database media upload failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur de stockage en base de données : ' . $e->getMessage()], 500);
         }
 
         return response()->json([

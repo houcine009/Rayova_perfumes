@@ -278,14 +278,20 @@ class ProductController extends Controller
             $file = $request->file('file');
             $mediaData['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
             $mediaData['mime_type'] = $file->getMimeType();
-            $mediaData['url'] = ''; 
+            // Use a valid placeholder to satisfy non-null DB constraint
+            $mediaData['url'] = 'db_location'; 
         }
 
         if (!empty($mediaData['is_primary'])) {
             $product->media()->update(['is_primary' => false]);
         }
 
-        $media = ProductMedia::create($mediaData);
+        try {
+            $media = ProductMedia::create($mediaData);
+        } catch (\Exception $e) {
+            \Log::error('Erreur creation media: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur database: ' . $e->getMessage()], 500);
+        }
 
         // Update URL if it was stored in DB
         if (empty($media->url) && $media->isStoredInDb()) {

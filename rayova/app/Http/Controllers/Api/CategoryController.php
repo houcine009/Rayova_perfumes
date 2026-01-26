@@ -50,8 +50,8 @@ class CategoryController extends Controller
             $file = $request->file('image_file');
             $validated['mime_type'] = $file->getMimeType();
             $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-            // URL will be set after creation
-            $validated['image_url'] = '';
+            // Valid placeholder for non-null DB constraint
+            $validated['image_url'] = 'db_location';
         }
 
         unset($validated['image_file']);
