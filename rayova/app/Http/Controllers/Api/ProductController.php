@@ -224,80 +224,74 @@ class ProductController extends Controller
 
     public function addMedia(Request $request, string $id): JsonResponse
     {
-        \Log::info('Product Media Request for ID ' . $id . ':', [
-            'all' => $request->all(),
-            'files' => array_keys($request->allFiles())
-        ]);
+        \Log::info('Product Media Request for ID ' . $id);
+        
         try {
             $product = Product::findOrFail($id);
 
             $validated = $request->validate([
                 'url' => 'nullable|string',
-                'file' => 'nullable|max:51200',
+                'file' => 'nullable|file|max:51200', // 50MB max
                 'alt_text' => 'nullable|string|max:255',
                 'is_primary' => 'nullable|boolean',
                 'display_order' => 'nullable|integer',
             ]);
 
             $url = $validated['url'] ?? null;
+            $uploadedFile = $request->file('file');
 
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                if (!$file->isValid()) {
-                     return response()->json(['message' => 'Le fichier est invalide.'], 422);
+            // 1. Try Cloudinary first if configured
+            if ($uploadedFile && !empty(config('cloudinary.cloud_name'))) {
+                try {
+                    $resourceType = str_starts_with($uploadedFile->getMimeType(), 'video/') ? 'video' : 'image';
+                    $result = Cloudinary::upload($uploadedFile->getRealPath(), [
+                        'folder' => 'rayova/products',
+                        'resource_type' => $resourceType,
+                        'public_id' => \Illuminate\Support\Str::uuid()->toString(),
+                    ]);
+                    $url = $result->getSecurePath();
+                } catch (\Exception $e) {
+                    \Log::warning('Cloudinary Upload Failed: ' . $e->getMessage());
+                    $url = null; // Fallback to local
                 }
+            }
+
+            // 2. Fallback to Local Disk Storage (public)
+            if (empty($url) && $uploadedFile) {
+                // Store in: storage/app/public/products
+                $path = $uploadedFile->store('products', 'public');
                 
-                // Cloudinary check
-                if (!empty(config('cloudinary.cloud_name'))) {
-                    try {
-                        $resourceType = str_starts_with($file->getMimeType(), 'video/') ? 'video' : 'image';
-                        $result = Cloudinary::upload($file->getRealPath(), [
-                            'folder' => 'rayova/products',
-                            'resource_type' => $resourceType,
-                            'public_id' => \Illuminate\Support\Str::uuid()->toString(),
-                        ]);
-                        $url = $result->getSecurePath();
-                    } catch (\Exception $e) {
-                        \Log::warning('Cloudinary fail in Product: ' . $e->getMessage());
-                        $url = 'pending_db_storage';
-                    }
-                } else {
-                    $url = 'pending_db_storage';
-                }
+                // Get URL: /storage/products/filename.jpg
+                $url = \Illuminate\Support\Facades\Storage::url($path);
             }
 
             if (!$url) {
-                return response()->json(['message' => 'Média requis'], 422);
+                return response()->json(['message' => 'Aucun média fourni ou échec de l\'upload.'], 422);
             }
 
+            // 3. Create Database Record (Prevent Binary Data)
             $mediaData = [
                 'product_id' => $product->id,
                 'url' => $url,
                 'alt_text' => $validated['alt_text'] ?? null,
                 'is_primary' => $validated['is_primary'] ?? false,
                 'display_order' => $validated['display_order'] ?? 0,
+                'file_data' => null, // FORCE NULL to avoid 'Data too long' error
+                'mime_type' => $uploadedFile ? $uploadedFile->getMimeType() : null,
             ];
 
-            if ($url === 'pending_db_storage' && $request->hasFile('file')) {
-                $path = $request->file('file')->store('products', 'public');
-                $mediaData['url'] = \Illuminate\Support\Facades\Storage::url($path);
-                
-                // Clean fields
-                $mediaData['file_data'] = null;
-                $mediaData['mime_type'] = null;
-            }
-
+            // Handle primary flag
             if (!empty($mediaData['is_primary'])) {
                 $product->media()->update(['is_primary' => false]);
             }
 
             $media = ProductMedia::create($mediaData);
 
-            return response()->json(['data' => $media, 'message' => 'Succès'], 201);
+            return response()->json(['data' => $media, 'message' => 'Média ajouté avec succès'], 201);
 
         } catch (\Exception $e) {
-            \Log::error('ProductMedia Error: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur Produit : ' . $e->getMessage()], 500);
+            \Log::error('ProductMedia Add Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur: ' . $e->getMessage()], 500);
         }
     }
 
