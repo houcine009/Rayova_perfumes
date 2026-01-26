@@ -49,6 +49,7 @@ foreach ($categories as $cat) {
         $cat->save();
         echo "<br><strong style='color:green'>FIXED Localhost -> Production</strong>";
         $fixedCats++;
+    }
     // Fix HTTP -> HTTPS
     elseif (str_starts_with($cat->image_url, 'http://')) {
         $newUrl = str_replace('http://', 'https://', $cat->image_url);
