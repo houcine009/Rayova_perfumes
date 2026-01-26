@@ -87,8 +87,8 @@ class SettingsController extends Controller
         
         // Fallback to Database storage (ensures persistence on ephemeral hosts)
         if (!$url) {
-            $path = $file->store('site', 'public');
-            $url = Storage::disk('public')->url($path);
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $url = 'data:' . $file->getMimeType() . ';base64,' . $base64;
         }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
@@ -111,10 +111,10 @@ class SettingsController extends Controller
                 'is_configured' => true,
                 'cloud_name' => $cloudinaryName ? substr($cloudinaryName, 0, 3) . '***' : null,
                 'app_url' => config('app.url'),
-                'version' => 'V9.1',
+                'version' => 'V10.0',
                 'message' => $isConfigured 
                     ? 'Cloudinary est prêt.' 
-                    : 'Le stockage DISQUE est actif. (Static URLs V9.1)',
+                    : 'Le coffre-fort IMMORTEL est actif. (Data-URIs V10.0)',
             ]
         ]);
     }
