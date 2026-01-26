@@ -224,6 +224,10 @@ class ProductController extends Controller
 
     public function addMedia(Request $request, string $id): JsonResponse
     {
+        \Log::info('Product Media Request for ID ' . $id . ':', [
+            'all' => $request->all(),
+            'files' => array_keys($request->allFiles())
+        ]);
         try {
             $product = Product::findOrFail($id);
 

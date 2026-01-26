@@ -67,16 +67,30 @@ class ApiClient {
     this.axiosInstance.interceptors.response.use(
       (response) => response.data,
       (error) => {
+        const status = error.response?.status;
+        const data = error.response?.data;
+
         console.error('[API Error]', {
           url: error.config?.url,
-          status: error.response?.status,
-          message: error.response?.data?.message || error.message,
-          data: error.response?.data
+          status,
+          message: data?.message || error.message,
+          errors: data?.errors,
+          data
         });
-        const message = error.response?.data?.message || error.message || 'Une erreur est survenue';
+
+        let message = data?.message || error.message || 'Une erreur est survenue';
+
+        // Handle validation errors (422)
+        if (status === 422 && data?.errors) {
+          const firstErrorKey = Object.keys(data.errors)[0];
+          const firstErrorMessage = data.errors[firstErrorKey][0];
+          message = `${message}: ${firstErrorMessage}`;
+        }
+
         const customError = new Error(message);
         (customError as any).response = error.response;
-        (customError as any).status = error.response?.status;
+        (customError as any).status = status;
+        (customError as any).validationErrors = data?.errors;
         return Promise.reject(customError);
       }
     );

@@ -33,6 +33,10 @@ class CategoryController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        \Log::info('Category Store Request:', [
+            'all' => $request->all(),
+            'files' => array_keys($request->allFiles())
+        ]);
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255|unique:categories,name',
@@ -76,6 +80,10 @@ class CategoryController extends Controller
 
     public function update(Request $request, string $id): JsonResponse
     {
+        \Log::info('Category Update Request for ID ' . $id . ':', [
+            'all' => $request->all(),
+            'files' => array_keys($request->allFiles())
+        ]);
         try {
             $category = Category::findOrFail($id);
 

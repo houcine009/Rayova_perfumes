@@ -183,7 +183,8 @@ const AdminProducts = () => {
         toast({ title: 'Produit mis à jour avec succès' });
       } else {
         const response: any = await createProduct.mutateAsync(formData);
-        product = response.data;
+        // The hook already returns response.data
+        product = response;
 
         // Final upload for new product
         if (selectedFiles.length > 0 && product?.id) {
@@ -192,6 +193,7 @@ const AdminProducts = () => {
             await api.upload(`/admin/products/${product.id}/media`, file);
           }
         }
+        toast({ title: 'Produit créé avec succès' });
       }
 
       setIsDialogOpen(false);
