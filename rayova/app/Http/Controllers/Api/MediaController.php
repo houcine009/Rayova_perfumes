@@ -81,13 +81,12 @@ class MediaController extends Controller
             $fileData = base64_encode(file_get_contents($file->getRealPath()));
 
             return response()->json([
-                'url' => null, // Frontend will need to handle this or we return a temp URL
+                'url' => null, 
                 'path' => 'db',
                 'filename' => $filename,
                 'original_name' => $file->getClientOriginalName(),
                 'size' => $file->getSize(),
                 'mime_type' => $mimeType,
-                'file_data' => $fileData, // Send back so ProductController can store it
                 'storage' => 'database',
             ], 201);
         }

@@ -36,8 +36,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
             'slug' => 'nullable|string|unique:categories,slug',
-            'description' => 'nullable|string',
-            'image_file' => 'nullable|max:20480', // Relaxed for phone compatibility
+            'image_file' => 'nullable|file|max:30720', // Explicitly marked as file, up to 30MB
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
