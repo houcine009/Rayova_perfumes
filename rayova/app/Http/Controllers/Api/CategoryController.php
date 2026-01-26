@@ -36,12 +36,9 @@ class CategoryController extends Controller
         \Log::info('Category Store [V3.0]:', $request->all());
         try {
             $validator = \Validator::make($request->all(), [
-                'name' => 'required|string|max:255|unique:categories,name',
-                'slug' => 'nullable|string|unique:categories,slug',
-                'description' => 'nullable|string',
-                'image_file' => 'nullable|max:40960', // 40MB Max, NO file rule
+                'image_file' => 'nullable|max:40960', // 40MB Max
                 'display_order' => 'nullable|integer',
-                'is_active' => 'nullable|boolean',
+                'is_active' => 'nullable', // Flexible for V4.0
             ]);
 
             if ($validator->fails()) {
@@ -59,14 +56,13 @@ class CategoryController extends Controller
                 $validated['slug'] = Str::slug($validated['name']);
             }
 
-            if ($request->hasFile('image_file')) {
-                $file = $request->file('image_file');
-                $validated['mime_type'] = $file->getMimeType();
-                $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
-                $validated['image_url'] = 'db_location';
+            unset($validated['image_file']);
+            
+            // Explicit cast for V4.0 multipart safety
+            if ($request->has('is_active')) {
+                $validated['is_active'] = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
             }
 
-            unset($validated['image_file']);
             $category = Category::create($validated);
 
             if ($category->image_url === 'db_location') {
@@ -74,10 +70,10 @@ class CategoryController extends Controller
                 $category->save();
             }
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V3.0]'], 201);
+            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V4.0]'], 201);
         } catch (\Exception $e) {
-            \Log::error('Category Store Error [V3.0]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V3.0] : ' . $e->getMessage()], 500);
+            \Log::error('Category Store Error [V4.0]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V4.0] : ' . $e->getMessage()], 500);
         }
     }
 
@@ -90,10 +86,9 @@ class CategoryController extends Controller
             $validator = \Validator::make($request->all(), [
                 'name' => 'sometimes|string|max:255|unique:categories,name,' . $id,
                 'slug' => 'sometimes|string|unique:categories,slug,' . $id,
-                'description' => 'nullable|string',
-                'image_file' => 'nullable|max:40960', // 40MB Max, NO file rule
+                'image_file' => 'nullable|max:40960', // 40MB Max
                 'display_order' => 'nullable|integer',
-                'is_active' => 'nullable|boolean',
+                'is_active' => 'nullable', // Flexible for V4.0
             ]);
 
             if ($validator->fails()) {
@@ -114,12 +109,18 @@ class CategoryController extends Controller
             }
 
             unset($validated['image_file']);
+            
+            // Explicit cast for V4.0 multipart safety
+            if ($request->has('is_active')) {
+                $validated['is_active'] = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
+            }
+
             $category->update($validated);
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V3.0]']);
+            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V4.0]']);
         } catch (\Exception $e) {
-            \Log::error('Category Update Error [V3.0]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V3.0] : ' . $e->getMessage()], 500);
+            \Log::error('Category Update Error [V4.0]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur [V4.0] : ' . $e->getMessage()], 500);
         }
     }
 
