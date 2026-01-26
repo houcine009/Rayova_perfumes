@@ -85,18 +85,10 @@ class SettingsController extends Controller
             }
         }
         
-        // Fallback to Database storage (ensures persistence on ephemeral hosts)
+        // Fallback to Standard Disk Storage
         if (!$url) {
-            $base64 = base64_encode(file_get_contents($file->getRealPath()));
-            $siteMedia = \App\Models\SiteMedia::updateOrCreate(
-                ['key' => $validated['key']],
-                [
-                    'file_data' => $base64,
-                    'mime_type' => $file->getMimeType(),
-                    'filename' => $file->getClientOriginalName(),
-                ]
-            );
-            $url = url('/api/media/proxy/site/' . $siteMedia->id);
+            $path = $file->store('settings', 'public');
+            $url = '/storage/' . $path;
         }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);

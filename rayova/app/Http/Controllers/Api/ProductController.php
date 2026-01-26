@@ -279,11 +279,12 @@ class ProductController extends Controller
             ];
 
             if ($url === 'pending_db_storage' && $request->hasFile('file')) {
-                $file = $request->file('file');
-                $base64 = base64_encode(file_get_contents($file->getRealPath()));
-                $mediaData['file_data'] = $base64;
-                $mediaData['mime_type'] = $file->getMimeType();
-                $mediaData['url'] = 'proxy_pending';
+                $path = $request->file('file')->store('products', 'public');
+                $mediaData['url'] = '/storage/' . $path;
+                
+                // Clean fields
+                $mediaData['file_data'] = null;
+                $mediaData['mime_type'] = null;
             }
 
             if (!empty($mediaData['is_primary'])) {
@@ -292,12 +293,7 @@ class ProductController extends Controller
 
             $media = ProductMedia::create($mediaData);
 
-            if ($media->url === 'proxy_pending') {
-                $media->url = url('/api/media/proxy/product/' . $media->id);
-                $media->save();
-            }
-
-            return response()->json(['data' => $media, 'message' => 'Succès [V11.0]'], 201);
+            return response()->json(['data' => $media, 'message' => 'Succès'], 201);
 
         } catch (\Exception $e) {
             \Log::error('ProductMedia Error: ' . $e->getMessage());

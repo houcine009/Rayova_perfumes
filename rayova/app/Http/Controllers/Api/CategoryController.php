@@ -33,19 +33,19 @@ class CategoryController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        \Log::info('Category Store [V11.0]:', $request->all());
+        \Log::info('Category Store [V12.0 - Standard]:', $request->all());
         try {
             $validator = \Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'slug' => 'nullable|string',
                 'description' => 'nullable|string',
-                'image_file' => 'nullable|max:20480', // 20MB
+                'image_file' => 'nullable|image|max:10240', // 10MB Standard limit
                 'display_order' => 'nullable|integer',
                 'is_active' => 'nullable',
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['message' => '[V11.0] Erreur : ' . $validator->errors()->first()], 422);
+                return response()->json(['message' => 'Erreur de validation', 'errors' => $validator->errors()], 422);
             }
 
             $validated = $validator->validated();
@@ -57,38 +57,26 @@ class CategoryController extends Controller
                 $validated['slug'] = Str::slug($validated['name']);
             }
 
-            // PRE-FILL with placeholder until ID is created
             if ($request->hasFile('image_file')) {
-                $validated['image_url'] = 'proxy_pending';
+                $path = $request->file('image_file')->store('categories', 'public');
+                $validated['image_url'] = '/storage/' . $path;
+                // Clear legacy binary fields
+                $validated['file_data'] = null;
+                $validated['mime_type'] = null;
             }
 
             unset($validated['image_file']);
             $category = Category::create($validated);
 
-            if (($validated['image_url'] ?? '') === 'proxy_pending') {
-                $file = $request->file('image_file');
-                $base64 = base64_encode(file_get_contents($file->getRealPath()));
-                
-                // V11.0: Store DATA in file_data, but LINK in image_url
-                $proxyUrl = url('/api/media/proxy/category/' . $category->id);
-                
-                $category->update([
-                    'file_data' => $base64,
-                    'mime_type' => $file->getMimeType(),
-                    'image_url' => $proxyUrl
-                ]);
-            }
-
-            return response()->json(['data' => $category, 'message' => 'Catégorie créée [V11.0]'], 201);
+            return response()->json(['data' => $category, 'message' => 'Catégorie créée'], 201);
         } catch (\Exception $e) {
-            \Log::error('Category Store Error [V11.0]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V11.0] : ' . $e->getMessage()], 500);
+            \Log::error('Category Store Error [V12.0]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur serveur'], 500);
         }
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
-        \Log::info('Category Update [V11.0] for ID ' . $id . ':', $request->all());
         try {
             $category = Category::findOrFail($id);
 
@@ -96,13 +84,13 @@ class CategoryController extends Controller
                 'name' => 'sometimes|string|max:255',
                 'slug' => 'sometimes|string',
                 'description' => 'nullable|string',
-                'image_file' => 'nullable|max:20480',
+                'image_file' => 'nullable|image|max:10240',
                 'display_order' => 'nullable|integer',
                 'is_active' => 'nullable',
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['message' => '[V11.0] Erreur : ' . $validator->errors()->first()], 422);
+                return response()->json(['message' => 'Erreur de validation', 'errors' => $validator->errors()], 422);
             }
 
             $validated = $validator->validated();
@@ -111,24 +99,25 @@ class CategoryController extends Controller
             }
 
             if ($request->hasFile('image_file')) {
-                $file = $request->file('image_file');
-                $base64 = base64_encode(file_get_contents($file->getRealPath()));
-                
-                // V11.0: Update to Proxy Link
-                $proxyUrl = url('/api/media/proxy/category/' . $category->id);
-                
-                $validated['image_url'] = $proxyUrl;
-                $validated['file_data'] = $base64;
-                $validated['mime_type'] = $file->getMimeType();
+                // Delete old image if exists
+                if ($category->image_url && str_starts_with($category->image_url, '/storage/')) {
+                    $oldPath = str_replace('/storage/', '', $category->image_url);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                }
+
+                $path = $request->file('image_file')->store('categories', 'public');
+                $validated['image_url'] = '/storage/' . $path;
+                $validated['file_data'] = null;
+                $validated['mime_type'] = null;
             }
 
             unset($validated['image_file']);
             $category->update($validated);
 
-            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour [V11.0]']);
+            return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour']);
         } catch (\Exception $e) {
-            \Log::error('Category Update Error [V11.0]: ' . $e->getMessage());
-            return response()->json(['message' => 'Erreur [V11.0] : ' . $e->getMessage()], 500);
+            \Log::error('Category Update Error [V12.0]: ' . $e->getMessage());
+            return response()->json(['message' => 'Erreur serveur'], 500);
         }
     }
 
