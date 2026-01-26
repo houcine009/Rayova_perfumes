@@ -37,8 +37,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name',
             'slug' => 'nullable|string|unique:categories,slug',
             'description' => 'nullable|string',
-            'image_url' => 'nullable|string',
-            'image_file' => 'nullable|file|image|max:10240', // 10MB max
+            'image_file' => 'nullable|max:20480', // Relaxed for phone compatibility
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
@@ -78,8 +77,7 @@ class CategoryController extends Controller
             'name' => 'sometimes|string|max:255|unique:categories,name,' . $id,
             'slug' => 'sometimes|string|unique:categories,slug,' . $id,
             'description' => 'nullable|string',
-            'image_url' => 'nullable|string',
-            'image_file' => 'nullable|file|image|max:10240', // 10MB max
+            'image_file' => 'nullable|max:20480', // Relaxed for phone compatibility
             'display_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
