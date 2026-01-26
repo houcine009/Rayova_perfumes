@@ -18,6 +18,8 @@ class Category extends Model
         'image_url',
         'display_order',
         'is_active',
+        'file_data',
+        'mime_type',
     ];
 
     protected $casts = [

@@ -27,7 +27,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/id/{id}', [ProductController::class, 'showById']);
-Route::get('/media/db/{id}', [MediaController::class, 'serve']);
+Route::get('/media/db/{type}/{id}', [MediaController::class, 'serve']);
 
 // Public category routes
 Route::get('/categories', [CategoryController::class, 'index']);

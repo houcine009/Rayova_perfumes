@@ -60,26 +60,59 @@ class MediaController extends Controller
             }
         }
         
-        // Fallback: Database storage (ensures persistence on ephemeral hosts)
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $mimeType = $file->getMimeType();
-        $fileData = base64_encode(file_get_contents($file->getRealPath()));
+        // Fallback to Database storage (ensures persistence on ephemeral hosts)
+        if ($key) {
+            // If a key is provided, store in SiteMedia
+            $siteMedia = \App\Models\SiteMedia::updateOrCreate(
+                ['key' => $key],
+                [
+                    'file_data' => base64_encode(file_get_contents($file->getRealPath())),
+                    'mime_type' => $file->getMimeType(),
+                    'filename' => $file->getClientOriginalName(),
+                ]
+            );
+            $url = url('/api/media/db/site/' . $siteMedia->id);
+            $path = 'db_site_' . $siteMedia->id; // Unique path for site media
+        } else {
+            // General database storage for other media types
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $mimeType = $file->getMimeType();
+            $fileData = base64_encode(file_get_contents($file->getRealPath()));
+
+            return response()->json([
+                'url' => null, // Frontend will need to handle this or we return a temp URL
+                'path' => 'db',
+                'filename' => $filename,
+                'original_name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime_type' => $mimeType,
+                'file_data' => $fileData, // Send back so ProductController can store it
+                'storage' => 'database',
+            ], 201);
+        }
 
         return response()->json([
-            'url' => null, // Frontend will need to handle this or we return a temp URL
-            'path' => 'db',
-            'filename' => $filename,
+            'url' => $url,
+            'path' => $path,
+            'filename' => $file->getClientOriginalName(),
             'original_name' => $file->getClientOriginalName(),
             'size' => $file->getSize(),
-            'mime_type' => $mimeType,
-            'file_data' => $fileData, // Send back so ProductController can store it
             'storage' => 'database',
         ], 201);
     }
 
-    public function serve(string $id)
+    public function serve(string $type, string $id)
     {
-        $media = ProductMedia::findOrFail($id);
+        $media = null;
+        if ($type === 'product') {
+            $media = \App\Models\ProductMedia::findOrFail($id);
+        } elseif ($type === 'category') {
+            $media = \App\Models\Category::findOrFail($id);
+        } elseif ($type === 'site') {
+            $media = \App\Models\SiteMedia::findOrFail($id);
+        } else {
+            return response()->json(['message' => 'Type de média invalide'], 400);
+        }
         
         if (!$media->file_data) {
             return response()->json(['message' => 'Média non trouvé ou non stocké en base'], 404);
@@ -90,7 +123,7 @@ class MediaController extends Controller
         return response($data)
             ->header('Content-Type', $media->mime_type ?? 'application/octet-stream')
             ->header('Cache-Control', 'public, max-age=31536000')
-            ->header('Content-Disposition', 'inline; filename="' . ($media->alt_text ?: 'media') . '"');
+            ->header('Content-Disposition', 'inline; filename="' . ($media->name ?? $media->alt_text ?? 'media') . '"');
     }
 
     public function delete(Request $request): JsonResponse

@@ -48,16 +48,21 @@ class CategoryController extends Controller
             $validated['slug'] = Str::slug($validated['name']);
         }
 
-        // Handle image upload if file is provided
         if ($request->hasFile('image_file')) {
             $file = $request->file('image_file');
-            $mimeType = $file->getMimeType();
-            $base64 = base64_encode(file_get_contents($file->getRealPath()));
-            $validated['image_url'] = 'data:' . $mimeType . ';base64,' . $base64;
+            $validated['mime_type'] = $file->getMimeType();
+            $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
+            // URL will be set after creation
+            $validated['image_url'] = '';
         }
 
         unset($validated['image_file']);
         $category = Category::create($validated);
+
+        if ($category->file_data) {
+            $category->image_url = url('/api/media/db/category/' . $category->id);
+            $category->save();
+        }
 
         return response()->json([
             'data' => $category,
@@ -79,12 +84,11 @@ class CategoryController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        // Handle image upload if file is provided
         if ($request->hasFile('image_file')) {
             $file = $request->file('image_file');
-            $mimeType = $file->getMimeType();
-            $base64 = base64_encode(file_get_contents($file->getRealPath()));
-            $validated['image_url'] = 'data:' . $mimeType . ';base64,' . $base64;
+            $validated['mime_type'] = $file->getMimeType();
+            $validated['file_data'] = base64_encode(file_get_contents($file->getRealPath()));
+            $validated['image_url'] = url('/api/media/db/category/' . $category->id);
         }
 
         unset($validated['image_file']);

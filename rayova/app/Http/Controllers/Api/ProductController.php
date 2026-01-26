@@ -290,15 +290,9 @@ class ProductController extends Controller
 
         // Update URL if it was stored in DB
         if (empty($media->url) && $media->isStoredInDb()) {
-            $media->url = url('/api/media/db/' . $media->id);
+            $media->url = url('/api/media/db/product/' . $media->id);
             $media->save();
         }
-
-        if (!empty($mediaData['is_primary'])) {
-            $product->media()->update(['is_primary' => false]);
-        }
-
-        $media = ProductMedia::create($mediaData);
 
         return response()->json([
             'data' => $media,
