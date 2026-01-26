@@ -280,7 +280,7 @@ class ProductController extends Controller
 
             if ($url === 'pending_db_storage' && $request->hasFile('file')) {
                 $path = $request->file('file')->store('products', 'public');
-                $mediaData['url'] = '/storage/' . $path;
+                $mediaData['url'] = \Illuminate\Support\Facades\Storage::url($path);
                 
                 // Clean fields
                 $mediaData['file_data'] = null;

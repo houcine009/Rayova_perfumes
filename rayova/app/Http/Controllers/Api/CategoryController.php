@@ -59,7 +59,7 @@ class CategoryController extends Controller
 
             if ($request->hasFile('image_file')) {
                 $path = $request->file('image_file')->store('categories', 'public');
-                $validated['image_url'] = '/storage/' . $path;
+                $validated['image_url'] = \Illuminate\Support\Facades\Storage::url($path);
                 // Clear legacy binary fields
                 $validated['file_data'] = null;
                 $validated['mime_type'] = null;
@@ -70,7 +70,7 @@ class CategoryController extends Controller
 
             return response()->json(['data' => $category, 'message' => 'Catégorie créée'], 201);
         } catch (\Exception $e) {
-            \Log::error('Category Store Error [V12.0]: ' . $e->getMessage());
+            \Log::error('Category Store Error [V12.1]: ' . $e->getMessage());
             return response()->json(['message' => 'Erreur serveur'], 500);
         }
     }
@@ -106,7 +106,7 @@ class CategoryController extends Controller
                 }
 
                 $path = $request->file('image_file')->store('categories', 'public');
-                $validated['image_url'] = '/storage/' . $path;
+                $validated['image_url'] = \Illuminate\Support\Facades\Storage::url($path);
                 $validated['file_data'] = null;
                 $validated['mime_type'] = null;
             }
@@ -116,7 +116,7 @@ class CategoryController extends Controller
 
             return response()->json(['data' => $category, 'message' => 'Catégorie mise à jour']);
         } catch (\Exception $e) {
-            \Log::error('Category Update Error [V12.0]: ' . $e->getMessage());
+            \Log::error('Category Update Error [V12.1]: ' . $e->getMessage());
             return response()->json(['message' => 'Erreur serveur'], 500);
         }
     }

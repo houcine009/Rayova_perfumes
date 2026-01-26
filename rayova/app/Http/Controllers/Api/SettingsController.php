@@ -88,7 +88,7 @@ class SettingsController extends Controller
         // Fallback to Standard Disk Storage
         if (!$url) {
             $path = $file->store('settings', 'public');
-            $url = '/storage/' . $path;
+            $url = \Illuminate\Support\Facades\Storage::url($path);
         }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
