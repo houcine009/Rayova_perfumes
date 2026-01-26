@@ -27,6 +27,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/id/{id}', [ProductController::class, 'showById']);
+Route::get('/media/proxy/{type}/{id}', [\App\Http\Controllers\Api\ProxyMediaController::class, 'stream']); // V11.0 Proxy Route
 Route::get('/media/db/{type}/{id}', [MediaController::class, 'serve']);
 
 // Public category routes

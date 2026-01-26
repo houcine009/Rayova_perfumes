@@ -88,7 +88,15 @@ class SettingsController extends Controller
         // Fallback to Database storage (ensures persistence on ephemeral hosts)
         if (!$url) {
             $base64 = base64_encode(file_get_contents($file->getRealPath()));
-            $url = 'data:' . $file->getMimeType() . ';base64,' . $base64;
+            $siteMedia = \App\Models\SiteMedia::updateOrCreate(
+                ['key' => $validated['key']],
+                [
+                    'file_data' => $base64,
+                    'mime_type' => $file->getMimeType(),
+                    'filename' => $file->getClientOriginalName(),
+                ]
+            );
+            $url = url('/api/media/proxy/site/' . $siteMedia->id);
         }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
@@ -111,10 +119,10 @@ class SettingsController extends Controller
                 'is_configured' => true,
                 'cloud_name' => $cloudinaryName ? substr($cloudinaryName, 0, 3) . '***' : null,
                 'app_url' => config('app.url'),
-                'version' => 'V10.0',
+                'version' => 'V11.0',
                 'message' => $isConfigured 
                     ? 'Cloudinary est prêt.' 
-                    : 'Le coffre-fort IMMORTEL est actif. (Data-URIs V10.0)',
+                    : 'Le flux PROXY est actif. (V11.0)',
             ]
         ]);
     }
