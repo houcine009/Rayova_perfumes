@@ -114,7 +114,8 @@ class MediaController extends Controller
         }
         
         if (!$media->file_data) {
-            return response()->json(['message' => 'Média non trouvé ou non stocké en base'], 404);
+            \Log::warning("Media Not Found [V7.1]: Type=$type, ID=$id");
+            return response()->json(['message' => 'Média non trouvé [V7.1]'], 404);
         }
 
         $data = base64_decode($media->file_data);
@@ -122,6 +123,8 @@ class MediaController extends Controller
         return response($data)
             ->header('Content-Type', $media->mime_type ?? 'application/octet-stream')
             ->header('Cache-Control', 'public, max-age=31536000')
+            ->header('Access-Control-Allow-Origin', '*') 
+            ->header('X-Content-Type-Options', 'nosniff')
             ->header('Content-Disposition', 'inline; filename="' . ($media->name ?? $media->alt_text ?? 'media') . '"');
     }
 
