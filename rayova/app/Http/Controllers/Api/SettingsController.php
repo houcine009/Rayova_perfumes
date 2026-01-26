@@ -95,7 +95,7 @@ class SettingsController extends Controller
                     'filename' => $file->getClientOriginalName(),
                 ]
             );
-            $url = '/api/media/db/site/' . $siteMedia->id;
+            $url = url('/api/media/db/site/' . $siteMedia->id);
         }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
@@ -118,10 +118,10 @@ class SettingsController extends Controller
                 'is_configured' => true,
                 'cloud_name' => $cloudinaryName ? substr($cloudinaryName, 0, 3) . '***' : null,
                 'app_url' => config('app.url'),
-                'version' => 'V5.1',
+                'version' => 'V6.1',
                 'message' => $isConfigured 
                     ? 'Cloudinary est prêt.' 
-                    : 'Le coffre-fort de données est ACTIF. (URLs Relatives V5.1)',
+                    : 'Le coffre-fort de données est ACTIF. (URLs Absolues V6.1)',
             ]
         ]);
     }
