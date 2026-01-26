@@ -142,23 +142,63 @@ const AdminProducts = () => {
     setIsDialogOpen(true);
   };
 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (editingId) {
+      // Direct upload if editing
+      const loadingToast = toast({ title: 'Chargement...', description: "Envoi du média" });
+      try {
+        const { api } = await import('@/lib/api');
+        for (const file of Array.from(files)) {
+          await api.upload(`/admin/products/${editingId}/media`, file);
+        }
+        toast({ title: 'Média ajouté avec succès' });
+        queryClient.invalidateQueries({ queryKey: ['products'] });
+      } catch (error: any) {
+        toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      }
+    } else {
+      // Local selection if creating
+      const newFiles = Array.from(files);
+      setSelectedFiles(prev => [...prev, ...newFiles]);
+      setPreviews(prev => [...prev, ...newFiles.map(f => URL.createObjectURL(f))]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      let product;
       if (editingId) {
-        await updateProduct.mutateAsync({
+        product = await updateProduct.mutateAsync({
           id: editingId,
           updates: formData,
         });
         toast({ title: 'Produit mis à jour avec succès' });
       } else {
-        await createProduct.mutateAsync(formData);
-        toast({ title: 'Produit créé avec succès' });
+        const response: any = await createProduct.mutateAsync(formData);
+        product = response.data;
+
+        // Final upload for new product
+        if (selectedFiles.length > 0 && product?.id) {
+          const { api } = await import('@/lib/api');
+          for (const file of selectedFiles) {
+            await api.upload(`/admin/products/${product.id}/media`, file);
+          }
+        }
       }
+
       setIsDialogOpen(false);
       setEditingId(null);
       setFormData(defaultFormData);
+      setSelectedFiles([]);
+      setPreviews([]);
     } catch (error: any) {
       toast({
         title: 'Erreur',
@@ -168,52 +208,11 @@ const AdminProducts = () => {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editingId) return;
-
-    // Use a loading toast
-    const loadingToast = toast({
-      title: 'Chargement...',
-      description: "Envoi du média en cours",
-    });
-
-    try {
-      // 1. Upload file to get URL (using common upload endpoint if distinct, or direct product media endpoint)
-      // Actually, useAddProductMedia expects JSON { product_id, url ... } usually, 
-      // but let's check the hook definition in useProducts.ts.
-      // Wait, the hook calls `productService.addMedia`. 
-      // `productService.addMedia` calls `api.post('/admin/products/${productId}/media', data)`.
-      // BUT `api.post` sends JSON. We need `api.upload` or FormData for files.
-      // The current controller expects `file` in FormData.
-      // The `productService.addMedia` signature is: 
-      // addMedia(productId, data: { url: string... }) 
-      // It DOES NOT support File object directly based on Step 563.
-
-      // FIX: We must use api.upload explicitly AND invalidate queries.
-      // Since useAddProductMedia might not be set up for file uploads yet.
-
-      const { api } = await import('@/lib/api');
-      await api.upload(`/admin/products/${editingId}/media`, file);
-
-      toast({ title: 'Média ajouté avec succès' });
-
-      // Force refresh of products list
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-    } catch (error: any) {
-      toast({
-        title: 'Erreur d\'upload',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
-  };
-
-
   const handleDeleteMedia = async (mediaId: string) => {
     try {
       await api.delete(`/admin/products/media/${mediaId}`);
       toast({ title: 'Média supprimé' });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     } catch (error: any) {
       toast({
         title: 'Erreur',
@@ -245,6 +244,8 @@ const AdminProducts = () => {
       setIsDialogOpen(false);
       setEditingId(null);
       setFormData(defaultFormData);
+      setSelectedFiles([]);
+      setPreviews([]);
     }
   };
 
@@ -514,6 +515,26 @@ const AdminProducts = () => {
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
+                    </div>
+                  ))}
+
+                  {/* New Media Previews (during creation) */}
+                  {previews.map((url, index) => (
+                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-primary/30 group">
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        type="button"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => {
+                          setPreviews(prev => prev.filter((_, i) => i !== index));
+                          setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                      <div className="absolute bottom-0 left-0 right-0 bg-primary/80 text-[8px] text-white text-center py-0.5">Nouveau</div>
                     </div>
                   ))}
 
