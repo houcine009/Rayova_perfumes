@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Caddy - Automatic HTTPS with Let's Encrypt
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./dist:/var/www/frontend
+    depends_on:
+      - backend
+    networks:
+      - rayova-network
+
+  # Laravel Backend
+  backend:
+    build:
+      context: ./rayova
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - APP_NAME=Rayova
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://api.rayovaparfums.com
+      - APP_KEY=${APP_KEY}
+      - DB_CONNECTION=sqlite
+      - SESSION_DRIVER=file
+      - CACHE_STORE=file
+      - QUEUE_CONNECTION=sync
+      - FRONTEND_URL=https://rayovaparfums.com
+      - CLOUDINARY_CLOUD_NAME=
+      - CLOUDINARY_API_KEY=
+      - CLOUDINARY_API_SECRET=
+    volumes:
+      - backend_storage:/var/www/html/storage
+      - backend_database:/var/www/html/database
+    networks:
+      - rayova-network
+
+networks:
+  rayova-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
+  backend_storage:
+  backend_database:
