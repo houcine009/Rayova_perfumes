@@ -37,6 +37,7 @@ import {
 import { useOrders, useUpdateOrderStatus, useDeleteOrder, type OrderWithItems, type OrderStatus } from '@/hooks/useOrders';
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from '@/hooks/use-toast';
+import { formatWhatsAppLink, formatPhoneDisplay } from '@/lib/phoneUtils';
 
 const statusLabels: Record<OrderStatus, string> = {
   pending: 'En attente',
@@ -249,18 +250,21 @@ const AdminOrders = () => {
                   {selectedOrder.shipping_postal_code && ` ${selectedOrder.shipping_postal_code}`}
                 </p>
                 {selectedOrder.shipping_phone && (
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground">
-                      Tél: {selectedOrder.shipping_phone}
-                    </p>
+                  <div className="flex items-center gap-3 bg-muted/30 p-3 rounded-lg border border-border/50">
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Téléphone & WhatsApp</p>
+                      <p className="font-mono text-lg tracking-tight">
+                        {formatPhoneDisplay(selectedOrder.shipping_phone)}
+                      </p>
+                    </div>
                     <a
-                      href={`https://wa.me/${selectedOrder.shipping_phone.replace(/\+/g, '').replace(/\s/g, '')}`}
+                      href={`https://wa.me/${formatWhatsAppLink(selectedOrder.shipping_phone)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-green-600 hover:text-green-700 p-1"
+                      className="flex items-center justify-center h-10 w-10 bg-green-500 hover:bg-green-600 text-white rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
                       title="Contacter sur WhatsApp"
                     >
-                      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+                      <svg viewBox="0 0 24 24" className="h-6 w-6 fill-current">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.249-.57-.398zM12 4c-4.418 0-8 3.582-8 8 0 1.408.366 2.736.996 3.882L3.5 19.5l3.774-1.487C8.428 18.666 9.686 19 11 19c4.418 0 8-3.582 8-8s-3.582-8-8-8z" />
                       </svg>
                     </a>
