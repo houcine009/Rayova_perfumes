@@ -85,11 +85,11 @@ const AdminSettings = () => {
 
     setIsSaving(true);
     try {
-      const response: any = await api.post('/admin/settings/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      console.log(`[Upload] Starting upload for ${key}...`);
+      const response: any = await api.post('/admin/settings/upload', formData);
 
       const newUrl = response.url;
+      console.log(`[Upload] Success! New URL: ${newUrl}`);
       if (key === 'hero_background_url') {
         setHeroSettings(prev => ({ ...prev, image_url: newUrl }));
       } else {

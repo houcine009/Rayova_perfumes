@@ -48,7 +48,6 @@ class ApiClient {
       withCredentials: false,
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
       },
     });
 
@@ -113,32 +112,47 @@ class ApiClient {
     return this.axiosInstance.get<any, T>(endpoint, { params });
   }
 
-  async post<T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    const isFormData = data instanceof FormData;
+  async post<T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const isFormData = data instanceof FormData || (data && typeof data.append === 'function');
     const requestConfig = { ...config };
 
     if (isFormData) {
-      requestConfig.headers = {
-        ...requestConfig.headers,
-        'Content-Type': 'multipart/form-data', // Optional, usually better to let browser set it, but explicit ensures axios doesn't use json
-      };
-      // Actually, safest way with Axios is to delete Content-Type and let browser set boundary
-      if (requestConfig.headers['Content-Type']) {
+      // For FormData, we MUST NOT set Content-Type header manually
+      // so the browser can set it with the correct boundary string.
+      if (requestConfig.headers) {
         delete requestConfig.headers['Content-Type'];
       }
+    } else if (data && typeof data === 'object' && !(requestConfig.headers && requestConfig.headers['Content-Type'])) {
+      // Default to JSON for plain objects if not specified
+      requestConfig.headers = {
+        ...requestConfig.headers,
+        'Content-Type': 'application/json',
+      };
     }
 
     return this.axiosInstance.post<any, T>(endpoint, data, requestConfig);
   }
 
-  async put<T>(endpoint: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
-    const isFormData = data instanceof FormData;
+  async put<T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const isFormData = data instanceof FormData || (data && typeof data.append === 'function');
     const requestConfig = { ...config };
 
     if (isFormData) {
-      if (requestConfig.headers && requestConfig.headers['Content-Type']) {
+      if (requestConfig.headers) {
         delete requestConfig.headers['Content-Type'];
       }
+      // Laravel/PHP handles PUT with files best via POST spoofing
+      if (data instanceof FormData && !data.has('_method')) {
+        data.append('_method', 'PUT');
+      }
+      return this.axiosInstance.post<any, T>(endpoint, data, requestConfig);
+    }
+
+    if (data && typeof data === 'object' && !(requestConfig.headers && requestConfig.headers['Content-Type'])) {
+      requestConfig.headers = {
+        ...requestConfig.headers,
+        'Content-Type': 'application/json',
+      };
     }
 
     return this.axiosInstance.put<any, T>(endpoint, data, requestConfig);
