@@ -159,9 +159,9 @@ export default function Checkout() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Téléphone *</Label>
+                      <Label htmlFor="phone">Téléphone d'appel *</Label>
                       <Input
                         id="phone"
                         name="phone"
@@ -171,9 +171,10 @@ export default function Checkout() {
                         placeholder="06XXXXXXXX"
                         required
                       />
+                      <p className="text-[10px] text-muted-foreground italic">Pour vous appeler lors de la livraison</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="whatsapp">WhatsApp *</Label>
+                      <Label htmlFor="whatsapp">Numéro WhatsApp *</Label>
                       <Input
                         id="whatsapp"
                         name="whatsapp"
@@ -183,6 +184,7 @@ export default function Checkout() {
                         placeholder="06XXXXXXXX"
                         required
                       />
+                      <p className="text-[10px] text-muted-foreground italic">Pour confirmer les détails par message</p>
                     </div>
                   </div>
 
