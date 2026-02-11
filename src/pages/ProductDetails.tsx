@@ -114,6 +114,7 @@ const ProductDetails = () => {
                                             loop
                                             muted
                                             playsInline
+                                            controls
                                             preload="auto"
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
@@ -195,14 +196,6 @@ const ProductDetails = () => {
                                 <h1 className="text-4xl lg:text-5xl font-playfair font-bold text-foreground">
                                     {product.name}
                                 </h1>
-                                <div className="flex items-center gap-4 text-sm">
-                                    <div className="flex text-primary">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className={`h-4 w-4 ${i < Math.floor(Number(product.rating) || 5) ? 'fill-current' : 'text-muted-foreground opacity-50'}`} />
-                                        ))}
-                                    </div>
-                                    <span className="text-muted-foreground">({Number(product.rating || 5).toFixed(1)}/5) Basé sur {product.reviews_count || 0} avis</span>
-                                </div>
                             </div>
 
                             <div className="flex items-baseline gap-4 mb-8">
@@ -305,10 +298,10 @@ const ProductDetails = () => {
                         </div>
                     </div>
                 </div>
-            </main>
+            </main >
 
             <Footer />
-        </div>
+        </div >
     );
 };
 

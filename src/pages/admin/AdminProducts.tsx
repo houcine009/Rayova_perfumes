@@ -474,34 +474,6 @@ const AdminProducts = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="rating">Note (étoiles, e.g. 4.9)</Label>
-                  <Input
-                    id="rating"
-                    type="number"
-                    step="0.1"
-                    min="0"
-                    max="5"
-                    value={formData.rating}
-                    onChange={(e) =>
-                      setFormData({ ...formData, rating: parseFloat(e.target.value) })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="reviews_count">Nombre d'avis</Label>
-                  <Input
-                    id="reviews_count"
-                    type="number"
-                    min="0"
-                    value={formData.reviews_count}
-                    onChange={(e) =>
-                      setFormData({ ...formData, reviews_count: parseInt(e.target.value) })
-                    }
-                  />
-                </div>
-              </div>
 
               <div className="flex flex-wrap gap-6">
                 <div className="flex items-center gap-2">

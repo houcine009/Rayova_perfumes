@@ -91,15 +91,6 @@ const AdminHome = () => {
       color: 'text-purple-500',
       bg: 'bg-gradient-to-br from-purple-500/20 to-purple-600/10',
     },
-    {
-      title: 'Avis en attente',
-      value: stats?.reviews.pending || 0,
-      subValue: `${stats?.reviews.approved || 0} approuvés`,
-      icon: Star,
-      color: 'text-amber-500',
-      bg: 'bg-gradient-to-br from-amber-500/20 to-amber-600/10',
-      link: '/admin/avis',
-    },
   ];
 
   const orderStats = [
