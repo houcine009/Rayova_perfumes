@@ -15,19 +15,22 @@ Review::where('is_approved', false)->update(['is_approved' => true]);
 echo "Syncing Product Stats...\n";
 
 $products = Product::all();
+echo "Found " . $products->count() . " products.\n";
 
 foreach ($products as $product) {
     $stats = Review::where('product_id', $product->id)
-        ->where('is_approved', true)
         ->selectRaw('COUNT(*) as count, AVG(rating) as average')
         ->first();
 
+    $count = $stats->count ?? 0;
+    $rating = round($stats->average ?? 5.0, 1);
+
     $product->update([
-        'reviews_count' => $stats->count ?? 0,
-        'rating' => round($stats->average ?? 5.0, 1),
+        'reviews_count' => $count,
+        'rating' => $rating,
     ]);
 
-    echo "Synced Product: {$product->name} - Count: {$product->reviews_count}, Rating: {$product->rating}\n";
+    echo "✅ Synced: [{$product->name}] -> Avis: {$count}, Note: {$rating}/5\n";
 }
 
 echo "Done!\n";
