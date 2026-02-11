@@ -6,6 +6,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import collectionHomme from "@/assets/collection-homme.jpg";
 import collectionFemme from "@/assets/collection-femme.jpg";
 import collectionNiche from "@/assets/collection-niche.jpg";
@@ -47,6 +48,16 @@ const CategoryPage = () => {
   });
 
   const displayedProducts = products || [];
+
+  useEffect(() => {
+    const meta = document.createElement('meta');
+    meta.name = "robots";
+    meta.content = "noindex, follow";
+    document.head.appendChild(meta);
+    return () => {
+      document.head.removeChild(meta);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">

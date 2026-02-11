@@ -74,14 +74,22 @@ const AdminHome = () => {
       link: '/admin/commandes',
     },
     {
-      title: 'Revenus',
+      title: 'Ventes (Net)',
       value: `${Number(stats?.orders.revenue || 0).toLocaleString('fr-FR')} MAD`,
-      subValue: 'Total confirmé',
+      subValue: 'Produits uniquement',
       icon: TrendingUp,
       color: 'text-primary',
       bg: 'bg-gradient-to-br from-primary/20 to-primary/10',
       trend: '+12%',
       trendUp: true,
+    },
+    {
+      title: 'Livraison (Total)',
+      value: `${Number(stats?.orders.total_shipping || 0).toLocaleString('fr-FR')} MAD`,
+      subValue: 'Frais collectés',
+      icon: CheckCircle,
+      color: 'text-purple-500',
+      bg: 'bg-gradient-to-br from-purple-500/20 to-purple-600/10',
     },
     {
       title: 'Avis en attente',
@@ -136,7 +144,7 @@ const AdminHome = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {mainStats.map((stat, index) => (
           <motion.div
             key={stat.title}

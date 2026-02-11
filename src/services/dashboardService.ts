@@ -20,6 +20,7 @@ export interface DashboardStats {
         processing: number;
         completed: number;
         revenue: number;
+        total_shipping: number;
         today: number;
         this_month: number;
     };
