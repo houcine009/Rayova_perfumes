@@ -106,7 +106,7 @@ const ProductDetails = () => {
                         <div className="space-y-4">
                             <div className="relative aspect-square overflow-hidden bg-card rounded-2xl group">
                                 <AnimatePresence mode="wait">
-                                    {images[activeImage].match(/\.(mp4|webm|mov|ogg)$/i) ? (
+                                    {images[activeImage].match(/\.(mp4|webm|mov|ogg|m4v|3gp|mkv)$/i) ? (
                                         <motion.video
                                             key={activeImage}
                                             src={images[activeImage]}
@@ -114,6 +114,7 @@ const ProductDetails = () => {
                                             loop
                                             muted
                                             playsInline
+                                            preload="auto"
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
@@ -161,9 +162,15 @@ const ProductDetails = () => {
                                             className={`relative flex-shrink-0 w-24 aspect-square rounded-lg overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-primary' : 'border-transparent'
                                                 }`}
                                         >
-                                            {img.match(/\.(mp4|webm|mov|ogg)$/i) ? (
+                                            {img.match(/\.(mp4|webm|mov|ogg|m4v)$/i) ? (
                                                 <div className="w-full h-full relative">
-                                                    <video src={img} className="w-full h-full object-cover" />
+                                                    <video
+                                                        src={img}
+                                                        muted
+                                                        playsInline
+                                                        preload="auto"
+                                                        className="w-full h-full object-cover"
+                                                    />
                                                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                                                         <div className="w-6 h-6 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm">
                                                             <div className="w-0 h-0 border-l-[6px] border-l-white border-y-[4px] border-y-transparent ml-0.5" />
