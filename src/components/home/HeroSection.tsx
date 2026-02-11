@@ -33,8 +33,12 @@ export function HeroSection() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover"
+            preload="auto"
+            poster={imageUrl || undefined}
+            className="w-full h-full object-cover transition-opacity duration-1000"
             key={videoUrl}
+            onCanPlay={(e) => (e.currentTarget.style.opacity = "1")}
+            style={{ opacity: 0 }}
           >
             <source src={videoUrl} type="video/mp4" />
           </video>

@@ -106,16 +106,32 @@ const ProductDetails = () => {
                         <div className="space-y-4">
                             <div className="relative aspect-square overflow-hidden bg-card rounded-2xl group">
                                 <AnimatePresence mode="wait">
-                                    <motion.img
-                                        key={activeImage}
-                                        src={images[activeImage]}
-                                        alt={product.name}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.5 }}
-                                        className="w-full h-full object-cover"
-                                    />
+                                    {images[activeImage].match(/\.(mp4|webm|mov|ogg)$/i) ? (
+                                        <motion.video
+                                            key={activeImage}
+                                            src={images[activeImage]}
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <motion.img
+                                            key={activeImage}
+                                            src={images[activeImage]}
+                                            alt={product.name}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    )}
                                 </AnimatePresence>
 
                                 {images.length > 1 && (
@@ -145,7 +161,18 @@ const ProductDetails = () => {
                                             className={`relative flex-shrink-0 w-24 aspect-square rounded-lg overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-primary' : 'border-transparent'
                                                 }`}
                                         >
-                                            <img src={img} alt="" className="w-full h-full object-cover" />
+                                            {img.match(/\.(mp4|webm|mov|ogg)$/i) ? (
+                                                <div className="w-full h-full relative">
+                                                    <video src={img} className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                                        <div className="w-6 h-6 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                                            <div className="w-0 h-0 border-l-[6px] border-l-white border-y-[4px] border-y-transparent ml-0.5" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <img src={img} alt="" className="w-full h-full object-cover" />
+                                            )}
                                         </button>
                                     ))}
                                 </div>
@@ -235,7 +262,10 @@ const ProductDetails = () => {
                                     </div>
                                     <div>
                                         <p className="text-xs font-semibold uppercase">Livraison</p>
-                                        <p className="text-xs text-muted-foreground">Gratuite dès 500 MAD</p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {product.price >= 500 ? 'Gratuite' : '35 MAD'}
+                                            {product.price < 500 && ' (Gratuit dès 500 MAD)'}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
