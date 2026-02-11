@@ -1,10 +1,4 @@
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from "lucide-react";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/CartContext";
+import { MediaDisplay } from "@/components/common/MediaDisplay";
 
 export default function Panier() {
   const { items, removeItem, updateQuantity, subtotal, shippingCost, total, itemCount } = useCart();
@@ -50,23 +44,12 @@ export default function Panier() {
                       exit={{ opacity: 0 }}
                       className="flex gap-4 p-4 bg-card border border-border rounded-lg"
                     >
-                      <div className="w-24 h-24 bg-muted rounded overflow-hidden flex-shrink-0">
-                        {item.image?.match(/\.(mp4|webm|ogg)$/i) ? (
-                          <video
-                            src={item.image}
-                            className="w-full h-full object-cover"
-                            muted
-                            playsInline
-                            onMouseOver={e => e.currentTarget.play()}
-                            onMouseOut={e => e.currentTarget.pause()}
-                          />
-                        ) : (
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
+                      <div className="w-24 h-24 rounded overflow-hidden flex-shrink-0">
+                        <MediaDisplay
+                          src={item.image}
+                          alt={item.name}
+                          onHoverPlay
+                        />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground">{item.name}</h3>

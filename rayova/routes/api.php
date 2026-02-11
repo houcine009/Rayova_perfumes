@@ -32,7 +32,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/id/{id}', [ProductController::class, 'showById']);
 Route::get('/media/proxy/{type}/{id}', [\App\Http\Controllers\Api\ProxyMediaController::class, 'stream']); // V11.0 Proxy Route
-Route::get('/media/db/{type}/{id}', [MediaController::class, 'serve']);
+Route::get('/media/db/{type}/{id}{extension?}', [MediaController::class, 'serve'])->where('extension', '\..+');
 
 // Public category routes
 Route::get('/categories', [CategoryController::class, 'index']);

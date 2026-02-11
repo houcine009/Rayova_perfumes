@@ -4,6 +4,7 @@ import { ShoppingBag, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { MediaDisplay } from "@/components/common/MediaDisplay";
 
 interface ProductCardProps {
   id: string;
@@ -71,23 +72,12 @@ export function ProductCard({
       <Link to={`/produit/${slug}`} className="block">
         {/* Image/Video Container */}
         <div className="relative overflow-hidden aspect-[3/4] bg-card mb-4 group-hover:shadow-2xl transition-shadow duration-500">
-          {displayImage.match(/\.(mp4|webm|mov|ogg|m4v|3gp|mkv)$/i) ? (
-            <video
-              src={displayImage}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          ) : (
-            <img
-              src={displayImage}
-              alt={name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          )}
+          <MediaDisplay
+            src={displayImage}
+            alt={name}
+            className="transition-transform duration-700 group-hover:scale-105"
+            onHoverPlay
+          />
 
           {/* Overlay on Hover */}
           <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">

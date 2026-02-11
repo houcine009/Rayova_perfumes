@@ -33,6 +33,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '@/hooks/useCategories';
 import { useToast } from '@/hooks/use-toast';
+import { MediaDisplay } from '@/components/common/MediaDisplay';
 
 interface CategoryFormData {
   name: string;
@@ -350,27 +351,8 @@ const AdminCategories = () => {
                 {categories?.map((category) => (
                   <TableRow key={category.id}>
                     <TableCell>
-                      <div className="w-12 h-12 rounded overflow-hidden bg-muted">
-                        {category.image_url ? (
-                          category.image_url.match(/\.(mp4|webm|ogg)$/i) ? (
-                            <video
-                              src={category.image_url}
-                              className="w-full h-full object-cover"
-                              muted
-                              playsInline
-                            />
-                          ) : (
-                            <img
-                              src={category.image_url}
-                              alt={category.name}
-                              className="w-full h-full object-cover"
-                            />
-                          )
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            <Plus className="h-4 w-4 opacity-20" />
-                          </div>
-                        )}
+                      <div className="w-12 h-12 rounded overflow-hidden">
+                        <MediaDisplay src={category.image_url} alt={category.name} />
                       </div>
                     </TableCell>
                     <TableCell className="font-medium">{category.name}</TableCell>
