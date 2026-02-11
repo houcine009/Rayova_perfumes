@@ -51,11 +51,22 @@ export default function Panier() {
                       className="flex gap-4 p-4 bg-card border border-border rounded-lg"
                     >
                       <div className="w-24 h-24 bg-muted rounded overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
+                        {item.image?.match(/\.(mp4|webm|ogg)$/i) ? (
+                          <video
+                            src={item.image}
+                            className="w-full h-full object-cover"
+                            muted
+                            playsInline
+                            onMouseOver={e => e.currentTarget.play()}
+                            onMouseOut={e => e.currentTarget.pause()}
+                          />
+                        ) : (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground">{item.name}</h3>

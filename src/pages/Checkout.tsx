@@ -286,11 +286,22 @@ export default function Checkout() {
                     {items.map(item => (
                       <div key={item.id} className="flex gap-3">
                         <div className="w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
+                          {item.image?.match(/\.(mp4|webm|ogg)$/i) ? (
+                            <video
+                              src={item.image}
+                              className="w-full h-full object-cover"
+                              muted
+                              playsInline
+                              autoPlay
+                              loop
+                            />
+                          ) : (
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                         </div>
                         <div className="flex-1">
                           <h4 className="font-medium text-sm text-foreground">{item.name}</h4>
