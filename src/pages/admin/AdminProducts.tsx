@@ -64,6 +64,8 @@ interface ProductFormData {
   is_new: boolean;
   is_active: boolean;
   category_ids: string[];
+  rating: number;
+  reviews_count: number;
 }
 
 const defaultFormData: ProductFormData = {
@@ -83,6 +85,8 @@ const defaultFormData: ProductFormData = {
   is_new: false,
   is_active: true,
   category_ids: [],
+  rating: 5,
+  reviews_count: 0,
 };
 
 const AdminProducts = () => {
@@ -137,7 +141,9 @@ const AdminProducts = () => {
       is_featured: !!product.is_featured,
       is_new: !!product.is_new,
       is_active: product.is_active !== false,
-      category_ids: product.categories?.map(c => c.id) || [],
+      category_ids: product.category_ids || product.categories?.map(c => c.id) || [],
+      rating: Number(product.rating) || 5,
+      reviews_count: Number(product.reviews_count) || 0,
     });
     setIsDialogOpen(true);
   };
@@ -463,6 +469,35 @@ const AdminProducts = () => {
                     value={formData.notes_base}
                     onChange={(e) =>
                       setFormData({ ...formData, notes_base: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="rating">Note (étoiles, e.g. 4.9)</Label>
+                  <Input
+                    id="rating"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={formData.rating}
+                    onChange={(e) =>
+                      setFormData({ ...formData, rating: parseFloat(e.target.value) })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reviews_count">Nombre d'avis</Label>
+                  <Input
+                    id="reviews_count"
+                    type="number"
+                    min="0"
+                    value={formData.reviews_count}
+                    onChange={(e) =>
+                      setFormData({ ...formData, reviews_count: parseInt(e.target.value) })
                     }
                   />
                 </div>

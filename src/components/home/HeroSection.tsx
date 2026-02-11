@@ -37,6 +37,14 @@ export function HeroSection() {
             poster={imageUrl || undefined}
             className="w-full h-full object-cover"
             key={videoUrl}
+            // Adding `disablePictureInPicture` and `controlsList` can sometimes help with browser performance
+            // by preventing certain UI elements or modes that might consume resources.
+            // `disablePictureInPicture` prevents the video from being put into Picture-in-Picture mode.
+            // `controlsList="nodownload nofullscreen noremoteplayback"` removes default controls like download, fullscreen, and remote playback.
+            // While these are primarily UX/security features, removing unnecessary browser UI can sometimes
+            // subtly improve rendering performance or prevent unexpected behavior that might be perceived as "lag".
+            disablePictureInPicture
+            controlsList="nodownload nofullscreen noremoteplayback"
           >
             <source src={videoUrl} type="video/mp4" />
           </video>

@@ -30,6 +30,8 @@ class Product extends Model
         'notes_heart',
         'notes_base',
         'brand',
+        'rating',
+        'reviews_count',
     ];
 
     protected $casts = [
@@ -40,6 +42,8 @@ class Product extends Model
         'is_new' => 'boolean',
         'is_active' => 'boolean',
         'volume_ml' => 'integer',
+        'rating' => 'decimal:2',
+        'reviews_count' => 'integer',
     ];
 
     public function media(): HasMany

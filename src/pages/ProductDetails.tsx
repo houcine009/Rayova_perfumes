@@ -79,7 +79,7 @@ const ProductDetails = () => {
             price: product.price,
             image: images[0],
             volume_ml: product.volume_ml,
-        });
+        }, quantity);
         toast({
             title: "Ajouté au panier",
             description: `${product.name} a été ajouté à votre panier.`,
@@ -198,10 +198,10 @@ const ProductDetails = () => {
                                 <div className="flex items-center gap-4 text-sm">
                                     <div className="flex text-primary">
                                         {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className="h-4 w-4 fill-current" />
+                                            <Star key={i} className={`h-4 w-4 ${i < Math.floor(Number(product.rating) || 5) ? 'fill-current' : 'text-muted-foreground opacity-50'}`} />
                                         ))}
                                     </div>
-                                    <span className="text-muted-foreground">(4.9/5) Basé sur 120 avis</span>
+                                    <span className="text-muted-foreground">({Number(product.rating || 5).toFixed(1)}/5) Basé sur {product.reviews_count || 0} avis</span>
                                 </div>
                             </div>
 
@@ -224,20 +224,28 @@ const ProductDetails = () => {
                                     </p>
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-4 py-6 border-y border-border/50">
-                                    <div className="text-center">
-                                        <p className="text-xs text-muted-foreground uppercase tracking-tighter mb-1">Notes de Tête</p>
-                                        <p className="text-sm font-medium">{product.notes_top || 'Citron, Bergamote'}</p>
+                                {(product.notes_top || product.notes_heart || product.notes_base) && (
+                                    <div className="grid grid-cols-3 gap-4 py-6 border-y border-border/50">
+                                        {product.notes_top && (
+                                            <div className="text-center">
+                                                <p className="text-xs text-muted-foreground uppercase tracking-tighter mb-1">Notes de Tête</p>
+                                                <p className="text-sm font-medium">{product.notes_top}</p>
+                                            </div>
+                                        )}
+                                        {product.notes_heart && (
+                                            <div className="text-center">
+                                                <p className="text-xs text-muted-foreground uppercase tracking-tighter mb-1">Notes de Cœur</p>
+                                                <p className="text-sm font-medium">{product.notes_heart}</p>
+                                            </div>
+                                        )}
+                                        {product.notes_base && (
+                                            <div className="text-center">
+                                                <p className="text-xs text-muted-foreground uppercase tracking-tighter mb-1">Notes de Fond</p>
+                                                <p className="text-sm font-medium">{product.notes_base}</p>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="text-center">
-                                        <p className="text-xs text-muted-foreground uppercase tracking-tighter mb-1">Notes de Cœur</p>
-                                        <p className="text-sm font-medium">{product.notes_heart || 'Rose, Jasmin'}</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <p className="text-xs text-muted-foreground uppercase tracking-tighter mb-1">Notes de Fond</p>
-                                        <p className="text-sm font-medium">{product.notes_base || 'Ambre, Musc'}</p>
-                                    </div>
-                                </div>
+                                )}
 
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center border border-border rounded-lg h-12">
