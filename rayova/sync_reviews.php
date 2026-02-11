@@ -25,12 +25,15 @@ foreach ($products as $product) {
     $count = $stats->count ?? 0;
     $rating = round($stats->average ?? 5.0, 1);
 
-    $product->update([
-        'reviews_count' => $count,
-        'rating' => $rating,
-    ]);
-
-    echo "✅ Synced: [{$product->name}] -> Avis: {$count}, Note: {$rating}/5\n";
+    if ($count > 0) {
+        $product->update([
+            'reviews_count' => $count,
+            'rating' => $rating,
+        ]);
+        echo "✅ Synced: [{$product->name}] -> Avis: {$count}, Note: {$rating}/5\n";
+    } else {
+        echo "⏭️ Skipped: [{$product->name}] (Preserving manual stats: {$product->reviews_count} avis)\n";
+    }
 }
 
 echo "Done!\n";

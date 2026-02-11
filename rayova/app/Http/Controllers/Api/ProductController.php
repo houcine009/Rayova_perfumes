@@ -116,6 +116,8 @@ class ProductController extends Controller
                 'brand' => 'nullable|string|max:255',
                 'category_ids' => 'nullable|array',
                 'category_ids.*' => 'uuid|exists:categories,id',
+                'rating' => 'nullable|numeric|min:0|max:5',
+                'reviews_count' => 'nullable|integer|min:0',
             ]);
 
             // Generate slug if not provided
@@ -185,6 +187,8 @@ class ProductController extends Controller
                 'brand' => 'nullable|string|max:255',
                 'category_ids' => 'nullable|array',
                 'category_ids.*' => 'uuid|exists:categories,id',
+                'rating' => 'nullable|numeric|min:0|max:5',
+                'reviews_count' => 'nullable|integer|min:0',
             ]);
 
             $categoryIds = $validated['category_ids'] ?? null;
