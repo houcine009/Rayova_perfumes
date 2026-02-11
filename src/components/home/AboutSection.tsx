@@ -38,8 +38,8 @@ export function AboutSection() {
             À Propos de <span className="text-gold-gradient">Rayova</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            Rayova incarne l'excellence dans l'art de la parfumerie. 
-            Notre maison est née d'une passion profonde pour les fragrances 
+            Rayova incarne l'excellence dans l'art de la parfumerie.
+            Notre maison est née d'une passion profonde pour les fragrances
             exceptionnelles et l'artisanat de luxe.
           </p>
         </motion.div>
@@ -50,18 +50,40 @@ export function AboutSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="max-w-4xl mx-auto text-center mb-16 space-y-8"
         >
-          <p className="text-muted-foreground leading-relaxed mb-4">
-            Fondée avec la vision de créer des parfums qui transcendent 
-            le temps, Rayova s'engage à offrir uniquement les fragrances 
-            les plus raffinées et les plus mémorables.
-          </p>
-          <p className="text-muted-foreground leading-relaxed">
-            Chaque parfum de notre collection est soigneusement sélectionné, 
-            combinant des ingrédients de première qualité avec un savoir-faire 
-            artisanal exceptionnel.
-          </p>
+          <div className="space-y-6 text-muted-foreground leading-relaxed text-left md:text-center">
+            <p>
+              Bienvenue chez <strong>Rayova Parfums</strong>, votre destination ultime pour la <strong>parfumerie de luxe au Maroc</strong>.
+              Notre maison est née d'une vision simple mais ambitieuse : démocratiser l'accès aux fragrances les plus sophistiquées
+              tout en préservant l'exclusivité et le prestige des grandes maisons de parfum. Que vous soyez à la recherche d'un
+              <strong>parfum pour homme</strong> puissant et charismatique, d'un <strong>parfum pour femme</strong> délicat et envoûtant,
+              ou d'une création <strong>unisex</strong> audacieuse, notre collection est conçue pour répondre aux attentes des
+              amateurs les plus exigeants.
+            </p>
+
+            <p>
+              Basée au cœur du <strong>Maroc</strong>, Rayova s'inspire de la richesse olfactive de notre pays, mêlant traditions
+              ancestrales et modernité occidentale. Nous collaborons avec les meilleurs nez pour sélectionner des ingrédients
+              rares et précieux, garantissant une tenue exceptionnelle et un sillage unique. Chaque flacon est une promesse
+              d'élégance, un accessoire invisible mais indispensable qui définit votre présence et marque les esprits.
+            </p>
+
+            <p>
+              Nous comprenons que l'achat d'un <strong>parfum de luxe</strong> est une expérience sensorielle et personnelle.
+              C'est pourquoi nous avons mis en place un service client d'exception et une logistique de pointe. Nous offrons la
+              <strong>livraison rapide sur tout le Maroc</strong> (Casablanca, Rabat, Marrakech, Tanger, Agadir, et toutes les villes du Royaume).
+              Pour votre sérénité, nous proposons le <strong>paiement à la livraison (COD - Cash on Delivery)</strong>, vous permettant
+              de commander en toute confiance et de régler votre achat uniquement à la réception de votre colis.
+            </p>
+
+            <p>
+              Chez Rayova, nous ne vendons pas seulement des parfums ; nous partageons une passion. Notre mission est de vous
+              accompagner dans la quête de votre identité olfactive, en vous proposant des collections <strong>Niche</strong>,
+              <strong>Prestige</strong> et <strong>Premium</strong> à des prix justes. Rejoignez la communauté Rayova et
+              découvrez pourquoi nous sommes devenus la référence de la parfumerie sélective au Maroc.
+            </p>
+          </div>
         </motion.div>
 
         {/* Values Grid */}

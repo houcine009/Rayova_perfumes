@@ -152,9 +152,9 @@ const AdminHome = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
-            <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border-border/50">
-              <div className={`absolute inset-0 ${stat.bg} opacity-50`} />
-              <CardContent className="relative p-6">
+            <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm">
+              <div className={`absolute inset-0 ${stat.bg} opacity-5 group-hover:opacity-10 transition-opacity`} />
+              <CardContent className="relative p-6 flex flex-col h-full justify-between min-h-[140px]">
                 {statsLoading ? (
                   <div className="space-y-3">
                     <Skeleton className="h-4 w-24" />
@@ -162,26 +162,28 @@ const AdminHome = () => {
                     <Skeleton className="h-3 w-20" />
                   </div>
                 ) : (
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                      <p className="text-3xl font-bold text-foreground mt-2">
-                        {stat.value}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-xs text-muted-foreground">{stat.subValue}</p>
-                        {stat.trend && (
-                          <span className={`flex items-center text-xs font-medium ${stat.trendUp ? 'text-emerald-500' : 'text-red-500'}`}>
-                            {stat.trendUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                            {stat.trend}
-                          </span>
-                        )}
+                  <>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`p-2.5 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
+                        <stat.icon className={`h-5 w-5 ${stat.color}`} />
                       </div>
+                      {stat.trend && (
+                        <span className={`flex items-center text-xs font-semibold px-2 py-1 rounded-full ${stat.trendUp ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                          {stat.trendUp ? <ArrowUpRight className="h-3 w-3 mr-0.5" /> : <ArrowDownRight className="h-3 w-3 mr-0.5" />}
+                          {stat.trend}
+                        </span>
+                      )}
                     </div>
-                    <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
-                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">{stat.title}</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-foreground">
+                          {stat.value}
+                        </p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-1 font-medium">{stat.subValue}</p>
                     </div>
-                  </div>
+                  </>
                 )}
                 {stat.link && (
                   <Link

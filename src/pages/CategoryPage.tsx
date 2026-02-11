@@ -50,14 +50,23 @@ const CategoryPage = () => {
   const displayedProducts = products || [];
 
   useEffect(() => {
+    // Noindex for categories to prioritize homepage
     const meta = document.createElement('meta');
     meta.name = "robots";
     meta.content = "noindex, follow";
     document.head.appendChild(meta);
+
+    // Dynamic Canonical Link for each category
+    const link = document.createElement('link');
+    link.rel = "canonical";
+    link.href = `https://rayovaparfums.com/categories/${slug}`;
+    document.head.appendChild(link);
+
     return () => {
       document.head.removeChild(meta);
+      document.head.removeChild(link);
     };
-  }, []);
+  }, [slug]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -15,21 +15,13 @@ export function HeroSection() {
   const videoUrl = heroSettings?.video_url;
   const imageUrl = heroSettings?.image_url;
 
-  if (isLoading) {
-    return (
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background">
-        <div className="absolute inset-0 bg-hero-overlay z-10" />
-      </section>
-    );
-  }
+  const isLoadingFinal = isLoading; // Placeholder for logic if we want to bypass
 
   return (
-    <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+    <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background">
       {/* Background Media */}
       <div className="absolute inset-0">
-        {isLoading || !videoUrl && !imageUrl ? (
-          <div className="absolute inset-0 bg-background" />
-        ) : videoUrl ? (
+        {videoUrl ? (
           <video
             autoPlay
             loop
@@ -44,11 +36,13 @@ export function HeroSection() {
           >
             <source src={videoUrl} type="video/mp4" />
           </video>
-        ) : (
+        ) : imageUrl ? (
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${imageUrl})` }}
           />
+        ) : (
+          <div className="absolute inset-0 bg-background" />
         )}
       </div>
 
@@ -83,26 +77,26 @@ export function HeroSection() {
       {/* Content */}
       <div className="relative z-10 container-luxury text-center">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
+          transition={{ duration: 0.8 }}
           className="max-w-4xl mx-auto"
         >
           {/* Tagline */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="text-primary font-medium tracking-[0.3em] uppercase text-sm mb-6"
           >
             {subtitle}
           </motion.p>
 
-          {/* Main Title */}
+          {/* Main Title - SEO H1 */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium mb-6"
           >
             <span className="text-gold-gradient">{title}</span>
@@ -110,9 +104,9 @@ export function HeroSection() {
 
           {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-10 font-light leading-relaxed"
           >
             {description}
@@ -120,9 +114,9 @@ export function HeroSection() {
 
           {/* CTA Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Link to="/boutique">
@@ -142,7 +136,7 @@ export function HeroSection() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
+          transition={{ duration: 1, delay: 0.8 }}
           className="absolute -bottom-20 left-1/2 -translate-x-1/2"
         >
           <motion.div
