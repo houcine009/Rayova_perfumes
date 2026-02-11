@@ -144,7 +144,7 @@ const AdminHome = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
         {mainStats.map((stat, index) => (
           <motion.div
             key={stat.title}
@@ -154,7 +154,7 @@ const AdminHome = () => {
           >
             <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm">
               <div className={`absolute inset-0 ${stat.bg} opacity-5 group-hover:opacity-10 transition-opacity`} />
-              <CardContent className="relative p-6 flex flex-col h-full justify-between min-h-[140px]">
+              <CardContent className="relative p-4 sm:p-6 flex flex-col h-full justify-between min-h-[120px] sm:min-h-[140px]">
                 {statsLoading ? (
                   <div className="space-y-3">
                     <Skeleton className="h-4 w-24" />
@@ -175,13 +175,13 @@ const AdminHome = () => {
                       )}
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">{stat.title}</p>
+                      <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">{stat.title}</p>
                       <div className="flex items-baseline gap-2">
-                        <p className="text-2xl font-bold text-foreground">
+                        <p className="text-xl sm:text-2xl font-bold text-foreground">
                           {stat.value}
                         </p>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-1 font-medium">{stat.subValue}</p>
+                      <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 sm:mt-1 font-medium">{stat.subValue}</p>
                     </div>
                   </>
                 )}
@@ -350,9 +350,9 @@ const AdminHome = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
       >
-        <Card className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
-          <CardContent className="py-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <Card className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-none">
+          <CardContent className="py-4 sm:py-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
               <div>
                 <p className="text-3xl font-bold text-primary">{stats?.products.featured || 0}</p>
                 <p className="text-sm text-muted-foreground">Produits vedettes</p>
