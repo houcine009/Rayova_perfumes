@@ -93,7 +93,8 @@ class ReviewController extends Controller
     public function approve(string $id): JsonResponse
     {
         $review = Review::findOrFail($id);
-        $review->update(['is_approved' => true]);
+        $review->is_approved = true;
+        $review->save();
 
         return response()->json([
             'data' => $review,
@@ -104,7 +105,8 @@ class ReviewController extends Controller
     public function reject(string $id): JsonResponse
     {
         $review = Review::findOrFail($id);
-        $review->update(['is_approved' => false]);
+        $review->is_approved = false;
+        $review->save();
 
         return response()->json([
             'data' => $review,
