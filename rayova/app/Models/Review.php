@@ -72,7 +72,6 @@ class Review extends Model
         if (!$product) return;
 
         $stats = self::where('product_id', $this->product_id)
-            ->where('is_approved', true)
             ->selectRaw('COUNT(*) as count, AVG(rating) as average')
             ->first();
 

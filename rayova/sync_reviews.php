@@ -9,6 +9,9 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
+echo "Approving all existing reviews...\n";
+Review::where('is_approved', false)->update(['is_approved' => true]);
+
 echo "Syncing Product Stats...\n";
 
 $products = Product::all();

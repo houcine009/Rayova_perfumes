@@ -30,7 +30,7 @@ class DashboardController extends Controller
                 'pending' => Order::byStatus('pending')->count(),
                 'processing' => Order::whereIn('status', ['confirmed', 'processing'])->count(),
                 'completed' => Order::byStatus('delivered')->count(),
-                'revenue' => Order::whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('total') - Order::whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('shipping_cost'),
+                'revenue' => Order::whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('subtotal'),
                 'total_shipping' => Order::whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('shipping_cost'),
                 'today' => Order::whereDate('created_at', today())->count(),
                 'this_month' => Order::whereMonth('created_at', now()->month)->count(),

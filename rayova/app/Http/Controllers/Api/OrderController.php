@@ -160,7 +160,8 @@ class OrderController extends Controller
             'shipped' => Order::byStatus('shipped')->count(),
             'delivered' => Order::byStatus('delivered')->count(),
             'cancelled' => Order::byStatus('cancelled')->count(),
-            'revenue' => Order::whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('total'),
+            'revenue' => Order::whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('subtotal'),
+            'total_shipping' => Order::whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])->sum('shipping_cost'),
             'today' => Order::whereDate('created_at', today())->count(),
             'this_month' => Order::whereMonth('created_at', now()->month)->count(),
         ];

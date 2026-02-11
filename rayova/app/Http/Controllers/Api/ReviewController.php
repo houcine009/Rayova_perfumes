@@ -37,7 +37,6 @@ class ReviewController extends Controller
     {
         $reviews = Review::with('user.profile')
             ->where('product_id', $productId)
-            ->approved()
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -80,13 +79,13 @@ class ReviewController extends Controller
         }
 
         $validated['user_id'] = $request->user()->id;
-        $validated['is_approved'] = false; // Needs admin approval
+        $validated['is_approved'] = true; // Auto-approved as requested
 
         $review = Review::create($validated);
 
         return response()->json([
             'data' => $review->load('user.profile'),
-            'message' => 'Avis soumis, en attente de validation',
+            'message' => 'Avis ajouté avec succès',
         ], 201);
     }
 
