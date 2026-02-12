@@ -9,7 +9,7 @@ export function HeroSection() {
   const title = heroSettings?.title || "Rayova";
   const subtitle = heroSettings?.subtitle || "L'Art de la Parfumerie";
   // @ts-ignore - description might not be in the exact type but present in JSON
-  const description = heroSettings?.description || "Découvrez notre collection exclusive de parfums de luxe. Chaque fragrance est une invitation au voyage sensoriel.";
+  const description = heroSettings?.description || "Découvrez l´essence de luxe";
   const ctaPrimary = heroSettings?.cta_primary || "Découvrir les parfums";
   const ctaSecondary = heroSettings?.cta_secondary || "Acheter maintenant";
   const videoUrl = heroSettings?.video_url;

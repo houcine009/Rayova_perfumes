@@ -55,7 +55,7 @@ export default function Panier() {
                         <MediaDisplay
                           src={item.image}
                           alt={item.name}
-                          onHoverPlay
+                          autoPlay={true}
                         />
                       </div>
                       <div className="flex-1">

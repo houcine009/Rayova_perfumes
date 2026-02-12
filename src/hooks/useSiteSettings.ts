@@ -10,6 +10,8 @@ export const useSiteSettings = () => {
       const response = await settingsService.getAll();
       return response.data;
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 };
 
@@ -20,6 +22,8 @@ export const useSiteSetting = <T = unknown>(key: string) => {
       const response = await settingsService.get<T>(key);
       return response.data;
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 };
 
@@ -29,6 +33,8 @@ export const useHeroSettings = () => {
     queryFn: async () => {
       return await settingsService.getHero();
     },
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 };
 

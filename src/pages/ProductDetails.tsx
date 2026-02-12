@@ -179,6 +179,8 @@ const ProductDetails = () => {
                                                         src={img}
                                                         muted
                                                         playsInline
+                                                        autoPlay
+                                                        loop
                                                         preload="auto"
                                                         className="w-full h-full object-cover"
                                                     />
