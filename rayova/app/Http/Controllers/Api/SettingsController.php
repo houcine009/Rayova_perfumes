@@ -11,7 +11,7 @@ class SettingsController extends Controller
 {
     public function index(): JsonResponse
     {
-        $settings = \Illuminate\Support\Facades\Cache::tags(['settings'])->remember('settings_all', 3600, function () {
+        $settings = \Illuminate\Support\Facades\Cache::remember('settings_all', 3600, function () {
             return SiteSetting::all()->pluck('value', 'key');
         });
 
@@ -20,7 +20,7 @@ class SettingsController extends Controller
 
     public function show(string $key): JsonResponse
     {
-        $value = \Illuminate\Support\Facades\Cache::tags(['settings'])->remember("setting_{$key}", 3600, function () use ($key) {
+        $value = \Illuminate\Support\Facades\Cache::remember("setting_{$key}", 3600, function () use ($key) {
             $setting = SiteSetting::where('key', $key)->first();
             return $setting ? $setting->value : null;
         });
@@ -37,7 +37,7 @@ class SettingsController extends Controller
         SiteSetting::setValue($key, $validated['value'], $request->user()->id);
 
         // Invalidate cache
-        \Illuminate\Support\Facades\Cache::tags(['settings'])->flush();
+        \Illuminate\Support\Facades\Cache::forget('settings_all');
 
         return response()->json([
             'data' => $validated['value'],
@@ -58,7 +58,7 @@ class SettingsController extends Controller
         }
 
         // Invalidate cache
-        \Illuminate\Support\Facades\Cache::tags(['settings'])->flush();
+        \Illuminate\Support\Facades\Cache::forget('settings_all');
 
         return response()->json([
             'message' => 'Paramètres mis à jour',
@@ -101,7 +101,7 @@ class SettingsController extends Controller
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
 
         // Invalidate cache
-        \Illuminate\Support\Facades\Cache::tags(['settings'])->flush();
+        \Illuminate\Support\Facades\Cache::forget('settings_all');
 
         return response()->json([
             'url' => $url,

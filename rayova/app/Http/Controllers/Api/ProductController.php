@@ -16,18 +16,35 @@ class ProductController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $isAdmin = $request->user() && $request->user()->isAdmin();
+        $user = $request->user();
+        $isAdmin = $user && ($user->role === 'admin' || $user->role === 'super_admin');
         
-        // Don't cache for admins to ensure they see real-time updates
+        Log::info('Product Index Request', [
+            'is_admin' => $isAdmin,
+            'user_role' => $user ? $user->role : 'guest',
+            'path' => $request->path()
+        ]);
+
         if ($isAdmin) {
-            return response()->json($this->getProductsQuery($request)->paginate($request->get('per_page', 20)));
+            $products = $this->getProductsQuery($request)->paginate($request->get('per_page', 50));
+            Log::info('Admin products count: ' . $products->total());
+            return response()->json($products);
         }
 
-        $cacheKey = 'products_index_' . md5(json_encode($request->all()) . 'guest');
+        // Use cache versioning for file driver compatibility
+        $version = Cache::get('products_cache_version', 'v1');
+        $cacheKey = 'products_index_' . $version . '_' . md5(json_encode($request->all()));
 
-        return Cache::tags(['products'])->remember($cacheKey, 3600, function () use ($request) {
-            return response()->json($this->getProductsQuery($request)->paginate($request->get('per_page', 20)));
+        $data = Cache::remember($cacheKey, 3600, function () use ($request) {
+            return $this->getProductsQuery($request)->paginate($request->get('per_page', 20))->toArray();
         });
+
+        return response()->json($data);
+    }
+
+    private function incrementCacheVersion()
+    {
+        Cache::put('products_cache_version', time());
     }
 
     private function getProductsQuery(Request $request)
@@ -94,7 +111,7 @@ class ProductController extends Controller
             return response()->json(['data' => $product]);
         }
 
-        return Cache::tags(['products'])->remember("product_show_{$slug}", 3600, function () use ($slug) {
+        return Cache::remember("product_show_{$slug}", 3600, function () use ($slug) {
             $product = Product::with('media', 'categories', 'reviews.user')
                 ->where('slug', $slug)
                 ->firstOrFail();
@@ -170,7 +187,7 @@ class ProductController extends Controller
             }
 
             // Invalidate cache
-            Cache::tags(['products'])->flush();
+            $this->incrementCacheVersion();
 
             return response()->json([
                 'data' => $product->load('media', 'categories'),
@@ -227,7 +244,7 @@ class ProductController extends Controller
             }
 
             // Invalidate cache
-            Cache::tags(['products'])->flush();
+            $this->incrementCacheVersion();
 
             return response()->json([
                 'data' => $product->fresh()->load('media', 'categories'),
@@ -246,7 +263,7 @@ class ProductController extends Controller
         $product->delete();
 
         // Invalidate cache
-        Cache::tags(['products'])->flush();
+        $this->incrementCacheVersion();
 
         return response()->json([
             'message' => 'Produit supprimé',
@@ -319,7 +336,7 @@ class ProductController extends Controller
             $media = ProductMedia::create($mediaData);
 
             // Invalidate cache
-            Cache::tags(['products'])->flush();
+            $this->incrementCacheVersion();
 
             return response()->json(['data' => $media, 'message' => 'Média ajouté avec succès'], 201);
 
@@ -335,7 +352,7 @@ class ProductController extends Controller
         $media->delete();
 
         // Invalidate cache
-        Cache::tags(['products'])->flush();
+        $this->incrementCacheVersion();
 
         return response()->json([
             'message' => 'Média supprimé',
