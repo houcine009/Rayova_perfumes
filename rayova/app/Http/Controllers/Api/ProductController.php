@@ -17,7 +17,7 @@ class ProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $isAdmin = $user && ($user->role === 'admin' || $user->role === 'super_admin');
+        $isAdmin = $user && $user->isAdmin();
         
         Log::info('Product Index Request', [
             'is_admin' => $isAdmin,

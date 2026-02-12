@@ -10,11 +10,19 @@ export const useProducts = (options?: ProductFilters, isAdmin: boolean = false) 
     queryKey: ['products', options, isAdmin],
     queryFn: async () => {
       const response = await productService.getAll(options, isAdmin);
-      // Handle both paginated and non-paginated responses
-      if ('data' in response && Array.isArray(response.data)) {
+
+      // Handle array response
+      if (Array.isArray(response)) {
+        return response as ProductWithMedia[];
+      }
+
+      // Handle paginated or wrapped response { data: [...] }
+      if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
         return response.data as ProductWithMedia[];
       }
-      return (response as any).data as ProductWithMedia[];
+
+      // Fallback
+      return [] as ProductWithMedia[];
     },
   });
 };

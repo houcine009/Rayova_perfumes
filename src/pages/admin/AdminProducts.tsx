@@ -104,8 +104,10 @@ const AdminProducts = () => {
   const deleteProduct = useDeleteProduct();
   const { toast } = useToast();
 
-  const filteredProducts = (products || []).filter((p: any) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+  /* Safe access to products */
+  const productsArray = Array.isArray(products) ? products : [];
+  const filteredProducts = productsArray.filter((p: any) =>
+    (p.name || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const generateSlug = (name: string) => {
