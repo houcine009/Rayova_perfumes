@@ -271,8 +271,8 @@ const ProductDetails = () => {
                                     <div>
                                         <p className="text-xs font-semibold uppercase">Livraison</p>
                                         <p className="text-xs text-muted-foreground">
-                                            {product.price >= 500 ? 'Gratuite' : '35 MAD'}
-                                            {product.price < 500 && ' (Gratuit dès 500 MAD)'}
+                                            {product.price >= 300 ? 'Gratuite' : '35 MAD'}
+                                            {product.price < 300 && ' (Gratuit dès 300 MAD)'}
                                         </p>
                                     </div>
                                 </div>

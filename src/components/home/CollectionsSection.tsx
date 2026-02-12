@@ -2,31 +2,82 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
-const defaultCollections = [
+import { useRef, useState, useEffect } from "react";
+
+interface Collection {
+  slug: string;
+  name: string;
+  description: string;
+  image?: string | null;
+  href: string;
+}
+
+const defaultCollections: Collection[] = [
   {
     slug: "niche",
     name: "Niche",
     description: "Créations exclusives et avant-gardistes",
+    image: null,
     href: "/categorie/niche",
   },
   {
     slug: "homme",
     name: "Homme",
     description: "Élégance masculine raffinée",
+    image: null,
     href: "/categorie/homme",
   },
   {
     slug: "femme",
     name: "Femme",
     description: "Féminité et sophistication",
+    image: null,
     href: "/categorie/femme",
   },
 ];
 
+function LazyVideo({ src, className }: { src: string; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="absolute inset-0">
+      {visible ? (
+        <video
+          src={src}
+          className={className}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+        />
+      ) : (
+        <div className="w-full h-full bg-muted animate-pulse" />
+      )}
+    </div>
+  );
+}
+
 export function CollectionsSection() {
   const { data: categories } = useCategories();
 
-  // Show all active categories, possibly limited to 3 or 6 for UI
   const activeCategories = categories?.filter(c => c.is_active) || [];
 
   const collections = activeCategories.length > 0
@@ -74,13 +125,9 @@ export function CollectionsSection() {
               >
                 {/* Image or Video */}
                 {collection.image?.match(/\.(mp4|webm|ogg)$/i) ? (
-                  <video
+                  <LazyVideo
                     src={collection.image}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
                   />
                 ) : collection.image ? (
                   <div

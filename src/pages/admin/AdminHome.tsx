@@ -4,7 +4,6 @@ import {
   ShoppingCart,
   Users,
   TrendingUp,
-  Star,
   Clock,
   CheckCircle,
   AlertCircle,

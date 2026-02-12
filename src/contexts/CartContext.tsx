@@ -71,8 +71,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  // Free shipping for orders >= 500 MAD
-  const shippingCost = (items.length > 0 && subtotal < 500) ? SHIPPING_COST : 0;
+  // Free shipping for orders >= 300 MAD
+  const shippingCost = (items.length > 0 && subtotal < 300) ? SHIPPING_COST : 0;
   const total = subtotal + shippingCost;
 
   return (

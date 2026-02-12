@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface MediaDisplayProps {
@@ -25,20 +25,32 @@ export function MediaDisplay({
     onHoverPlay = false,
 }: MediaDisplayProps) {
     const [isError, setIsError] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Lazy-load: only render video/image when visible in viewport
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: "200px" }
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     // Improved detection logic
     const isVideo = (url: string) => {
         if (!url) return false;
-
-        // Check extension
         if (url.match(/\.(mp4|webm|mov|ogg|m4v|3gp|mkv)$/i)) return true;
-
-        // Check for API hint/mime hints in URL (V11.0 enhancement)
         if (url.toLowerCase().includes('.mp4') || url.toLowerCase().includes('type=video')) return true;
-
-        // Check for "vid" or "video" in common binary paths if we know they are videos
         if (url.includes('/media/db/') && (url.toLowerCase().includes('video') || url.toLowerCase().includes('mp4'))) return true;
-
         return false;
     };
 
@@ -63,8 +75,10 @@ export function MediaDisplay({
     }
 
     return (
-        <div className={cn("relative w-full h-full overflow-hidden", containerClassName)}>
-            {isVideo(src) ? (
+        <div ref={containerRef} className={cn("relative w-full h-full overflow-hidden", containerClassName)}>
+            {!isVisible ? (
+                <div className="w-full h-full bg-muted animate-pulse" />
+            ) : isVideo(src) ? (
                 <video
                     src={src}
                     className={cn("w-full h-full object-cover", className)}
@@ -73,6 +87,7 @@ export function MediaDisplay({
                     muted={muted}
                     playsInline
                     controls={controls}
+                    preload="metadata"
                     onMouseOver={handleMouseOver}
                     onMouseOut={handleMouseOut}
                     onError={() => setIsError(true)}
@@ -84,6 +99,7 @@ export function MediaDisplay({
                     className={cn("w-full h-full object-cover", className)}
                     onError={() => setIsError(true)}
                     loading="lazy"
+                    decoding="async"
                 />
             )}
         </div>
