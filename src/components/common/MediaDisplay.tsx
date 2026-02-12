@@ -11,6 +11,7 @@ interface MediaDisplayProps {
     muted?: boolean;
     controls?: boolean;
     onHoverPlay?: boolean;
+    isVideoHint?: boolean;
 }
 
 export function MediaDisplay({
@@ -23,6 +24,7 @@ export function MediaDisplay({
     muted = true,
     controls = false,
     onHoverPlay = false,
+    isVideoHint = false,
 }: MediaDisplayProps) {
     const [isError, setIsError] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -46,7 +48,8 @@ export function MediaDisplay({
     }, []);
 
     // Improved detection logic
-    const isVideo = (url: string) => {
+    const isVideoMedia = (url: string) => {
+        if (isVideoHint) return true;
         if (!url) return false;
         if (url.match(/\.(mp4|webm|mov|ogg|m4v|3gp|mkv)$/i)) return true;
         if (url.toLowerCase().includes('.mp4') || url.toLowerCase().includes('type=video')) return true;
@@ -78,7 +81,7 @@ export function MediaDisplay({
         <div ref={containerRef} className={cn("relative w-full h-full overflow-hidden", containerClassName)}>
             {!isVisible ? (
                 <div className="w-full h-full bg-muted animate-pulse" />
-            ) : isVideo(src) ? (
+            ) : isVideoMedia(src) ? (
                 <video
                     src={src}
                     className={cn("w-full h-full object-cover", className)}

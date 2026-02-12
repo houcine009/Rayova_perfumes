@@ -14,7 +14,7 @@ interface ProductCardProps {
   price: number | string;
   original_price?: number | string;
   image?: string;
-  media?: Array<{ url: string; is_primary: boolean }>;
+  media?: Array<{ url: string; is_primary: boolean; mime_type?: string | null }>;
   category?: string;
   categories?: Array<{ name: string }>;
   is_featured?: boolean;
@@ -39,7 +39,9 @@ export function ProductCard({
   const numericPrice = Number(price);
   const numericOriginalPrice = original_price ? Number(original_price) : undefined;
 
-  const displayImage = media?.find(m => m.is_primary)?.url || media?.[0]?.url || image || '';
+  const primaryMedia = media?.find(m => m.is_primary) || media?.[0];
+  const displayImage = primaryMedia?.url || image || '';
+  const mediaMimeType = primaryMedia?.mime_type || null;
   const displayCategory = categories?.[0]?.name || category || '';
 
   const discount = numericOriginalPrice
@@ -77,6 +79,7 @@ export function ProductCard({
             alt={name}
             className="transition-transform duration-700 group-hover:scale-105"
             onHoverPlay
+            isVideoHint={mediaMimeType?.startsWith('video/') || false}
           />
 
           {/* Overlay on Hover */}

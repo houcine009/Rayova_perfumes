@@ -72,6 +72,17 @@ const ProductDetails = () => {
         ? product.media.map(m => m.url)
         : ['/placeholder.svg'];
 
+    const mimeTypes = product.media && product.media.length > 0
+        ? product.media.map(m => m.mime_type || null)
+        : [null];
+
+    const isCurrentMediaVideo = (index: number) => {
+        const mime = mimeTypes[index];
+        if (mime && mime.startsWith('video/')) return true;
+        const url = images[index];
+        return url?.match(/\.(mp4|webm|mov|ogg|m4v|3gp|mkv)$/i) ? true : false;
+    };
+
     const handleAddToCart = () => {
         addItem({
             id: product.id,
@@ -106,7 +117,7 @@ const ProductDetails = () => {
                         <div className="space-y-4">
                             <div className="relative aspect-square overflow-hidden bg-card rounded-2xl group">
                                 <AnimatePresence mode="wait">
-                                    {images[activeImage].match(/\.(mp4|webm|mov|ogg|m4v|3gp|mkv)$/i) ? (
+                                    {isCurrentMediaVideo(activeImage) ? (
                                         <motion.video
                                             key={activeImage}
                                             src={images[activeImage]}
@@ -163,7 +174,7 @@ const ProductDetails = () => {
                                             className={`relative flex-shrink-0 w-24 aspect-square rounded-lg overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-primary' : 'border-transparent'
                                                 }`}
                                         >
-                                            {img.match(/\.(mp4|webm|mov|ogg|m4v)$/i) ? (
+                                            {isCurrentMediaVideo(idx) ? (
                                                 <div className="w-full h-full relative">
                                                     <video
                                                         src={img}

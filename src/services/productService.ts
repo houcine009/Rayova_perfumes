@@ -8,6 +8,7 @@ export interface ProductMedia {
     alt_text: string | null;
     is_primary: boolean;
     display_order: number;
+    mime_type?: string | null;
     created_at: string;
     updated_at: string;
 }
