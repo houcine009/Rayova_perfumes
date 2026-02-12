@@ -78,7 +78,8 @@ export function ProductCard({
             src={displayImage}
             alt={name}
             className="transition-transform duration-700 group-hover:scale-105"
-            onHoverPlay
+            autoPlay={true}
+            onHoverPlay={false}
             isVideoHint={mediaMimeType?.startsWith('video/') || false}
           />
 

@@ -165,6 +165,7 @@ const AdminProducts = () => {
         }
         toast({ title: 'Média ajouté avec succès' });
         queryClient.invalidateQueries({ queryKey: ['products'] });
+        queryClient.invalidateQueries({ queryKey: ['product'] });
       } catch (error: any) {
         toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
       }
@@ -221,6 +222,7 @@ const AdminProducts = () => {
       await api.delete(`/admin/products/media/${mediaId}`);
       toast({ title: 'Média supprimé' });
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product'] });
     } catch (error: any) {
       toast({
         title: 'Erreur',

@@ -125,7 +125,6 @@ const ProductDetails = () => {
                                             loop
                                             muted
                                             playsInline
-                                            controls
                                             preload="auto"
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
