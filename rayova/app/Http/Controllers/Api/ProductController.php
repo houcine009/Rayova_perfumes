@@ -16,73 +16,84 @@ class ProductController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $cacheKey = 'products_index_' . md5(json_encode($request->all()) . ($request->user() ? $request->user()->id : 'guest'));
+        $isAdmin = $request->user() && $request->user()->isAdmin();
+        
+        // Don't cache for admins to ensure they see real-time updates
+        if ($isAdmin) {
+            return response()->json($this->getProductsQuery($request)->paginate($request->get('per_page', 20)));
+        }
+
+        $cacheKey = 'products_index_' . md5(json_encode($request->all()) . 'guest');
 
         return Cache::tags(['products'])->remember($cacheKey, 3600, function () use ($request) {
-            $query = Product::with('media', 'categories');
+            return response()->json($this->getProductsQuery($request)->paginate($request->get('per_page', 20)));
+        });
+    }
 
-            // Filter by active status for public
-            if (!$request->user() || !$request->user()->isAdmin()) {
-                $query->active();
-            }
+    private function getProductsQuery(Request $request)
+    {
+        $query = Product::with('media', 'categories');
 
-            // Optional filters
-            if ($request->has('featured') && $request->featured) {
-                $query->featured();
-            }
+        // Filter by active status for public
+        if (!$request->user() || !$request->user()->isAdmin()) {
+            $query->active();
+        }
 
-            if ($request->has('gender')) {
-                $query->byGender($request->gender);
-            }
+        // Optional filters
+        if ($request->has('featured') && $request->featured) {
+            $query->featured();
+        }
 
-            if ($request->has('category')) {
-                $categorySlug = $request->category;
-                
-                if (in_array($categorySlug, ['homme', 'femme'])) {
-                    $query->where(function($q) use ($categorySlug) {
-                        $q->whereHas('categories', function ($subQ) use ($categorySlug) {
-                            $subQ->where('slug', $categorySlug);
-                        })
-                        ->orWhere('gender', $categorySlug)
-                        ->orWhere('gender', 'unisexe');
-                    });
-                } else {
-                    $query->whereHas('categories', function ($q) use ($categorySlug) {
-                        $q->where('slug', $categorySlug);
-                    });
-                }
-            }
+        if ($request->has('gender')) {
+            $query->byGender($request->gender);
+        }
 
-            if ($request->has('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%")
-                      ->orWhere('brand', 'like', "%{$search}%");
+        if ($request->has('category')) {
+            $categorySlug = $request->category;
+            
+            if (in_array($categorySlug, ['homme', 'femme'])) {
+                $query->where(function($q) use ($categorySlug) {
+                    $q->whereHas('categories', function ($subQ) use ($categorySlug) {
+                        $subQ->where('slug', $categorySlug);
+                    })
+                    ->orWhere('gender', $categorySlug)
+                    ->orWhere('gender', 'unisexe');
+                });
+            } else {
+                $query->whereHas('categories', function ($q) use ($categorySlug) {
+                    $q->where('slug', $categorySlug);
                 });
             }
+        }
 
-            // Sorting
-            $sortBy = $request->get('sort_by', 'created_at');
-            $sortOrder = $request->get('sort_order', 'desc');
-            $query->orderBy($sortBy, $sortOrder);
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('brand', 'like', "%{$search}%");
+            });
+        }
 
-            // Pagination
-            $perPage = $request->get('per_page', 20);
-            
-            if ($request->has('limit')) {
-                $products = $query->limit($request->limit)->get();
-                return response()->json(['data' => $products]);
-            }
+        // Sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
 
-            $products = $query->paginate($perPage);
-
-            return response()->json($products);
-        });
+        return $query;
     }
 
     public function show(string $slug): JsonResponse
     {
+        $isAdmin = auth()->check() && auth()->user()->isAdmin();
+
+        if ($isAdmin) {
+            $product = Product::with('media', 'categories', 'reviews.user')
+                ->where('slug', $slug)
+                ->firstOrFail();
+            return response()->json(['data' => $product]);
+        }
+
         return Cache::tags(['products'])->remember("product_show_{$slug}", 3600, function () use ($slug) {
             $product = Product::with('media', 'categories', 'reviews.user')
                 ->where('slug', $slug)
