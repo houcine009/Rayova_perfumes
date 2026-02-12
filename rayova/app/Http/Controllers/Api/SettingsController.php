@@ -11,20 +11,21 @@ class SettingsController extends Controller
 {
     public function index(): JsonResponse
     {
-        $settings = SiteSetting::all()->pluck('value', 'key');
+        $settings = \Illuminate\Support\Facades\Cache::tags(['settings'])->remember('settings_all', 3600, function () {
+            return SiteSetting::all()->pluck('value', 'key');
+        });
 
         return response()->json(['data' => $settings]);
     }
 
     public function show(string $key): JsonResponse
     {
-        $setting = SiteSetting::where('key', $key)->first();
+        $value = \Illuminate\Support\Facades\Cache::tags(['settings'])->remember("setting_{$key}", 3600, function () use ($key) {
+            $setting = SiteSetting::where('key', $key)->first();
+            return $setting ? $setting->value : null;
+        });
 
-        if (!$setting) {
-            return response()->json(['data' => null]);
-        }
-
-        return response()->json(['data' => $setting->value]);
+        return response()->json(['data' => $value]);
     }
 
     public function update(Request $request, string $key): JsonResponse
@@ -34,6 +35,9 @@ class SettingsController extends Controller
         ]);
 
         SiteSetting::setValue($key, $validated['value'], $request->user()->id);
+
+        // Invalidate cache
+        \Illuminate\Support\Facades\Cache::tags(['settings'])->flush();
 
         return response()->json([
             'data' => $validated['value'],
@@ -52,6 +56,9 @@ class SettingsController extends Controller
         foreach ($validated['settings'] as $setting) {
             SiteSetting::setValue($setting['key'], $setting['value'], $request->user()->id);
         }
+
+        // Invalidate cache
+        \Illuminate\Support\Facades\Cache::tags(['settings'])->flush();
 
         return response()->json([
             'message' => 'Paramètres mis à jour',
@@ -92,6 +99,9 @@ class SettingsController extends Controller
         }
 
         SiteSetting::setValue($validated['key'], $url, $request->user()->id);
+
+        // Invalidate cache
+        \Illuminate\Support\Facades\Cache::tags(['settings'])->flush();
 
         return response()->json([
             'url' => $url,

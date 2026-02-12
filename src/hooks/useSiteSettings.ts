@@ -3,12 +3,22 @@ import { settingsService, type HeroSettings, type ContactSettings, type SocialSe
 
 export type { HeroSettings, ContactSettings, SocialSettings };
 
+const SETTINGS_KEY = 'rayova_site_settings';
+const HERO_KEY = 'rayova_hero_settings';
+
 export const useSiteSettings = () => {
   return useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       const response = await settingsService.getAll();
+      if (response.data) {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(response.data));
+      }
       return response.data;
+    },
+    placeholderData: () => {
+      const saved = localStorage.getItem(SETTINGS_KEY);
+      return saved ? JSON.parse(saved) : undefined;
     },
     staleTime: 0,
     refetchOnMount: 'always',
@@ -31,7 +41,15 @@ export const useHeroSettings = () => {
   return useQuery({
     queryKey: ['site-setting', 'hero'],
     queryFn: async () => {
-      return await settingsService.getHero();
+      const data = await settingsService.getHero();
+      if (data) {
+        localStorage.setItem(HERO_KEY, JSON.stringify(data));
+      }
+      return data;
+    },
+    placeholderData: () => {
+      const saved = localStorage.getItem(HERO_KEY);
+      return saved ? JSON.parse(saved) : undefined;
     },
     staleTime: 0,
     refetchOnMount: 'always',
@@ -65,6 +83,14 @@ export const useUpdateSetting = () => {
       return response.data;
     },
     onSuccess: (_, variables) => {
+      // Update specific key in settings cache if possible
+      const saved = localStorage.getItem(SETTINGS_KEY);
+      if (saved) {
+        const settings = JSON.parse(saved);
+        settings[variables.key] = variables.value;
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      }
+
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
       queryClient.invalidateQueries({ queryKey: ['site-setting', variables.key] });
     },
@@ -79,7 +105,10 @@ export const useUpdateHeroSettings = () => {
       const response = await settingsService.updateHero(data);
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data) {
+        localStorage.setItem(HERO_KEY, JSON.stringify(data));
+      }
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
       queryClient.invalidateQueries({ queryKey: ['site-setting', 'hero'] });
     },
