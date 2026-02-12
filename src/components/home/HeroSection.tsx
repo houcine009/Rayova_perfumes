@@ -2,11 +2,25 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useHeroSettings } from "@/hooks/useSiteSettings";
-import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 
 export function HeroSection() {
   const { data: heroSettings, isLoading } = useHeroSettings();
-  const { resolvedTheme } = useTheme();
+  const [isDark, setIsDark] = useState(true); // Default to dark as per Navbar logic
+
+  useEffect(() => {
+    // Sync with the manual dark mode logic from Navbar
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+
+    checkTheme();
+    // Observe class changes on html element
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
 
   const title = heroSettings?.title || "Rayova";
   const subtitle = heroSettings?.subtitle || "L'Art de la Parfumerie";
@@ -18,7 +32,7 @@ export function HeroSection() {
   const imageUrl = heroSettings?.image_url;
 
   // Dynamic colors from settings
-  const descriptionColor = resolvedTheme === 'dark'
+  const descriptionColor = isDark
     ? (heroSettings?.description_color_dark || '#f2f2f2')
     : (heroSettings?.description_color_light || '#1a1a1a');
 
