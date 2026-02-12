@@ -2,9 +2,11 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useHeroSettings } from "@/hooks/useSiteSettings";
+import { useTheme } from "next-themes";
 
 export function HeroSection() {
   const { data: heroSettings, isLoading } = useHeroSettings();
+  const { resolvedTheme } = useTheme();
 
   const title = heroSettings?.title || "Rayova";
   const subtitle = heroSettings?.subtitle || "L'Art de la Parfumerie";
@@ -14,6 +16,11 @@ export function HeroSection() {
   const ctaSecondary = heroSettings?.cta_secondary || "Acheter maintenant";
   const videoUrl = heroSettings?.video_url;
   const imageUrl = heroSettings?.image_url;
+
+  // Dynamic colors from settings
+  const descriptionColor = resolvedTheme === 'dark'
+    ? (heroSettings?.description_color_dark || '#f2f2f2')
+    : (heroSettings?.description_color_light || '#1a1a1a');
 
   const isLoadingFinal = isLoading; // Placeholder for logic if we want to bypass
 
@@ -107,7 +114,8 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-10 font-light leading-relaxed"
+            className="text-lg md:text-xl max-w-2xl mx-auto mb-10 font-light leading-relaxed"
+            style={{ color: descriptionColor }}
           >
             {description}
           </motion.p>

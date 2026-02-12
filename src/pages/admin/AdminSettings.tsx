@@ -34,6 +34,9 @@ const AdminSettings = () => {
   const [heroSettings, setHeroSettings] = useState<HeroSettings>({
     title: 'Rayova',
     subtitle: "L'Art du Parfum",
+    description: "Découvrez l´essence de luxe",
+    description_color_light: '#1a1a1a',
+    description_color_dark: '#f2f2f2',
     cta_primary: 'Découvrir',
     cta_secondary: 'Acheter',
     video_url: null,
@@ -175,26 +178,59 @@ const AdminSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="hero_title">Titre</Label>
+                  <Label htmlFor="hero_description">Texte de description</Label>
                   <Input
-                    id="hero_title"
-                    value={heroSettings?.title || ''}
+                    id="hero_description"
+                    value={heroSettings?.description || ''}
                     onChange={(e) =>
-                      setHeroSettings({ ...heroSettings, title: e.target.value })
+                      setHeroSettings({ ...heroSettings, description: e.target.value })
                     }
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="hero_subtitle">Sous-titre</Label>
-                  <Input
-                    id="hero_subtitle"
-                    value={heroSettings?.subtitle || ''}
-                    onChange={(e) =>
-                      setHeroSettings({ ...heroSettings, subtitle: e.target.value })
-                    }
-                  />
+                  <Label htmlFor="hero_description_color_light">Couleur description (Mode Clair)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="hero_description_color_light"
+                      type="color"
+                      className="w-12 p-1 h-10"
+                      value={heroSettings?.description_color_light || '#1a1a1a'}
+                      onChange={(e) =>
+                        setHeroSettings({ ...heroSettings, description_color_light: e.target.value })
+                      }
+                    />
+                    <Input
+                      value={heroSettings?.description_color_light || '#1a1a1a'}
+                      onChange={(e) =>
+                        setHeroSettings({ ...heroSettings, description_color_light: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hero_description_color_dark">Couleur description (Mode Sombre)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="hero_description_color_dark"
+                      type="color"
+                      className="w-12 p-1 h-10"
+                      value={heroSettings?.description_color_dark || '#f2f2f2'}
+                      onChange={(e) =>
+                        setHeroSettings({ ...heroSettings, description_color_dark: e.target.value })
+                      }
+                    />
+                    <Input
+                      value={heroSettings?.description_color_dark || '#f2f2f2'}
+                      onChange={(e) =>
+                        setHeroSettings({ ...heroSettings, description_color_dark: e.target.value })
+                      }
+                    />
+                  </div>
                 </div>
               </div>
 

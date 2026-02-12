@@ -4,6 +4,9 @@ import { api } from '@/lib/api';
 export interface HeroSettings {
     title: string;
     subtitle: string;
+    description?: string;
+    description_color_light?: string;
+    description_color_dark?: string;
     cta_primary: string;
     cta_secondary: string;
     video_url: string | null;
