@@ -178,6 +178,29 @@ const AdminSettings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="hero_title">Titre</Label>
+                  <Input
+                    id="hero_title"
+                    value={heroSettings?.title || ''}
+                    onChange={(e) =>
+                      setHeroSettings({ ...heroSettings, title: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hero_subtitle">Sous-titre</Label>
+                  <Input
+                    id="hero_subtitle"
+                    value={heroSettings?.subtitle || ''}
+                    onChange={(e) =>
+                      setHeroSettings({ ...heroSettings, subtitle: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="hero_description">Texte de description</Label>
