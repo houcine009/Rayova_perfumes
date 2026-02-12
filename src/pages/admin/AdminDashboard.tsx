@@ -67,7 +67,10 @@ const AdminDashboard = () => {
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             <p className="px-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Menu Principal</p>
-            {adminNavItems.map((item) => {
+            {allNavItems.filter(item =>
+              isSuperAdmin ||
+              ['Dashboard', 'Commandes'].includes(item.name)
+            ).filter(item => !superAdminNavItems.some(si => si.name === item.name)).map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link

@@ -17,6 +17,7 @@ import { dashboardService } from '@/services/dashboardService';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 const statusLabels: Record<string, string> = {
   pending: 'En attente',
@@ -37,6 +38,7 @@ const statusColors: Record<string, string> = {
 };
 
 const AdminHome = () => {
+  const { isSuperAdmin } = useAuth();
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
@@ -62,6 +64,7 @@ const AdminHome = () => {
       color: 'text-blue-500',
       bg: 'bg-gradient-to-br from-blue-500/20 to-blue-600/10',
       link: '/admin/produits',
+      show: isSuperAdmin,
     },
     {
       title: 'Commandes',
@@ -71,6 +74,7 @@ const AdminHome = () => {
       color: 'text-emerald-500',
       bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-600/10',
       link: '/admin/commandes',
+      show: true,
     },
     {
       title: 'Ventes (Net)',
@@ -81,6 +85,7 @@ const AdminHome = () => {
       bg: 'bg-gradient-to-br from-primary/20 to-primary/10',
       trend: '+12%',
       trendUp: true,
+      show: isSuperAdmin,
     },
     {
       title: 'Livraison (Total)',
@@ -89,8 +94,18 @@ const AdminHome = () => {
       icon: CheckCircle,
       color: 'text-purple-500',
       bg: 'bg-gradient-to-br from-purple-500/20 to-purple-600/10',
+      show: isSuperAdmin,
     },
-  ];
+    {
+      title: 'Commandes Livrées',
+      value: stats?.orders.completed || 0,
+      subValue: 'Total livraisons',
+      icon: CheckCircle,
+      color: 'text-emerald-500',
+      bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-600/10',
+      show: true,
+    },
+  ].filter(s => s.show);
 
   const orderStats = [
     { label: 'En attente', value: stats?.orders.pending || 0, color: 'bg-amber-500' },
