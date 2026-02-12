@@ -7,7 +7,6 @@ import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import collectionHomme from "@/assets/collection-homme.jpg";
 import collectionFemme from "@/assets/collection-femme.jpg";
 import collectionNiche from "@/assets/collection-niche.jpg";
@@ -118,17 +117,8 @@ const CategoryPage = () => {
         <section className="section-padding">
           <div className="container-luxury">
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="space-y-4">
-                    <Skeleton className="aspect-[3/4] w-full" />
-                    <div className="space-y-2 text-center">
-                      <Skeleton className="h-4 w-1/4 mx-auto" />
-                      <Skeleton className="h-6 w-3/4 mx-auto" />
-                      <Skeleton className="h-5 w-1/2 mx-auto" />
-                    </div>
-                  </div>
-                ))}
+              <div className="flex justify-center py-20">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
               </div>
             ) : (
               <>

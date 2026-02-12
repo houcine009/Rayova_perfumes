@@ -9,80 +9,87 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Product::with('media', 'categories');
+        $cacheKey = 'products_index_' . md5(json_encode($request->all()) . ($request->user() ? $request->user()->id : 'guest'));
 
-        // Filter by active status for public
-        if (!$request->user() || !$request->user()->isAdmin()) {
-            $query->active();
-        }
+        return Cache::tags(['products'])->remember($cacheKey, 3600, function () use ($request) {
+            $query = Product::with('media', 'categories');
 
-        // Optional filters
-        if ($request->has('featured') && $request->featured) {
-            $query->featured();
-        }
+            // Filter by active status for public
+            if (!$request->user() || !$request->user()->isAdmin()) {
+                $query->active();
+            }
 
-        if ($request->has('gender')) {
-            $query->byGender($request->gender);
-        }
+            // Optional filters
+            if ($request->has('featured') && $request->featured) {
+                $query->featured();
+            }
 
-        if ($request->has('category')) {
-            $categorySlug = $request->category;
-            
-            if (in_array($categorySlug, ['homme', 'femme'])) {
-                $query->where(function($q) use ($categorySlug) {
-                    $q->whereHas('categories', function ($subQ) use ($categorySlug) {
-                        $subQ->where('slug', $categorySlug);
-                    })
-                    ->orWhere('gender', $categorySlug)
-                    ->orWhere('gender', 'unisexe');
-                });
-            } else {
-                $query->whereHas('categories', function ($q) use ($categorySlug) {
-                    $q->where('slug', $categorySlug);
+            if ($request->has('gender')) {
+                $query->byGender($request->gender);
+            }
+
+            if ($request->has('category')) {
+                $categorySlug = $request->category;
+                
+                if (in_array($categorySlug, ['homme', 'femme'])) {
+                    $query->where(function($q) use ($categorySlug) {
+                        $q->whereHas('categories', function ($subQ) use ($categorySlug) {
+                            $subQ->where('slug', $categorySlug);
+                        })
+                        ->orWhere('gender', $categorySlug)
+                        ->orWhere('gender', 'unisexe');
+                    });
+                } else {
+                    $query->whereHas('categories', function ($q) use ($categorySlug) {
+                        $q->where('slug', $categorySlug);
+                    });
+                }
+            }
+
+            if ($request->has('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('brand', 'like', "%{$search}%");
                 });
             }
-        }
 
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('brand', 'like', "%{$search}%");
-            });
-        }
+            // Sorting
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+            $query->orderBy($sortBy, $sortOrder);
 
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-        $query->orderBy($sortBy, $sortOrder);
+            // Pagination
+            $perPage = $request->get('per_page', 20);
+            
+            if ($request->has('limit')) {
+                $products = $query->limit($request->limit)->get();
+                return response()->json(['data' => $products]);
+            }
 
-        // Pagination
-        $perPage = $request->get('per_page', 20);
-        
-        if ($request->has('limit')) {
-            $products = $query->limit($request->limit)->get();
-            return response()->json(['data' => $products]);
-        }
+            $products = $query->paginate($perPage);
 
-        $products = $query->paginate($perPage);
-
-        return response()->json($products);
+            return response()->json($products);
+        });
     }
 
     public function show(string $slug): JsonResponse
     {
-        $product = Product::with('media', 'categories', 'reviews.user')
-            ->where('slug', $slug)
-            ->firstOrFail();
+        return Cache::tags(['products'])->remember("product_show_{$slug}", 3600, function () use ($slug) {
+            $product = Product::with('media', 'categories', 'reviews.user')
+                ->where('slug', $slug)
+                ->firstOrFail();
 
-        return response()->json(['data' => $product]);
+            return response()->json(['data' => $product]);
+        });
     }
 
     public function showById(string $id): JsonResponse
@@ -151,6 +158,9 @@ class ProductController extends Controller
                 $product->categories()->attach($categoryIds);
             }
 
+            // Invalidate cache
+            Cache::tags(['products'])->flush();
+
             return response()->json([
                 'data' => $product->load('media', 'categories'),
                 'message' => 'Produit créé avec succès',
@@ -205,6 +215,9 @@ class ProductController extends Controller
                 $product->categories()->sync($categoryIds);
             }
 
+            // Invalidate cache
+            Cache::tags(['products'])->flush();
+
             return response()->json([
                 'data' => $product->fresh()->load('media', 'categories'),
                 'message' => 'Produit mis à jour',
@@ -220,6 +233,9 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->delete();
+
+        // Invalidate cache
+        Cache::tags(['products'])->flush();
 
         return response()->json([
             'message' => 'Produit supprimé',
@@ -291,6 +307,9 @@ class ProductController extends Controller
 
             $media = ProductMedia::create($mediaData);
 
+            // Invalidate cache
+            Cache::tags(['products'])->flush();
+
             return response()->json(['data' => $media, 'message' => 'Média ajouté avec succès'], 201);
 
         } catch (\Exception $e) {
@@ -303,6 +322,9 @@ class ProductController extends Controller
     {
         $media = ProductMedia::findOrFail($id);
         $media->delete();
+
+        // Invalidate cache
+        Cache::tags(['products'])->flush();
 
         return response()->json([
             'message' => 'Média supprimé',

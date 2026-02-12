@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, SlidersHorizontal, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const Boutique = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -102,17 +101,9 @@ const Boutique = () => {
         <section className="section-padding">
           <div className="container-luxury">
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 py-20">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="space-y-4">
-                    <Skeleton className="aspect-[3/4] w-full" />
-                    <div className="space-y-2 text-center">
-                      <Skeleton className="h-4 w-1/4 mx-auto" />
-                      <Skeleton className="h-6 w-3/4 mx-auto" />
-                      <Skeleton className="h-5 w-1/2 mx-auto" />
-                    </div>
-                  </div>
-                ))}
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+                <p className="text-muted-foreground">Chargement des parfums...</p>
               </div>
             ) : (
               <>
