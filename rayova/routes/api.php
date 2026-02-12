@@ -24,8 +24,8 @@ Route::options('/{any}', function() {
     return response()->json(['status' => 'ok']);
 })->where('any', '.*');
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
 // Public product routes
 Route::get('/products', [ProductController::class, 'index']);
@@ -46,7 +46,7 @@ Route::get('/settings', [SettingsController::class, 'index']);
 Route::get('/settings/{key}', [SettingsController::class, 'show']);
 
 // Newsletter subscription
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->middleware('throttle:newsletter');
 Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe']);
 
 // Order placement (Public)

@@ -27,7 +27,7 @@ export function HeroSection() {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             poster={imageUrl || undefined}
             className="w-full h-full object-cover"
             key={videoUrl}

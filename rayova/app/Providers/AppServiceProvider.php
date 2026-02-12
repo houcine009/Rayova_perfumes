@@ -21,5 +21,18 @@ class AppServiceProvider extends ServiceProvider
     {
         // Force HTTPS in all environments to match production frontend
         \Illuminate\Support\Facades\URL::forceScheme('https');
+
+        // Security: Rate Limiting
+        \Illuminate\Support\Facades\RateLimiter::for('login', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->ip());
+        });
+
+        \Illuminate\Support\Facades\RateLimiter::for('register', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(3)->by($request->ip());
+        });
+
+        \Illuminate\Support\Facades\RateLimiter::for('newsletter', function (\Illuminate\Http\Request $request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->ip());
+        });
     }
 }
