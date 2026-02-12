@@ -41,7 +41,7 @@ export function MediaDisplay({
                     observer.disconnect();
                 }
             },
-            { rootMargin: "200px" }
+            { rootMargin: "1000px" }
         );
         observer.observe(el);
         return () => observer.disconnect();

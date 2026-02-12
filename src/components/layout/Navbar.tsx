@@ -42,16 +42,19 @@ export function Navbar() {
   }, [location]);
 
   useEffect(() => {
-    // Check for saved theme preference - default to light mode
+    // Check for saved theme preference - default to dark mode for luxury feel
     const savedTheme = localStorage.getItem("theme");
 
-    if (savedTheme === "dark") {
-      setIsDarkMode(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      // Explicitly set light mode as default
+    if (savedTheme === "light") {
       setIsDarkMode(false);
       document.documentElement.classList.remove("dark");
+    } else {
+      // Default to dark mode or explicitly use saved 'dark'
+      setIsDarkMode(true);
+      document.documentElement.classList.add("dark");
+      if (!savedTheme) {
+        localStorage.setItem("theme", "dark");
+      }
     }
   }, []);
 
