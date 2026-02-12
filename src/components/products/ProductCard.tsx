@@ -101,7 +101,7 @@ export function ProductCard({
           <div className="absolute top-4 left-4 flex flex-col gap-2">
             {is_featured && (
               <span className="bg-primary text-primary-foreground text-xs font-semibold tracking-wider uppercase px-3 py-1">
-                Vedette
+                Nouveau
               </span>
             )}
             {discount > 0 && (

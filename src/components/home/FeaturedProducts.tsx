@@ -26,10 +26,10 @@ export function FeaturedProducts() {
         >
           <div>
             <p className="text-primary font-medium tracking-[0.3em] uppercase text-sm mb-4">
-              Sélection Exclusive
+              Dernières Nouveautés
             </p>
             <h2 className="font-display text-4xl md:text-5xl">
-              Parfums Vedettes
+              Nouveaux Parfums
             </h2>
           </div>
           <Link to="/boutique">
