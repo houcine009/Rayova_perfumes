@@ -41,7 +41,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProducts';
+import { useProducts, useAdminProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useToast } from '@/hooks/use-toast';
 
@@ -97,7 +97,7 @@ const AdminProducts = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(defaultFormData);
 
-  const { data: products, isLoading } = useProducts();
+  const { data: products, isLoading } = useAdminProducts();
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
@@ -123,7 +123,7 @@ const AdminProducts = () => {
     });
   };
 
-  const handleEdit = (product: NonNullable<typeof products>[number]) => {
+  const handleEdit = (product: any) => {
     setEditingId(product.id);
     setFormData({
       name: product.name,

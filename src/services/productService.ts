@@ -46,6 +46,9 @@ export interface Product {
     updated_at: string;
     media?: ProductMedia[];
     categories?: Category[];
+    category_ids?: string[];
+    rating?: number;
+    reviews_count?: number;
 }
 
 export interface ProductFilters {
@@ -84,8 +87,9 @@ export interface ProductCreateData {
 export interface ProductUpdateData extends Partial<ProductCreateData> { }
 
 export const productService = {
-    async getAll(filters?: ProductFilters): Promise<{ data: Product[] } | PaginatedResponse<Product>> {
-        return api.get('/products', filters as Record<string, string | number | boolean>);
+    async getAll(filters?: ProductFilters, isAdmin: boolean = false): Promise<{ data: Product[] } | PaginatedResponse<Product>> {
+        const prefix = isAdmin ? '/admin' : '';
+        return api.get(`${prefix}/products`, filters as Record<string, string | number | boolean>);
     },
 
     async getBySlug(slug: string): Promise<{ data: Product }> {

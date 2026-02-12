@@ -5,11 +5,11 @@ export type { Product, ProductCreateData, ProductUpdateData };
 
 export interface ProductWithMedia extends Product { }
 
-export const useProducts = (options?: ProductFilters) => {
+export const useProducts = (options?: ProductFilters, isAdmin: boolean = false) => {
   return useQuery({
-    queryKey: ['products', options],
+    queryKey: ['products', options, isAdmin],
     queryFn: async () => {
-      const response = await productService.getAll(options);
+      const response = await productService.getAll(options, isAdmin);
       // Handle both paginated and non-paginated responses
       if ('data' in response && Array.isArray(response.data)) {
         return response.data as ProductWithMedia[];
@@ -17,6 +17,10 @@ export const useProducts = (options?: ProductFilters) => {
       return (response as any).data as ProductWithMedia[];
     },
   });
+};
+
+export const useAdminProducts = (options?: ProductFilters) => {
+  return useProducts(options, true);
 };
 
 export const useProduct = (slug: string) => {
