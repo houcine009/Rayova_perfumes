@@ -38,6 +38,7 @@ class SettingsController extends Controller
 
         // Invalidate cache
         \Illuminate\Support\Facades\Cache::forget('settings_all');
+        \Illuminate\Support\Facades\Cache::forget("setting_{$key}");
 
         return response()->json([
             'data' => $validated['value'],
@@ -59,6 +60,9 @@ class SettingsController extends Controller
 
         // Invalidate cache
         \Illuminate\Support\Facades\Cache::forget('settings_all');
+        foreach ($validated['settings'] as $setting) {
+            \Illuminate\Support\Facades\Cache::forget("setting_{$setting['key']}");
+        }
 
         return response()->json([
             'message' => 'Paramètres mis à jour',
