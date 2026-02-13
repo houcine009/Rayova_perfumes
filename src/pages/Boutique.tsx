@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Loader2 } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2, LayoutGrid, List } from "lucide-react";
 import { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
 
@@ -13,6 +13,7 @@ const Boutique = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("featured");
+  const [gridCols, setGridCols] = useState<1 | 2>(2);
 
   const { data: products, isLoading } = useProducts({
     search: searchQuery || undefined,
@@ -111,10 +112,26 @@ const Boutique = () => {
                   <p className="text-muted-foreground">
                     {displayedProducts.length} produit{displayedProducts.length > 1 ? "s" : ""} trouvé{displayedProducts.length > 1 ? "s" : ""}
                   </p>
+                  <div className="flex gap-1 sm:hidden">
+                    <button
+                      onClick={() => setGridCols(1)}
+                      className={`p-2 rounded-md transition-colors ${gridCols === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                      aria-label="Vue liste"
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setGridCols(2)}
+                      className={`p-2 rounded-md transition-colors ${gridCols === 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                      aria-label="Vue grille"
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {displayedProducts.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+                  <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
                     {displayedProducts.map((product) => (
                       <ProductCard key={product.id} {...product} />
                     ))}

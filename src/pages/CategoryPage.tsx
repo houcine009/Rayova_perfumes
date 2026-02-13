@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { ProductCard } from "@/components/products/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
-import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { Loader2, LayoutGrid, List } from "lucide-react";
+import { useState, useEffect } from "react";
 import collectionHomme from "@/assets/collection-homme.jpg";
 import collectionFemme from "@/assets/collection-femme.jpg";
 import collectionNiche from "@/assets/collection-niche.jpg";
@@ -48,6 +48,7 @@ const CategoryPage = () => {
   });
 
   const displayedProducts = products || [];
+  const [gridCols, setGridCols] = useState<1 | 2>(2);
 
   useEffect(() => {
     // Noindex for categories to prioritize homepage
@@ -126,9 +127,25 @@ const CategoryPage = () => {
                   <p className="text-muted-foreground">
                     {displayedProducts.length} produit{displayedProducts.length > 1 ? "s" : ""}
                   </p>
+                  <div className="flex gap-1 sm:hidden">
+                    <button
+                      onClick={() => setGridCols(1)}
+                      className={`p-2 rounded-md transition-colors ${gridCols === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                      aria-label="Vue liste"
+                    >
+                      <List className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setGridCols(2)}
+                      className={`p-2 rounded-md transition-colors ${gridCols === 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                      aria-label="Vue grille"
+                    >
+                      <LayoutGrid className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+                <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
                   {displayedProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />
                   ))}
