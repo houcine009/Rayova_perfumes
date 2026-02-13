@@ -106,6 +106,7 @@ class SettingsController extends Controller
 
         // Invalidate cache
         \Illuminate\Support\Facades\Cache::forget('settings_all');
+        \Illuminate\Support\Facades\Cache::forget("setting_{$validated['key']}");
 
         return response()->json([
             'url' => $url,
