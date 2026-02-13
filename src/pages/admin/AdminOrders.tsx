@@ -315,6 +315,17 @@ const AdminOrders = () => {
                 )}
               </div>
 
+              {selectedOrder.notes && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200/50 dark:border-amber-900/50">
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-400 mb-1">
+                    Note du client
+                  </p>
+                  <p className="text-sm text-foreground italic">
+                    "{selectedOrder.notes}"
+                  </p>
+                </div>
+              )}
+
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Articles</p>
                 <div className="space-y-2">
