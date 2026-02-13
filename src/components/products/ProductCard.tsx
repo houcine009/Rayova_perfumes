@@ -126,7 +126,7 @@ export function ProductCard({
 
           {/* Category Badge */}
           <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
-            <span className="bg-background/80 text-foreground text-[10px] sm:text-xs font-medium tracking-wider uppercase px-1.5 py-0.5 sm:px-3 sm:py-1 backdrop-blur-sm">
+            <span className="bg-black/80 text-white text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase px-1.5 py-0.5 sm:px-3 sm:py-1.5 backdrop-blur-sm border border-white/10">
               {displayCategory}
             </span>
           </div>
@@ -134,14 +134,14 @@ export function ProductCard({
 
         {/* Product Info */}
         <div className="text-center px-1">
-          <p className="text-muted-foreground text-[10px] sm:text-xs tracking-wider uppercase mb-0.5 sm:mb-1 truncate">
+          <p className="text-muted-foreground text-[10px] sm:text-xs tracking-[0.1em] uppercase mb-0.5 sm:mb-1 truncate">
             {brand}
           </p>
           <h3 className="font-display text-sm sm:text-lg text-foreground group-hover:text-primary transition-colors duration-300 mb-1 sm:mb-2 line-clamp-2 leading-tight">
             {name}
           </h3>
           <div className="flex items-center justify-center gap-1.5 sm:gap-3 flex-wrap">
-            <span className="text-primary font-semibold text-sm sm:text-lg">
+            <span className="text-primary font-bold text-sm sm:text-lg">
               {numericPrice.toLocaleString("fr-MA")} MAD
             </span>
             {numericOriginalPrice && (
