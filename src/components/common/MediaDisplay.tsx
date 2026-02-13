@@ -90,7 +90,7 @@ export function MediaDisplay({
                     muted={muted}
                     playsInline
                     controls={controls}
-                    preload="auto"
+                    preload="metadata"
                     onMouseOver={handleMouseOver}
                     onMouseOut={handleMouseOut}
                     onError={() => setIsError(true)}
@@ -103,6 +103,8 @@ export function MediaDisplay({
                     onError={() => setIsError(true)}
                     loading="lazy"
                     decoding="async"
+                    width="600"
+                    height="800"
                 />
             )}
         </div>

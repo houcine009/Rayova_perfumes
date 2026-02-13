@@ -90,6 +90,7 @@ export function ProductCard({
               size="icon"
               className="h-12 w-12 rounded-full"
               onClick={handleAddToCart}
+              aria-label={`Ajouter ${name} au panier`}
             >
               <ShoppingBag className="h-5 w-5" />
             </Button>
