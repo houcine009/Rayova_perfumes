@@ -168,8 +168,8 @@ class OrderController extends Controller
             'cancelled' => Order::byStatus('cancelled')->count(),
             'revenue' => Order::where('status', 'delivered')->sum('subtotal'),
             'total_shipping' => Order::where('status', 'delivered')->sum('shipping_cost'),
-            'today' => Order::whereDate('created_at', today())->count(),
-            'this_month' => Order::whereMonth('created_at', now()->month)->count(),
+            'today' => Order::where('status', 'delivered')->whereDate('created_at', today())->count(),
+            'this_month' => Order::where('status', 'delivered')->whereMonth('created_at', now()->month)->count(),
         ];
 
         return response()->json(['data' => $stats]);
