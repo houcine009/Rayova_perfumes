@@ -59,6 +59,8 @@ export function HeroSection() {
             controlsList="nodownload nofullscreen noremoteplayback"
             // @ts-ignore
             fetchpriority="high"
+            width="1920"
+            height="1080"
           >
             <source src={videoUrl} type="video/mp4" />
           </video>
