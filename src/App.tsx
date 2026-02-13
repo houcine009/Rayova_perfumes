@@ -51,52 +51,56 @@ function PageLoader() {
   );
 }
 
+import { LazyMotion, domMax } from "framer-motion";
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/boutique" element={<Boutique />} />
-                <Route path="/categorie/:slug" element={<CategoryPage />} />
-                <Route path="/a-propos" element={<APropos />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/panier" element={<Panier />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/produit/:slug" element={<ProductDetails />} />
+  <LazyMotion features={domMax}>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <ScrollToTop />
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/boutique" element={<Boutique />} />
+                  <Route path="/categorie/:slug" element={<CategoryPage />} />
+                  <Route path="/a-propos" element={<APropos />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/panier" element={<Panier />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/produit/:slug" element={<ProductDetails />} />
 
-                {/* Admin Routes */}
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute requireAdmin>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<AdminHome />} />
-                  <Route path="produits" element={<AdminProducts />} />
-                  <Route path="categories" element={<AdminCategories />} />
-                  <Route path="commandes" element={<AdminOrders />} />
-                  <Route path="utilisateurs" element={<AdminUsers />} />
-                  <Route path="parametres" element={<AdminSettings />} />
-                </Route>
+                  {/* Admin Routes */}
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute requireAdmin>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route index element={<AdminHome />} />
+                    <Route path="produits" element={<AdminProducts />} />
+                    <Route path="categories" element={<AdminCategories />} />
+                    <Route path="commandes" element={<AdminOrders />} />
+                    <Route path="utilisateurs" element={<AdminUsers />} />
+                    <Route path="parametres" element={<AdminSettings />} />
+                  </Route>
 
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </TooltipProvider>
-      </CartProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CartProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </LazyMotion>
 );
 
 export default App;

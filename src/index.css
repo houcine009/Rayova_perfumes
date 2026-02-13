@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -150,7 +149,12 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display;
   }
 }
@@ -195,15 +199,22 @@
   .container-luxury {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+
+  .section-optimize {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 1000px;
+  }
 }
 
 @layer utilities {
   .animation-delay-200 {
     animation-delay: 200ms;
   }
+
   .animation-delay-400 {
     animation-delay: 400ms;
   }
+
   .animation-delay-600 {
     animation-delay: 600ms;
   }
