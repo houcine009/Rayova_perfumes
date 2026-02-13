@@ -133,6 +133,9 @@ class OrderController extends Controller
         ]);
 
         $order->update(['status' => $validated['status']]);
+        
+        \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        \Illuminate\Support\Facades\Cache::forget('order_stats');
 
         return response()->json([
             'data' => $order,
@@ -144,6 +147,9 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         $order->delete();
+
+        \Illuminate\Support\Facades\Cache::forget('dashboard_stats');
+        \Illuminate\Support\Facades\Cache::forget('order_stats');
 
         return response()->json([
             'message' => 'Commande supprimée',
