@@ -51,9 +51,10 @@ export function ProductCard({
   const displayImage = primaryMedia?.url || image || '';
   const mediaMimeType = primaryMedia?.mime_type || null;
   const rawCategory = categories?.[0]?.name || category || '';
-  // If viewing a specific category page (e.g. Homme), override "Unisexe" badge with the page context
+  const lowerCat = rawCategory.toLowerCase();
+  // If viewing a specific category page (e.g. Homme), override "Unisexe/Niche" badge with the page context
   const displayCategory = contextCategory
-    ? (rawCategory.toLowerCase() === 'unisexe' || rawCategory.toLowerCase() === 'niche' ? contextCategory : rawCategory)
+    ? (lowerCat === 'unisexe' || lowerCat === 'unisex' || lowerCat === 'niche' ? contextCategory : rawCategory)
     : rawCategory;
 
   const discount = numericOriginalPrice

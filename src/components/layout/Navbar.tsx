@@ -79,7 +79,7 @@ export function Navbar() {
   const dynamicNavLinks = [
     { name: "Accueil", href: "/" },
     { name: "Boutique", href: "/boutique" },
-    ...(categories?.filter(c => c.is_active).map(c => ({
+    ...(categories?.filter(c => c.is_active && c.slug !== 'unisexe' && c.slug !== 'unisex').map(c => ({
       name: c.name,
       href: `/categorie/${c.slug}`
     })) || []),
