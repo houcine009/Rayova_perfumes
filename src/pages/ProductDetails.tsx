@@ -23,7 +23,7 @@ const ProductDetails = () => {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const { toast } = useToast();
-    const { addItem } = useCart();
+    const { items, addItem } = useCart();
     const { data: product, isLoading, error } = useProduct(slug || '');
 
     const [activeImage, setActiveImage] = useState(0);
@@ -264,13 +264,30 @@ const ProductDetails = () => {
                                             className="px-4 h-full hover:bg-muted transition-colors"
                                         >+</button>
                                     </div>
-                                    <Button
-                                        className="flex-1 h-12 text-base font-semibold"
-                                        onClick={handleAddToCart}
-                                    >
-                                        <ShoppingBag className="mr-2 h-5 w-5" />
-                                        Ajouter au panier
-                                    </Button>
+                                    <div className="flex-1 flex flex-col gap-3">
+                                        <Button
+                                            className="w-full h-12 text-base font-semibold"
+                                            onClick={handleAddToCart}
+                                        >
+                                            <ShoppingBag className="mr-2 h-5 w-5" />
+                                            Ajouter au panier
+                                        </Button>
+
+                                        {items.some(item => item.id === product.id) && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                            >
+                                                <Button
+                                                    variant="heroOutline"
+                                                    className="w-full h-12 text-base font-semibold border-primary/20 hover:border-primary/50 text-primary"
+                                                    onClick={() => navigate('/panier')}
+                                                >
+                                                    Voir le panier
+                                                </Button>
+                                            </motion.div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
