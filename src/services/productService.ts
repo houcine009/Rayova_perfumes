@@ -82,6 +82,8 @@ export interface ProductCreateData {
     notes_base?: string;
     brand?: string;
     category_ids?: string[];
+    rating?: number;
+    reviews_count?: number;
 }
 
 export interface ProductUpdateData extends Partial<ProductCreateData> { }
