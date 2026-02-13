@@ -21,6 +21,7 @@ interface ProductCardProps {
   priority?: boolean;
   rating?: number;
   reviews_count?: number;
+  contextCategory?: string;
 }
 
 export function ProductCard({
@@ -38,6 +39,7 @@ export function ProductCard({
   priority = false,
   rating = 5,
   reviews_count = 0,
+  contextCategory,
 }: ProductCardProps) {
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -48,7 +50,11 @@ export function ProductCard({
   const primaryMedia = media?.find(m => m.is_primary) || media?.[0];
   const displayImage = primaryMedia?.url || image || '';
   const mediaMimeType = primaryMedia?.mime_type || null;
-  const displayCategory = categories?.[0]?.name || category || '';
+  const rawCategory = categories?.[0]?.name || category || '';
+  // If viewing a specific category page (e.g. Homme), override "Unisexe" badge with the page context
+  const displayCategory = contextCategory
+    ? (rawCategory.toLowerCase() === 'unisexe' || rawCategory.toLowerCase() === 'niche' ? contextCategory : rawCategory)
+    : rawCategory;
 
   const discount = numericOriginalPrice
     ? Math.round(((numericOriginalPrice - numericPrice) / numericOriginalPrice) * 100)
