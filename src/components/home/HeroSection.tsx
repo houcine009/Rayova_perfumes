@@ -41,26 +41,35 @@ export function HeroSection() {
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background">
       {/* Background Media */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-[#0a0a0a]">
+        {/* CSS Placeholder to fix LCP/White flash */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] z-0" />
+
         {videoUrl ? (
           <video
             autoPlay
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="auto"
             poster={imageUrl || undefined}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover relative z-10"
             key={videoUrl}
             disablePictureInPicture
             controlsList="nodownload nofullscreen noremoteplayback"
+            // @ts-ignore
+            fetchpriority="high"
           >
             <source src={videoUrl} type="video/mp4" />
           </video>
         ) : imageUrl ? (
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${imageUrl})` }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat z-10"
+            style={{
+              backgroundImage: `url(${imageUrl})`,
+            }}
           />
         ) : (
           <div className="absolute inset-0 bg-background" />

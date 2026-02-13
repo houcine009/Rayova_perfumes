@@ -18,6 +18,7 @@ interface ProductCardProps {
   category?: string;
   categories?: Array<{ name: string }>;
   is_featured?: boolean;
+  priority?: boolean;
 }
 
 export function ProductCard({
@@ -32,6 +33,7 @@ export function ProductCard({
   categories,
   media,
   is_featured,
+  priority = false,
 }: ProductCardProps) {
   const { addItem } = useCart();
   const { toast } = useToast();
@@ -78,6 +80,7 @@ export function ProductCard({
             src={displayImage}
             alt={name}
             className="transition-transform duration-700 group-hover:scale-105"
+            priority={priority}
             autoPlay={true}
             onHoverPlay={false}
             isVideoHint={mediaMimeType?.startsWith('video/') || false}

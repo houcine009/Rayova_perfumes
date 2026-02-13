@@ -12,6 +12,7 @@ interface MediaDisplayProps {
     controls?: boolean;
     onHoverPlay?: boolean;
     isVideoHint?: boolean;
+    priority?: boolean;
 }
 
 export function MediaDisplay({
@@ -25,6 +26,7 @@ export function MediaDisplay({
     controls = false,
     onHoverPlay = false,
     isVideoHint = false,
+    priority = false,
 }: MediaDisplayProps) {
     const [isError, setIsError] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -90,10 +92,14 @@ export function MediaDisplay({
                     muted={muted}
                     playsInline
                     controls={controls}
-                    preload="metadata"
+                    preload={priority ? "auto" : "metadata"}
+                    // @ts-ignore
+                    fetchpriority={priority ? "high" : "auto"}
                     onMouseOver={handleMouseOver}
                     onMouseOut={handleMouseOut}
                     onError={() => setIsError(true)}
+                    width="600"
+                    height="800"
                 />
             ) : (
                 <img
@@ -101,8 +107,10 @@ export function MediaDisplay({
                     alt={alt}
                     className={cn("w-full h-full object-cover", className)}
                     onError={() => setIsError(true)}
-                    loading="lazy"
+                    loading={priority ? "eager" : "lazy"}
                     decoding="async"
+                    // @ts-ignore
+                    fetchpriority={priority ? "high" : "auto"}
                     width="600"
                     height="800"
                 />
