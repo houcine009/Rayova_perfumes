@@ -74,6 +74,7 @@ export default function Checkout() {
       });
 
       setOrderNumber(order.order_number);
+      window.scrollTo(0, 0);
       setOrderComplete(true);
       clearCart();
     } catch (error: any) {
