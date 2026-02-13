@@ -48,7 +48,7 @@ export function HeroSection() {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             poster={imageUrl || undefined}
             className="w-full h-full object-cover"
             key={videoUrl}
@@ -72,13 +72,13 @@ export function HeroSection() {
 
       {/* Animated Gold Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(window.innerWidth < 768 ? 8 : 20)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-primary/30 rounded-full"
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
               opacity: 0,
             }}
             animate={{
