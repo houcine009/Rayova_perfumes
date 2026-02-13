@@ -50,8 +50,12 @@ export function ProductCard({
   const primaryMedia = media?.find(m => m.is_primary) || media?.[0];
   const displayImage = primaryMedia?.url || image || '';
   const mediaMimeType = primaryMedia?.mime_type || null;
-  const rawCategory = categories?.[0]?.name || category || '';
+  const catNames = categories?.map(c => c.name.toLowerCase()) || [];
+  const isMultiGender = catNames.includes('homme') && catNames.includes('femme');
+
+  const rawCategory = isMultiGender ? "Unisexe" : (categories?.[0]?.name || category || '');
   const lowerCat = rawCategory.toLowerCase();
+
   // If viewing a specific category page (e.g. Homme), override "Unisexe/Niche" badge with the page context
   const displayCategory = contextCategory
     ? (lowerCat === 'unisexe' || lowerCat === 'unisex' || lowerCat === 'niche' ? contextCategory : rawCategory)
