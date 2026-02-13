@@ -127,7 +127,7 @@ const CategoryPage = () => {
                   <p className="text-muted-foreground">
                     {displayedProducts.length} produit{displayedProducts.length > 1 ? "s" : ""}
                   </p>
-                  <div className="flex gap-1 sm:hidden">
+                  <div className="flex gap-1">
                     <button
                       onClick={() => setGridCols(1)}
                       className={`p-2 rounded-md transition-colors ${gridCols === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
@@ -145,7 +145,7 @@ const CategoryPage = () => {
                   </div>
                 </div>
 
-                <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
+                <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
                   {displayedProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />
                   ))}
