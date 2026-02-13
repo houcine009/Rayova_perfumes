@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/products/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
@@ -12,6 +13,7 @@ export function FeaturedProducts() {
   });
 
   const featuredProducts = products || [];
+  const [gridCols, setGridCols] = useState<1 | 2>(2);
 
   return (
     <section className="section-padding bg-card">
@@ -32,15 +34,33 @@ export function FeaturedProducts() {
               Nouveaux Parfums
             </h2>
           </div>
-          <Link to="/boutique">
-            <Button
-              variant="luxuryOutline"
-              className="group"
-            >
-              <span>Voir tout</span>
-              <ArrowRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1">
+              <button
+                onClick={() => setGridCols(1)}
+                className={`p-2 rounded-md transition-colors ${gridCols === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                aria-label="Vue liste"
+              >
+                <List className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setGridCols(2)}
+                className={`p-2 rounded-md transition-colors ${gridCols === 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
+                aria-label="Vue grille"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+            </div>
+            <Link to="/boutique">
+              <Button
+                variant="luxuryOutline"
+                className="group"
+              >
+                <span>Voir tout</span>
+                <ArrowRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+              </Button>
+            </Link>
+          </div>
         </motion.div>
 
         {/* Products Grid */}
@@ -49,7 +69,7 @@ export function FeaturedProducts() {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
             {featuredProducts.map((product, index) => (
               <motion.div
                 key={product.id}
