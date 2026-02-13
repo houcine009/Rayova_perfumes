@@ -43,7 +43,10 @@ export function MediaDisplay({
                     observer.disconnect();
                 }
             },
-            { rootMargin: "200px" }
+            {
+                rootMargin: "400px",
+                threshold: 0.01
+            }
         );
         observer.observe(el);
         return () => observer.disconnect();

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, SlidersHorizontal, Loader2, LayoutGrid, List } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
 
 const Boutique = () => {
@@ -22,15 +22,14 @@ const Boutique = () => {
     sort_order: sortBy === "price-asc" ? "asc" : "desc",
   });
 
-  // Since we might be doing frontend filtering/sorting too if API is limited
-  const displayedProducts = products || [];
+  const displayedProducts = React.useMemo(() => products || [], [products]);
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-24 lg:pt-32">
         {/* Page Header */}
-        <section className="section-padding bg-card border-b border-border">
+        <section className="section-padding bg-card border-b border-border section-optimize">
           <div className="container-luxury">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -99,7 +98,7 @@ const Boutique = () => {
         </section>
 
         {/* Products Grid */}
-        <section className="section-padding">
+        <section className="section-padding section-optimize">
           <div className="container-luxury">
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-20">

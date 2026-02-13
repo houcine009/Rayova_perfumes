@@ -1,6 +1,7 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Heart } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
@@ -24,7 +25,7 @@ interface ProductCardProps {
   contextCategory?: string;
 }
 
-export function ProductCard({
+export const ProductCard = memo(function ProductCard({
   id,
   slug,
   name,
@@ -50,6 +51,7 @@ export function ProductCard({
   const primaryMedia = media?.find(m => m.is_primary) || media?.[0];
   const displayImage = primaryMedia?.url || image || '';
   const mediaMimeType = primaryMedia?.mime_type || null;
+
   const catNames = categories?.map(c => c.name.toLowerCase()) || [];
   const isMultiGender = catNames.includes('homme') && catNames.includes('femme');
 
@@ -82,11 +84,12 @@ export function ProductCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      viewport={{ once: true, margin: "50px" }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
       className="group"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
     >
       <Link to={`/produit/${slug}`} className="block">
         {/* Image/Video Container */}
@@ -103,15 +106,17 @@ export function ProductCard({
 
           {/* Overlay on Hover */}
           <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-            <Button
-              variant="luxury"
-              size="icon"
-              className="h-10 w-10 sm:h-12 sm:w-12 rounded-full"
-              onClick={handleAddToCart}
-              aria-label={`Ajouter ${name} au panier`}
-            >
-              <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
+            <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+              <Button
+                variant="luxury"
+                size="icon"
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-xl"
+                onClick={handleAddToCart}
+                aria-label={`Ajouter ${name} au panier`}
+              >
+                <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Badges */}
@@ -174,5 +179,4 @@ export function ProductCard({
       </Link>
     </motion.div>
   );
-}
-
+});

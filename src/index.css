@@ -157,6 +157,12 @@
   h6 {
     @apply font-display;
   }
+
+  .section-optimize {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 1000px;
+    will-change: transform;
+  }
 }
 
 @layer components {

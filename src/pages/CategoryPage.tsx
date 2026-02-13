@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { Loader2, LayoutGrid, List } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import collectionHomme from "@/assets/collection-homme.jpg";
 import collectionFemme from "@/assets/collection-femme.jpg";
 import collectionNiche from "@/assets/collection-niche.jpg";
@@ -47,7 +47,7 @@ const CategoryPage = () => {
     category: slug === 'all' ? undefined : slug
   });
 
-  const displayedProducts = products || [];
+  const displayedProducts = useMemo(() => products || [], [products]);
   const [gridCols, setGridCols] = useState<1 | 2>(2);
 
   useEffect(() => {
@@ -115,7 +115,7 @@ const CategoryPage = () => {
         </section>
 
         {/* Products Grid */}
-        <section className="section-padding">
+        <section className="section-padding section-optimize">
           <div className="container-luxury">
             {isLoading ? (
               <div className="flex justify-center py-20">
