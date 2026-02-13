@@ -41,6 +41,8 @@ export function Footer() {
                 src={logo}
                 alt="Rayova Parfums"
                 className="h-16 w-auto"
+                width="200"
+                height="64"
               />
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">

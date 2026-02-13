@@ -105,6 +105,8 @@ export function Navbar() {
                 src={logo}
                 alt="Rayova Parfums"
                 className="h-12 lg:h-16 w-auto"
+                width="200"
+                height="64"
               />
             </Link>
 

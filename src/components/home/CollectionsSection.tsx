@@ -130,9 +130,13 @@ export function CollectionsSection() {
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 ) : collection.image ? (
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                    style={{ backgroundImage: `url(${collection.image})` }}
+                  <img
+                    src={collection.image}
+                    alt={collection.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                    width="400"
+                    height="600"
                   />
                 ) : (
                   <div className="absolute inset-0 bg-muted" />

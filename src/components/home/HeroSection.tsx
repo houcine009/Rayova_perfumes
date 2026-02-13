@@ -63,13 +63,17 @@ export function HeroSection() {
             <source src={videoUrl} type="video/mp4" />
           </video>
         ) : imageUrl ? (
-          <motion.div
+          <motion.img
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat z-10"
-            style={{
-              backgroundImage: `url(${imageUrl})`,
-            }}
+            src={imageUrl}
+            alt={title}
+            className="absolute inset-0 w-full h-full object-cover z-10"
+            // @ts-ignore
+            fetchpriority="high"
+            loading="eager"
+            width="1920"
+            height="1080"
           />
         ) : (
           <div className="absolute inset-0 bg-background" />
