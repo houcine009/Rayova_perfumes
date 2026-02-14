@@ -8,6 +8,7 @@ import {
     UserCheck,
     UserMinus,
     Users,
+    Phone,
     Calendar,
     AlertCircle,
     Loader2,
@@ -39,6 +40,7 @@ import { api } from '@/lib/api';
 interface Subscriber {
     id: string;
     email: string;
+    phone: string | null;
     is_active: boolean;
     subscribed_at: string;
     unsubscribed_at: string | null;
@@ -105,7 +107,10 @@ const AdminNewsletter = () => {
     };
 
     const filteredSubscribers = subscribers.filter(sub => {
-        const matchesSearch = sub.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch =
+            sub.email.toLowerCase().includes(searchLower) ||
+            (sub.phone && sub.phone.toLowerCase().includes(searchLower));
         const matchesFilter = filter === 'all' ? true : (filter === 'active' ? sub.is_active : !sub.is_active);
         return matchesSearch && matchesFilter;
     });
@@ -173,7 +178,7 @@ const AdminNewsletter = () => {
                             <div className="relative w-full sm:w-80">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    placeholder="Rechercher un email..."
+                                    placeholder="Rechercher email ou téléphone..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="pl-10 rounded-xl bg-background/50 border-border/50 focus:border-primary w-full"
@@ -200,6 +205,7 @@ const AdminNewsletter = () => {
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent border-border/50">
                                     <TableHead className="w-[300px] py-4">Email</TableHead>
+                                    <TableHead className="py-4">Téléphone</TableHead>
                                     <TableHead className="py-4">Statut</TableHead>
                                     <TableHead className="py-4">Date d'inscription</TableHead>
                                     <TableHead className="text-right py-4 pr-6">Actions</TableHead>
@@ -208,7 +214,7 @@ const AdminNewsletter = () => {
                             <TableBody>
                                 {loading ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="h-48 text-center">
+                                        <TableCell colSpan={5} className="h-48 text-center">
                                             <div className="flex flex-col items-center gap-3">
                                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                                 <span className="text-muted-foreground">Chargement des abonnés...</span>
@@ -217,7 +223,7 @@ const AdminNewsletter = () => {
                                     </TableRow>
                                 ) : filteredSubscribers.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="h-48 text-center">
+                                        <TableCell colSpan={5} className="h-48 text-center">
                                             <div className="flex flex-col items-center gap-3">
                                                 <AlertCircle className="h-8 w-8 text-muted-foreground/50" />
                                                 <span className="text-muted-foreground">Aucun abonné trouvé</span>
@@ -234,6 +240,16 @@ const AdminNewsletter = () => {
                                                     </div>
                                                     {subscriber.email}
                                                 </div>
+                                            </TableCell>
+                                            <TableCell className="py-4 text-muted-foreground">
+                                                {subscriber.phone ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <Phone className="h-3.5 w-3.5" />
+                                                        {subscriber.phone}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground/30">—</span>
+                                                )}
                                             </TableCell>
                                             <TableCell className="py-4">
                                                 {subscriber.is_active ? (
