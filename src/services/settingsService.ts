@@ -27,6 +27,15 @@ export interface SocialSettings {
     tiktok?: string | null;
 }
 
+export interface OpeningSoonSettings {
+    enabled: boolean;
+    title: string;
+    subtitle: string;
+    description: string;
+    video_url: string | null;
+    image_url: string | null;
+}
+
 export const settingsService = {
     async getAll(): Promise<{ data: Record<string, unknown> }> {
         return api.get('/settings');

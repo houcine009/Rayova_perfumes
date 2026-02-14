@@ -18,7 +18,8 @@ class NewsletterController extends Controller
         }
 
         if ($request->has('search')) {
-            $query->where('email', 'like', '%' . $request->search . '%');
+            $query->where('email', 'like', '%' . $request->search . '%')
+                  ->orWhere('phone', 'like', '%' . $request->search . '%');
         }
 
         $subscribers = $query->orderBy('subscribed_at', 'desc')
@@ -31,12 +32,18 @@ class NewsletterController extends Controller
     {
         $validated = $request->validate([
             'email' => 'required|email',
+            'phone' => 'nullable|string',
         ]);
 
         $subscriber = NewsletterSubscriber::where('email', $validated['email'])->first();
 
         if ($subscriber) {
             if ($subscriber->is_active) {
+                // Update phone if provided
+                if (isset($validated['phone'])) {
+                    $subscriber->update(['phone' => $validated['phone']]);
+                }
+                
                 return response()->json([
                     'message' => 'Cet email est déjà inscrit à la newsletter',
                 ], 422);
@@ -45,6 +52,7 @@ class NewsletterController extends Controller
             // Reactivate subscription
             $subscriber->update([
                 'is_active' => true,
+                'phone' => $validated['phone'] ?? $subscriber->phone,
                 'unsubscribed_at' => null,
                 'subscribed_at' => now(),
             ]);
@@ -56,6 +64,7 @@ class NewsletterController extends Controller
 
         NewsletterSubscriber::create([
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'subscribed_at' => now(),
         ]);
 

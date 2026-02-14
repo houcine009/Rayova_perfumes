@@ -6,15 +6,17 @@ import {
   AlertTriangle,
   CheckCircle2,
   AlertCircle,
-  AlertCircle as AlertCircleIcon
+  AlertCircle as AlertCircleIcon,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useSiteSettings, useUpdateSetting, type HeroSettings, type ContactSettings } from '@/hooks/useSiteSettings';
+import { useSiteSettings, useUpdateSetting, type HeroSettings, type ContactSettings, type OpeningSoonSettings } from '@/hooks/useSiteSettings';
 import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/lib/api';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -49,6 +51,15 @@ const AdminSettings = () => {
     address: 'Casablanca, Maroc',
   });
 
+  const [openingSoonSettings, setOpeningSoonSettings] = useState<OpeningSoonSettings>({
+    enabled: false,
+    title: 'Bientôt Disponible',
+    subtitle: 'Rayova Luxury Fragrance',
+    description: 'Nous préparons quelque chose de spécial pour vous.',
+    video_url: null,
+    image_url: null,
+  });
+
   // Fetch storage status on mount
   useEffect(() => {
     const fetchStorageStatus = async () => {
@@ -75,6 +86,9 @@ const AdminSettings = () => {
       if (settings.contact) {
         setContactSettings(prev => ({ ...prev, ...(settings.contact as ContactSettings) }));
       }
+      if (settings.opening_soon) {
+        setOpeningSoonSettings(prev => ({ ...prev, ...(settings.opening_soon as OpeningSoonSettings) }));
+      }
     }
   }, [settings]);
 
@@ -95,8 +109,12 @@ const AdminSettings = () => {
       console.log(`[Upload] Success! New URL: ${newUrl}`);
       if (key === 'hero_background_url') {
         setHeroSettings(prev => ({ ...prev, image_url: newUrl }));
-      } else {
+      } else if (key === 'hero_video_url') {
         setHeroSettings(prev => ({ ...prev, video_url: newUrl }));
+      } else if (key === 'opening_soon_image') {
+        setOpeningSoonSettings(prev => ({ ...prev, image_url: newUrl }));
+      } else if (key === 'opening_soon_video') {
+        setOpeningSoonSettings(prev => ({ ...prev, video_url: newUrl }));
       }
 
       toast({ title: 'Fichier chargé avec succès' });
@@ -143,6 +161,22 @@ const AdminSettings = () => {
     }
   };
 
+  const handleSaveOpeningSoon = async () => {
+    setIsSaving(true);
+    try {
+      await updateSetting.mutateAsync({ key: 'opening_soon', value: openingSoonSettings });
+      toast({ title: 'Paramètres "Ouverture Prochaine" sauvegardés' });
+    } catch (error: any) {
+      toast({
+        title: 'Erreur',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-16">
@@ -165,6 +199,7 @@ const AdminSettings = () => {
       <Tabs defaultValue="hero" className="space-y-6">
         <TabsList>
           <TabsTrigger value="hero">Section Hero</TabsTrigger>
+          <TabsTrigger value="opening_soon">Ouverture Prochaine</TabsTrigger>
           <TabsTrigger value="contact">Coordonnées</TabsTrigger>
           <TabsTrigger value="storage">Stockage</TabsTrigger>
         </TabsList>
@@ -354,6 +389,114 @@ const AdminSettings = () => {
                   <Save className="mr-2 h-4 w-4" />
                 )}
                 Sauvegarder
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="opening_soon">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Ouverture Prochaine (Maintenance)</CardTitle>
+                  <CardDescription>
+                    Activez cette page pour teser votre lancement
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="opening_soon_enabled" className="text-sm font-medium">Activer</Label>
+                  <Switch
+                    id="opening_soon_enabled"
+                    checked={openingSoonSettings.enabled}
+                    onCheckedChange={(checked) => setOpeningSoonSettings({ ...openingSoonSettings, enabled: checked })}
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="os_title">Titre Principal</Label>
+                  <Input
+                    id="os_title"
+                    value={openingSoonSettings.title}
+                    onChange={(e) => setOpeningSoonSettings({ ...openingSoonSettings, title: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="os_subtitle">Sous-titre</Label>
+                  <Input
+                    id="os_subtitle"
+                    value={openingSoonSettings.subtitle}
+                    onChange={(e) => setOpeningSoonSettings({ ...openingSoonSettings, subtitle: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="os_description">Message de Teaser</Label>
+                <Textarea
+                  id="os_description"
+                  value={openingSoonSettings.description}
+                  onChange={(e) => setOpeningSoonSettings({ ...openingSoonSettings, description: e.target.value })}
+                  className="min-h-[100px] bg-background/50"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <Label>Fond Vidéo (Recommandé)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={openingSoonSettings.video_url || ''}
+                      onChange={(e) => setOpeningSoonSettings({ ...openingSoonSettings, video_url: e.target.value || null })}
+                      placeholder="URL de la vidéo..."
+                    />
+                    <label className="cursor-pointer">
+                      <Button variant="outline" asChild>
+                        <span>Charger</span>
+                      </Button>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="video/*"
+                        onChange={(e) => handleBackgroundUpload(e, 'opening_soon_video' as any)}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Label>Fond Image (Alternative)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={openingSoonSettings.image_url || ''}
+                      onChange={(e) => setOpeningSoonSettings({ ...openingSoonSettings, image_url: e.target.value || null })}
+                      placeholder="URL de l'image..."
+                    />
+                    <label className="cursor-pointer">
+                      <Button variant="outline" asChild>
+                        <span>Charger</span>
+                      </Button>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => handleBackgroundUpload(e, 'opening_soon_image' as any)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <Button onClick={handleSaveOpeningSoon} disabled={isSaving} className="mt-4">
+                {isSaving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Sauvegarder les paramètres
               </Button>
             </CardContent>
           </Card>

@@ -54,6 +54,31 @@ function PageLoader() {
 
 import { LazyMotion, domMin } from "framer-motion";
 
+const OpeningSoon = lazy(() => import("./pages/OpeningSoon"));
+
+import { useAuth } from "@/contexts/AuthContext";
+import { useSiteSettings, type OpeningSoonSettings } from "@/hooks/useSiteSettings";
+
+function MaintenanceWrapper({ children }: { children: React.ReactNode }) {
+  const { data: settings, isLoading } = useSiteSettings();
+  const { user } = useAuth();
+  const osSettings = settings?.opening_soon as OpeningSoonSettings;
+
+  // Allow access if: 
+  // 1. We're still loading settings
+  // 2. Opening soon mode is disabled
+  // 3. User is an admin
+  // 4. We are on the /auth page (to allow admins to login)
+  const isAuthPage = window.location.pathname === '/auth';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+
+  if (!isLoading && osSettings?.enabled && !isAdmin && !isAuthPage) {
+    return <OpeningSoon />;
+  }
+
+  return <>{children}</>;
+}
+
 const App = () => (
   <LazyMotion features={domMin}>
     <QueryClientProvider client={queryClient}>
@@ -63,40 +88,43 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <ScrollToTop />
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/boutique" element={<Boutique />} />
-                  <Route path="/categorie/:slug" element={<CategoryPage />} />
-                  <Route path="/a-propos" element={<APropos />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/panier" element={<Panier />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/produit/:slug" element={<ProductDetails />} />
+              <MaintenanceWrapper>
+                <ScrollToTop />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/opening-soon" element={<OpeningSoon />} />
+                    <Route path="/boutique" element={<Boutique />} />
+                    <Route path="/categorie/:slug" element={<CategoryPage />} />
+                    <Route path="/a-propos" element={<APropos />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/panier" element={<Panier />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/produit/:slug" element={<ProductDetails />} />
 
-                  {/* Admin Routes */}
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute requireAdmin>
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    }
-                  >
-                    <Route index element={<AdminHome />} />
-                    <Route path="produits" element={<AdminProducts />} />
-                    <Route path="categories" element={<AdminCategories />} />
-                    <Route path="commandes" element={<AdminOrders />} />
-                    <Route path="newsletter" element={<AdminNewsletter />} />
-                    <Route path="utilisateurs" element={<AdminUsers />} />
-                    <Route path="parametres" element={<AdminSettings />} />
-                  </Route>
+                    {/* Admin Routes */}
+                    <Route
+                      path="/admin"
+                      element={
+                        <ProtectedRoute requireAdmin>
+                          <AdminDashboard />
+                        </ProtectedRoute>
+                      }
+                    >
+                      <Route index element={<AdminHome />} />
+                      <Route path="produits" element={<AdminProducts />} />
+                      <Route path="categories" element={<AdminCategories />} />
+                      <Route path="commandes" element={<AdminOrders />} />
+                      <Route path="newsletter" element={<AdminNewsletter />} />
+                      <Route path="utilisateurs" element={<AdminUsers />} />
+                      <Route path="parametres" element={<AdminSettings />} />
+                    </Route>
 
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </MaintenanceWrapper>
             </BrowserRouter>
           </TooltipProvider>
         </CartProvider>

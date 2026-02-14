@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { settingsService, type HeroSettings, type ContactSettings, type SocialSettings } from '@/services/settingsService';
+import { settingsService, type HeroSettings, type ContactSettings, type SocialSettings, type OpeningSoonSettings } from '@/services/settingsService';
 
-export type { HeroSettings, ContactSettings, SocialSettings };
+export type { HeroSettings, ContactSettings, SocialSettings, OpeningSoonSettings };
 
 const SETTINGS_KEY = 'rayova_site_settings';
 const HERO_KEY = 'rayova_hero_settings';
