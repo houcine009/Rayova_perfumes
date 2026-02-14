@@ -1,6 +1,6 @@
 <?php
 /**
- * RAYOVA SUPER DEBUG SCRIPT
+ * RAYOVA LIVE PATH DETECTOR & AUDIT
  * Run via: php rayova/super_debug.php
  */
 
@@ -17,63 +17,56 @@ use Illuminate\Support\Facades\DB;
 use App\Models\NewsletterSubscriber;
 use App\Models\SiteSetting;
 
-echo "=== RAYOVA SUPER DEBUG ===\n\n";
+echo "=== RAYOVA SYSTEM AUDIT & PATH SYNC ===\n\n";
 
-// 1. Check Table Structure
-echo "[1] Database Schema Check:\n";
-if (Schema::hasTable('newsletter_subscribers')) {
-    $columns = Schema::getColumnListing('newsletter_subscribers');
-    echo "- Table 'newsletter_subscribers' exists.\n";
-    echo "- Columns: " . implode(', ', $columns) . "\n";
-    if (in_array('phone', $columns)) {
-        echo "  SUCCESS: 'phone' column found.\n";
-    } else {
-        echo "  CRITICAL: 'phone' column MISSING!\n";
+$currentPath = base_path();
+$publicPath = public_path();
+$uniqueId = uniqid('rayova_');
+$testFile = $publicPath . '/path_sync_' . $uniqueId . '.txt';
+
+// 1. Path Sync Test
+echo "[1] Path Synchronization Test:\n";
+echo "- Current Script Path: $currentPath\n";
+echo "- Public Web Path: $publicPath\n";
+
+if (@file_put_contents($testFile, $uniqueId)) {
+    echo "- Created test file: /path_sync_$uniqueId.txt\n";
+    echo "- ACTION REQUIRED: Try to visit: https://api.rayovaparfums.com/path_sync_$uniqueId.txt\n";
+    echo "  (If you get 404, this directory is NOT live!)\n";
+} else {
+    echo "- WARNING: Cannot write to public directory!\n";
+}
+
+// 2. Data Persistence Check
+echo "\n[2] Database & Model Audit:\n";
+$subsCount = NewsletterSubscriber::count();
+echo "- Total Subscribers: $subsCount\n";
+$lastSub = NewsletterSubscriber::orderBy('created_at', 'desc')->first();
+if ($lastSub) {
+    echo "- Last Entry: Email: {$lastSub->email}, Phone: " . ($lastSub->phone ?? "[MISSING]") . "\n";
+}
+
+// 3. Security Whitelist Check
+echo "\n[3] Security Audit (Upload Whitelist):\n";
+$controllerFile = app_path('Http/Controllers/Api/SettingsController.php');
+if (file_exists($controllerFile)) {
+    $content = file_get_contents($controllerFile);
+    $whitelistMatch = [];
+    if (preg_match("/'key' => 'required\|string\|in:(.*?)'/", $content, $whitelistMatch)) {
+        echo "- Current Whitelist: {$whitelistMatch[1]}\n";
+        if (strpos($whitelistMatch[1], 'opening_soon_video') !== false) {
+             echo "  SUCCESS: 'opening_soon_video' is whitelisted.\n";
+        } else {
+             echo "  FAILURE: 'opening_soon_video' NOT whitelisted in this file.\n";
+        }
     }
-} else {
-    echo "  CRITICAL: Table 'newsletter_subscribers' MISSING!\n";
 }
 
-// 2. Check Model Fillable
-echo "\n[2] Model Check:\n";
-$model = new NewsletterSubscriber();
-echo "- Model Fillable: " . implode(', ', $model->getFillable()) . "\n";
-if (in_array('phone', $model->getFillable())) {
-    echo "  SUCCESS: 'phone' is fillable.\n";
-} else {
-    echo "  CRITICAL: 'phone' is NOT in fillable list!\n";
+// 4. Performance Check
+echo "\n[4] Performance Audit:\n";
+$cacheKeys = ['settings_all', 'setting_opening_soon'];
+foreach ($cacheKeys as $key) {
+    echo "- Cache Key '$key': " . (\Illuminate\Support\Facades\Cache::has($key) ? "EXISTS" : "MISSING (Normal if just cleared)") . "\n";
 }
 
-// 3. Check Data
-echo "\n[3] Newsletter Data Sample (Last 3):\n";
-$subs = NewsletterSubscriber::orderBy('created_at', 'desc')->limit(3)->get();
-if ($subs->count() > 0) {
-    foreach ($subs as $s) {
-        echo "- Email: {$s->email}, Phone: " . ($s->phone ?? "[NULL]") . ", Created: {$s->created_at}\n";
-    }
-} else {
-    echo "- No subscribers found.\n";
-}
-
-// 4. Code Verification (File content check)
-echo "\n[4] Server File Verification:\n";
-$controllerPath = app_path('Http/Controllers/Api/SettingsController.php');
-if (file_exists($controllerPath)) {
-    $content = file_get_contents($controllerPath);
-    if (strpos($content, 'opening_soon_video') !== false) {
-        echo "- SettingsController correctly contains 'opening_soon_video' key.\n";
-    } else {
-        echo "- CRITICAL: SettingsController DOES NOT contain new keys!\n";
-    }
-} else {
-    echo "- CRITICAL: SettingsController file not found at $controllerPath\n";
-}
-
-// 5. Environment
-echo "\n[5] Environment Check:\n";
-echo "- APP_URL: " . config('app.url') . "\n";
-echo "- Cache Driver: " . config('cache.default') . "\n";
-echo "- Base Path: " . base_path() . "\n";
-echo "- App Path: " . app_path() . "\n";
-
-echo "\n=== END DEBUG ===\n";
+echo "\n=== END AUDIT ===\n";
