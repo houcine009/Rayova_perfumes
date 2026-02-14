@@ -93,7 +93,7 @@ const AdminSettings = () => {
     }
   }, [settings]);
 
-  const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: 'hero_background_url' | 'hero_video_url') => {
+  const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: 'hero_background_url' | 'hero_video_url' | 'opening_soon_video' | 'opening_soon_image') => {
     const file = e.target.files?.[0];
     if (!file) return;
 

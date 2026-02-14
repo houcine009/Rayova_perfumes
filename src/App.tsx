@@ -64,15 +64,17 @@ function MaintenanceWrapper({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const osSettings = settings?.opening_soon as OpeningSoonSettings;
 
-  // Allow access if: 
-  // 1. We're still loading settings
-  // 2. Opening soon mode is disabled
-  // 3. User is an admin
-  // 4. We are on the /auth page (to allow admins to login)
+  // 1. If loading settings, show loader (prevents flash of main site)
+  if (isLoading) {
+    return <PageLoader />;
+  }
+
+  // 2. Determine access
   const isAuthPage = window.location.pathname === '/auth';
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
-  if (!isLoading && osSettings?.enabled && !isAdmin && !isAuthPage) {
+  // 3. If Opening Soon is enabled and user is not an admin, show maintenance page
+  if (osSettings?.enabled && !isAdmin && !isAuthPage) {
     return (
       <Suspense fallback={<PageLoader />}>
         <OpeningSoon />
