@@ -73,5 +73,7 @@ if (file_exists($controllerPath)) {
 echo "\n[5] Environment Check:\n";
 echo "- APP_URL: " . config('app.url') . "\n";
 echo "- Cache Driver: " . config('cache.default') . "\n";
+echo "- Base Path: " . base_path() . "\n";
+echo "- App Path: " . app_path() . "\n";
 
 echo "\n=== END DEBUG ===\n";

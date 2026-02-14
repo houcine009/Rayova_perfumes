@@ -104,15 +104,26 @@ class SettingsController extends Controller
             $url = \Illuminate\Support\Facades\Storage::url($path);
         }
 
-        SiteSetting::setValue($validated['key'], $url, $request->user()->id);
+        if (str_starts_with($validated['key'], 'opening_soon_')) {
+            $osSettings = SiteSetting::getValue('opening_soon', []);
+            $osKey = str_replace('opening_soon_', '', $validated['key']) . '_url';
+            $osSettings[$osKey] = $url;
+            SiteSetting::setValue('opening_soon', $osSettings, $request->user()->id);
+            \Log::info('Nested Opening Soon setting updated', ['osKey' => $osKey, 'url' => $url]);
+        } else {
+            SiteSetting::setValue($validated['key'], $url, $request->user()->id);
+        }
 
         // Invalidate cache
         \Illuminate\Support\Facades\Cache::forget('settings_all');
         \Illuminate\Support\Facades\Cache::forget("setting_{$validated['key']}");
+        if (str_starts_with($validated['key'], 'opening_soon_')) {
+            \Illuminate\Support\Facades\Cache::forget("setting_opening_soon");
+        }
 
         return response()->json([
             'url' => $url,
-            'message' => 'Fond d\'écran mis à jour',
+            'message' => 'Fichier mis à jour avec succès',
         ]);
     }
 
