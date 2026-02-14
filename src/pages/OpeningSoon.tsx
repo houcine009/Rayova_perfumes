@@ -94,9 +94,6 @@ export default function OpeningSoon() {
                     <h1 className="text-5xl md:text-8xl font-display font-bold leading-tight bg-gradient-to-b from-[#FFF0C1] via-[#D4AF37] to-[#8E6D1A] bg-clip-text text-transparent drop-shadow-sm">
                         {title}
                     </h1>
-                    <p className="text-white/70 max-w-xl mx-auto text-base md:text-xl leading-relaxed font-light italic">
-                        {description}
-                    </p>
                 </motion.div>
 
                 {/* Form Section */}
