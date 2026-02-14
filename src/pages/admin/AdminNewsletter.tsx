@@ -66,22 +66,13 @@ const AdminNewsletter = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
             const [subsRes, statsRes] = await Promise.all([
-                fetch('/api/admin/newsletter', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }),
-                fetch('/api/admin/newsletter/stats', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
+                api.get<any>('/admin/newsletter'),
+                api.get<any>('/admin/newsletter/stats')
             ]);
 
-            if (subsRes.ok && statsRes.ok) {
-                const subsData = await subsRes.json();
-                const statsData = await statsRes.json();
-                setSubscribers(subsData.data || []);
-                setStats(statsData.data);
-            }
+            setSubscribers(subsRes.data || []);
+            setStats(statsRes.data);
         } catch (error) {
             console.error('Error fetching data:', error);
             toast.error('Erreur lors du chargement des données');
@@ -94,20 +85,11 @@ const AdminNewsletter = () => {
         if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet abonné ?')) return;
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/admin/newsletter/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.ok) {
-                toast.success('Abonné supprimé');
-                fetchData();
-            } else {
-                toast.error('Erreur lors de la suppression');
-            }
+            await api.delete(`/admin/newsletter/${id}`);
+            toast.success('Abonné supprimé');
+            fetchData();
         } catch (error) {
-            toast.error('Erreur réseau');
+            toast.error('Erreur lors de la suppression');
         }
     };
 
