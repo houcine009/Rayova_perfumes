@@ -75,9 +75,9 @@ export default function OpeningSoon() {
                     className="mb-12"
                 >
                     <img
-                        src="/logo-gold.svg"
+                        src="/logo.png"
                         alt="Rayova Logo"
-                        className="h-20 md:h-28 w-auto drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                        className="h-32 md:h-48 w-auto drop-shadow-[0_0_25px_rgba(212,175,55,0.4)]"
                         onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://api.rayovaparfums.com/storage/site/logo.png';
                         }}
