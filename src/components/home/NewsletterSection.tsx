@@ -13,11 +13,28 @@ export function NewsletterSection() {
     if (!email) return;
 
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast.success("Merci pour votre inscription !");
-    setEmail("");
-    setIsSubmitting(false);
+    try {
+      const response = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || "Merci pour votre inscription !");
+        setEmail("");
+      } else {
+        toast.error(data.message || "Une erreur est survenue lors de l'inscription.");
+      }
+    } catch (error) {
+      toast.error("Erreur de connexion au serveur.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

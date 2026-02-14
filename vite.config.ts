@@ -23,14 +23,17 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    cssCodeSplit: true,
+    minify: 'esbuild',
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['@radix-ui/react-label', '@radix-ui/react-select', '@radix-ui/react-slot', '@radix-ui/react-tooltip'],
           'vendor-icons': ['lucide-react'],
           'vendor-core': ['@tanstack/react-query', 'framer-motion'],
-          'vendor-utils': ['clsx', 'tailwind-merge'],
+          'vendor-utils': ['clsx', 'tailwind-merge', 'lucide-react'],
         }
       }
     }

@@ -31,6 +31,7 @@ const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,10 +52,10 @@ function PageLoader() {
   );
 }
 
-import { LazyMotion, domMax } from "framer-motion";
+import { LazyMotion, domMin } from "framer-motion";
 
 const App = () => (
-  <LazyMotion features={domMax}>
+  <LazyMotion features={domMin}>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
@@ -87,6 +88,7 @@ const App = () => (
                     <Route path="produits" element={<AdminProducts />} />
                     <Route path="categories" element={<AdminCategories />} />
                     <Route path="commandes" element={<AdminOrders />} />
+                    <Route path="newsletter" element={<AdminNewsletter />} />
                     <Route path="utilisateurs" element={<AdminUsers />} />
                     <Route path="parametres" element={<AdminSettings />} />
                   </Route>
