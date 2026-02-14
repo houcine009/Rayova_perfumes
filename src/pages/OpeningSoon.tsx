@@ -91,13 +91,13 @@ export default function OpeningSoon() {
                     transition={{ duration: 0.8, delay: 0.3 }}
                     className="space-y-6 mb-12"
                 >
-                    <h2 className="text-secondary font-medium tracking-[0.3em] uppercase text-sm md:text-base">
+                    <h2 className="text-[#D4AF37] font-medium tracking-[0.4em] uppercase text-xs md:text-sm border-b border-[#D4AF37]/20 pb-2 inline-block">
                         {subtitle}
                     </h2>
-                    <h1 className="text-4xl md:text-7xl font-display font-bold leading-tight bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
+                    <h1 className="text-5xl md:text-8xl font-display font-bold leading-tight bg-gradient-to-b from-[#FFF0C1] via-[#D4AF37] to-[#8E6D1A] bg-clip-text text-transparent drop-shadow-sm">
                         {title}
                     </h1>
-                    <p className="text-white/60 max-w-xl mx-auto text-base md:text-lg leading-relaxed font-light">
+                    <p className="text-white/70 max-w-xl mx-auto text-base md:text-xl leading-relaxed font-light italic">
                         {description}
                     </p>
                 </motion.div>
@@ -120,7 +120,7 @@ export default function OpeningSoon() {
                             >
                                 <div className="space-y-3">
                                     <div className="relative group">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-secondary transition-colors">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-[#D4AF37] transition-colors">
                                             <Mail className="h-4 w-4" />
                                         </div>
                                         <Input
@@ -129,11 +129,11 @@ export default function OpeningSoon() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
-                                            className="h-14 pl-12 bg-white/5 border-white/10 focus:border-secondary/50 rounded-2xl transition-all placeholder:text-white/20"
+                                            className="h-14 pl-12 bg-white/5 border-white/10 focus:border-[#D4AF37]/50 rounded-2xl transition-all placeholder:text-white/20"
                                         />
                                     </div>
                                     <div className="relative group">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-secondary transition-colors">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-[#D4AF37] transition-colors">
                                             <Phone className="h-4 w-4" />
                                         </div>
                                         <Input
@@ -141,13 +141,13 @@ export default function OpeningSoon() {
                                             placeholder="Numéro de téléphone (optionnel)"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
-                                            className="h-14 pl-12 bg-white/5 border-white/10 focus:border-secondary/50 rounded-2xl transition-all placeholder:text-white/20"
+                                            className="h-14 pl-12 bg-white/5 border-white/10 focus:border-[#D4AF37]/50 rounded-2xl transition-all placeholder:text-white/20"
                                         />
                                     </div>
                                 </div>
                                 <Button
                                     type="submit"
-                                    className="w-full h-14 rounded-2xl bg-secondary hover:bg-secondary/90 text-black font-bold text-base transition-all group overflow-hidden relative"
+                                    className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#8E6D1A] hover:opacity-90 text-black font-bold text-base shadow-[0_10px_20px_rgba(212,175,55,0.2)] transition-all group overflow-hidden relative"
                                     disabled={isSubmitting}
                                 >
                                     <span className="relative z-10 flex items-center justify-center gap-2">

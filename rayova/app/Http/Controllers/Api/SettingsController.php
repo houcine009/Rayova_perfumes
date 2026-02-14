@@ -73,7 +73,7 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'file' => 'required|max:51200', // Relaxed for phone compatibility
-            'key' => 'required|string|in:hero_background_url,hero_video_url',
+            'key' => 'required|string|in:hero_background_url,hero_video_url,opening_soon_video,opening_soon_image',
         ]);
 
         $file = $request->file('file');
