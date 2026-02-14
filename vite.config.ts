@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
           'vendor-ui': ['@radix-ui/react-label', '@radix-ui/react-select', '@radix-ui/react-slot', '@radix-ui/react-tooltip'],
           'vendor-icons': ['lucide-react'],
           'vendor-core': ['@tanstack/react-query', 'framer-motion'],
-          'vendor-utils': ['clsx', 'tailwind-merge', 'lucide-react'],
+          'vendor-utils': ['clsx', 'tailwind-merge'],
         }
       }
     }
