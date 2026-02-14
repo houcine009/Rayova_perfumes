@@ -73,7 +73,11 @@ function MaintenanceWrapper({ children }: { children: React.ReactNode }) {
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
   if (!isLoading && osSettings?.enabled && !isAdmin && !isAuthPage) {
-    return <OpeningSoon />;
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <OpeningSoon />
+      </Suspense>
+    );
   }
 
   return <>{children}</>;
