@@ -91,9 +91,6 @@ export default function OpeningSoon() {
                     transition={{ duration: 0.8, delay: 0.3 }}
                     className="space-y-6 mb-12"
                 >
-                    <h2 className="text-[#D4AF37] font-medium tracking-[0.4em] uppercase text-xs md:text-sm border-b border-[#D4AF37]/20 pb-2 inline-block">
-                        {subtitle}
-                    </h2>
                     <h1 className="text-5xl md:text-8xl font-display font-bold leading-tight bg-gradient-to-b from-[#FFF0C1] via-[#D4AF37] to-[#8E6D1A] bg-clip-text text-transparent drop-shadow-sm">
                         {title}
                     </h1>
@@ -189,16 +186,6 @@ export default function OpeningSoon() {
                         )}
                     </AnimatePresence>
                 </motion.div>
-
-                {/* Footer Teaser */}
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1, delay: 1 }}
-                    className="mt-20 text-[10px] uppercase tracking-[0.5em] text-white/20"
-                >
-                    Excellence & Luxe • Arrivée Imminente
-                </motion.p>
             </div>
 
             {/* Decorative Elements */}
