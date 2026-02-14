@@ -34,6 +34,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { api } from '@/lib/api';
 
 interface Subscriber {
     id: string;
