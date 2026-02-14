@@ -70,7 +70,7 @@ function MaintenanceWrapper({ children }: { children: React.ReactNode }) {
   // 3. User is an admin
   // 4. We are on the /auth page (to allow admins to login)
   const isAuthPage = window.location.pathname === '/auth';
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
   if (!isLoading && osSettings?.enabled && !isAdmin && !isAuthPage) {
     return <OpeningSoon />;
