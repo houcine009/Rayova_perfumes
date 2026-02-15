@@ -14,8 +14,8 @@ use App\Http\Controllers\Api\GuestReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// 🚀 BULLETPROOF GUEST ACCESS (Absolute Top Priority)
-Route::any('/v2/reviews/guest/submit', [GuestReviewController::class, 'submit']);
+// 🚀 Guest Review Submission - Moved to web.php for bulletproof access
+
 
 /*
 |--------------------------------------------------------------------------
