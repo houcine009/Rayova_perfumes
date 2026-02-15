@@ -147,8 +147,8 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                                     >
                                                         <Star
                                                             className={`h-8 w-8 transition-colors ${s <= (hoverRating || rating)
-                                                                    ? 'text-amber-400 fill-amber-400'
-                                                                    : 'text-border fill-transparent'
+                                                                ? 'text-amber-400 fill-amber-400'
+                                                                : 'text-border fill-transparent'
                                                                 }`}
                                                         />
                                                     </button>
@@ -235,9 +235,6 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                                                 />
                                                             ))}
                                                         </div>
-                                                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest bg-muted px-2 py-0.5 rounded-full">
-                                                            Avis Vérifié
-                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
