@@ -67,20 +67,7 @@ class ReviewController extends Controller
         return $this->processSubmission($request, $request->user());
     }
 
-    public function storePublic(Request $request): JsonResponse
-    {
-        // 🛡️ Diagnostic/CORS Bypass: Always allow OPTIONS preflight
-        if ($request->isMethod('OPTIONS')) {
-            return response()->json(['status' => 'CORS logic bypass active'], 200)
-                ->header('Access-Control-Allow-Origin', '*')
-                ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-        }
 
-        // Explicitly use sanctum guard to find user if present, but allow guests
-        $user = Auth::guard('sanctum')->user();
-        return $this->processSubmission($request, $user);
-    }
 
     private function processSubmission(Request $request, $user): JsonResponse
     {

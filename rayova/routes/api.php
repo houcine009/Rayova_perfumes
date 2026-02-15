@@ -13,10 +13,8 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
-
-
-
+// 🚀 GUEST FEEDBACK (Clean, Secure, Performant)
+Route::match(['POST', 'OPTIONS'], '/feedback', [\App\Http\Controllers\Api\GuestFeedbackController::class, 'store']);
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +23,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public routes
-
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -41,8 +38,6 @@ Route::get('/media/db/{type}/{id}{extension?}', [MediaController::class, 'serve'
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
-
-
 // Public review routes 
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'productReviews']);
 
@@ -55,13 +50,7 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
 Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe']);
 
 // Order placement (Public)
-// Order placement (Public)
 Route::post('/orders', [OrderController::class, 'store']);
-
-// 🚀 MIRROR ROUTE (Mimics /orders path to bypass WAF/Server blocks)
-Route::any('/client-feedback', [ReviewController::class, 'storePublic']);
-
-// 🚀 Guest Review Submission - Moved to web.php (Bypass)
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -73,8 +62,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // User orders
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
-
-
 
     // Admin routes
     Route::middleware('admin')->prefix('admin')->group(function () {

@@ -56,9 +56,9 @@ export const reviewService = {
     },
 
     async create(data: ReviewCreateData): Promise<{ data: Review; message: string }> {
-        // Use the Mirror Route /client-feedback which mimics the working /orders path
+        // Use the clean GuestFeedbackController route
         const token = localStorage.getItem('auth_token');
-        const endpoint = token ? '/reviews' : '/client-feedback';
+        const endpoint = token ? '/reviews' : '/feedback';
         return api.post(endpoint, data);
     },
 
