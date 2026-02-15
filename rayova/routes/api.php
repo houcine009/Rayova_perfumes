@@ -14,7 +14,8 @@ use App\Http\Controllers\Api\GuestReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// 🚀 Guest Review Submission - Moved to web.php for bulletproof access
+// Guest Review Submission - Dedicated Public Route
+Route::post('/reviews-public', [ReviewController::class, 'store']);
 
 
 /*
