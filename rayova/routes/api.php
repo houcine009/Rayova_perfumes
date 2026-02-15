@@ -38,9 +38,9 @@ Route::get('/media/db/{type}/{id}{extension?}', [MediaController::class, 'serve'
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
-// Public review routes
+// Public review routes - Top Level for Guest Access
+Route::post('/public/reviews', [ReviewController::class, 'store']); // Dedicated Guest Route
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'productReviews']);
-Route::post('/reviews', [ReviewController::class, 'store']);
 Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
 // Public settings routes

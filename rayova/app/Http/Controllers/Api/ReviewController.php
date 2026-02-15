@@ -7,6 +7,8 @@ use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
+
 class ReviewController extends Controller
 {
     public function index(Request $request): JsonResponse
@@ -69,7 +71,7 @@ class ReviewController extends Controller
             'comment' => 'nullable|string',
         ]);
 
-        $user = $request->user();
+        $user = Auth::guard('sanctum')->user();
 
         // Check for duplicate review only if user is logged in
         if ($user) {

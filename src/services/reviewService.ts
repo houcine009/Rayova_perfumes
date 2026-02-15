@@ -56,7 +56,9 @@ export const reviewService = {
     },
 
     async create(data: ReviewCreateData): Promise<{ data: Review; message: string }> {
-        return api.post('/reviews', data);
+        const token = localStorage.getItem('auth_token');
+        const endpoint = token ? '/reviews' : '/public/reviews';
+        return api.post(endpoint, data);
     },
 
     async approve(id: string): Promise<{ data: Review; message: string }> {
