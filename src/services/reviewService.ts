@@ -71,6 +71,6 @@ export const reviewService = {
     },
 
     async delete(id: string): Promise<{ message: string }> {
-        return api.delete(`/reviews/${id}`);
+        return api.delete(`/admin/reviews/${id}`);
     },
 };
