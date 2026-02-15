@@ -72,16 +72,14 @@ class Review extends Model
         if (!$product) return;
 
         $stats = self::where('product_id', $this->product_id)
+            ->approved()
             ->selectRaw('COUNT(*) as count, AVG(rating) as average')
             ->first();
 
-        // Only sync if there are actual reviews in the database.
-        // This preserves manual overrides (social proof) if no reviews exist.
-        if ($stats && $stats->count > 0) {
-            $product->update([
-                'reviews_count' => $stats->count,
-                'rating' => round($stats->average, 1),
-            ]);
-        }
+        // Sync the stats to the product
+        $product->update([
+            'reviews_count' => $stats->count ?? 0,
+            'rating' => $stats ? round($stats->average, 1) : 0,
+        ]);
     }
 }

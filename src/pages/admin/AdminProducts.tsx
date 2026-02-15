@@ -63,9 +63,8 @@ interface ProductFormData {
   is_featured: boolean;
   is_new: boolean;
   is_active: boolean;
+  is_active: boolean;
   category_ids: string[];
-  rating: number;
-  reviews_count: number;
 }
 
 const defaultFormData: ProductFormData = {
@@ -84,9 +83,8 @@ const defaultFormData: ProductFormData = {
   is_featured: false,
   is_new: false,
   is_active: true,
+  is_active: true,
   category_ids: [],
-  rating: 5,
-  reviews_count: 0,
 };
 
 const AdminProducts = () => {
@@ -144,8 +142,6 @@ const AdminProducts = () => {
       is_new: !!product.is_new,
       is_active: product.is_active !== false,
       category_ids: product.category_ids || product.categories?.map(c => c.id) || [],
-      rating: Number(product.rating) || 5,
-      reviews_count: Number(product.reviews_count) || 0,
     });
     setIsDialogOpen(true);
   };
@@ -478,45 +474,7 @@ const AdminProducts = () => {
                 </div>
               </div>
 
-              {/* Rating & Reviews (Admin-controlled) */}
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-                <div className="space-y-2">
-                  <Label htmlFor="rating">Note (étoiles)</Label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          className="focus:outline-none transition-transform hover:scale-110"
-                          onClick={() => setFormData({ ...formData, rating: star })}
-                        >
-                          <svg
-                            className={`h-7 w-7 ${star <= formData.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300 fill-gray-300'}`}
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        </button>
-                      ))}
-                    </div>
-                    <span className="text-sm text-muted-foreground font-medium">{formData.rating}/5</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="reviews_count">Nombre d'avis</Label>
-                  <Input
-                    id="reviews_count"
-                    type="number"
-                    min="0"
-                    value={formData.reviews_count}
-                    onChange={(e) =>
-                      setFormData({ ...formData, reviews_count: parseInt(e.target.value) || 0 })
-                    }
-                    placeholder="ex: 128"
-                  />
-                </div>
-              </div>
+
 
               <div className="flex flex-wrap gap-6">
                 <div className="flex items-center gap-2">
