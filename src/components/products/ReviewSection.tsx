@@ -25,10 +25,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user) {
-            toast.error("Veuillez vous connecter pour laisser un avis.");
-            return;
-        }
+
 
         try {
             await createReview.mutateAsync({
@@ -40,7 +37,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
             setIsSubmitted(true);
             setComment('');
             setName('');
-            toast.success("Avis envoyé !");
+            toast.success("Avis envoyé ! Il sera visible après modération.");
         } catch (error: any) {
             toast.error(error.message || "Une erreur est survenue.");
         }
@@ -157,7 +154,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Votre Nom (Optionnel)</label>
+                                            <label className="text-sm font-medium">Votre Nom / Pseudo (Optionnel)</label>
                                             <Input
                                                 placeholder="Laissez vide pour rester anonyme"
                                                 value={name}
@@ -177,17 +174,12 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                             />
                                         </div>
 
-                                        {!user && (
-                                            <div className="p-3 bg-primary/5 rounded-lg border border-primary/10 flex gap-3 text-xs text-primary">
-                                                <AlertCircle className="h-4 w-4 shrink-0" />
-                                                <p>Vous devez être connecté pour publier un avis.</p>
-                                            </div>
-                                        )}
+
 
                                         <Button
                                             type="submit"
                                             className="w-full"
-                                            disabled={createReview.isPending || !user}
+                                            disabled={createReview.isPending}
                                         >
                                             {createReview.isPending ? "Envoi..." : "Publier l'avis"}
                                             <Send className="ml-2 h-4 w-4" />

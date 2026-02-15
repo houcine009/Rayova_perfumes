@@ -68,27 +68,30 @@ class ReviewController extends Controller
             'comment' => 'nullable|string',
         ]);
 
-        // Check if user already reviewed this product
-        $existingReview = Review::where('product_id', $validated['product_id'])
-            ->where('user_id', $request->user()->id)
-            ->first();
+        $user = $request->user();
 
-        if ($existingReview) {
-            return response()->json([
-                'message' => 'Vous avez déjà donné un avis sur ce produit',
-            ], 422);
+        // Check for duplicate review only if user is logged in
+        if ($user) {
+            $existingReview = Review::where('product_id', $validated['product_id'])
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($existingReview) {
+                return response()->json([
+                    'message' => 'Vous avez déjà donné un avis sur ce produit',
+                ], 422);
+            }
+            $validated['user_id'] = $user->id;
         }
 
-        $validated['user_id'] = $request->user()->id;
-        
-        // Manual Moderation: All reviews from non-admin users must be approved by admin
-        $validated['is_approved'] = $request->user()->isAdmin() ? true : false;
+        // Manual Moderation: All reviews from guests or non-admin users must be approved
+        $validated['is_approved'] = ($user && $user->isAdmin()) ? true : false;
 
         $review = Review::create($validated);
 
         return response()->json([
             'data' => $review->load('user.profile'),
-            'message' => 'Avis ajouté avec succès',
+            'message' => 'Avis envoyé ! Il sera visible après modération.',
         ], 201);
     }
 

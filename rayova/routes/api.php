@@ -40,6 +40,8 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
 // Public review routes
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'productReviews']);
+Route::post('/reviews', [ReviewController::class, 'store']);
+Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
 // Public settings routes
 Route::get('/settings', [SettingsController::class, 'index']);
@@ -63,9 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
 
-    // User reviews
-    Route::post('/reviews', [ReviewController::class, 'store']);
-    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+
 
     // Admin routes
     Route::middleware('admin')->prefix('admin')->group(function () {
