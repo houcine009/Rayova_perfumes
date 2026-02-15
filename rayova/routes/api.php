@@ -10,8 +10,12 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\GuestReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// 🚀 BULLETPROOF GUEST ACCESS (Absolute Top Priority)
+Route::any('/v2/reviews/guest/submit', [GuestReviewController::class, 'submit']);
 
 /*
 |--------------------------------------------------------------------------
@@ -36,8 +40,7 @@ Route::get('/media/db/{type}/{id}{extension?}', [MediaController::class, 'serve'
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
-// 🚀 Guest Review Submission (Public - No Auth Required)
-Route::post('/v1/guest/reviews/submit', [ReviewController::class, 'store']);
+
 
 // Public review routes 
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'productReviews']);
