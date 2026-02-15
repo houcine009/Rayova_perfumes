@@ -56,9 +56,10 @@ export const reviewService = {
     },
 
     async create(data: ReviewCreateData): Promise<{ data: Review; message: string }> {
-        // We use '../submit-opinion' to bypass the /api prefix and hit the web-level route
-        // This resolves persistent 405 Method Not Allowed errors caused by server-side /api rules
-        return api.post('../submit-opinion', data);
+        // We use the v4 diagnostic endpoint to resolve persistent CORS/405 errors
+        const token = localStorage.getItem('auth_token');
+        const endpoint = token ? '/reviews' : '/v4/opinion-submit';
+        return api.post(endpoint, data);
     },
 
     async approve(id: string): Promise<{ data: Review; message: string }> {

@@ -13,6 +13,9 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// 🚀 v4 BULLETPROOF GUEST ACCESS (Bypasses method checks and priority conflicts)
+Route::match(['POST', 'OPTIONS'], '/v4/opinion-submit', [ReviewController::class, 'storePublic']);
+
 
 
 
