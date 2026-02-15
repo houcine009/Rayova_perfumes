@@ -13,9 +13,7 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// 🚀 BULLETPROOF GUEST ACCESS (Unique Path + Explicit Methods)
-Route::post('/pub-rev-submit', [ReviewController::class, 'storePublic']);
-Route::options('/pub-rev-submit', function() { return response()->json(['status' => 'ok']); });
+
 
 
 /*
@@ -56,6 +54,9 @@ Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscrib
 
 // Order placement (Public)
 Route::post('/orders', [OrderController::class, 'store']);
+
+// Client Review Submission (Public)
+Route::post('/client-review-submit', [ReviewController::class, 'storePublic']);
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
