@@ -19,6 +19,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
 
     const [rating, setRating] = useState(5);
     const [hoverRating, setHoverRating] = useState(0);
+    const [name, setName] = useState('');
     const [comment, setComment] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -33,10 +34,12 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
             await createReview.mutateAsync({
                 product_id: productId,
                 rating,
+                title: name || undefined, // Store optional name in title field
                 comment,
             });
             setIsSubmitted(true);
             setComment('');
+            setName('');
             toast.success("Avis envoyé !");
         } catch (error: any) {
             toast.error(error.message || "Une erreur est survenue.");
@@ -100,7 +103,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                         </div>
 
                         {/* Leave a Review */}
-                        <div className="bg-card p-8 rounded-2xl border border-border/50 shadow-sm">
+                        <div className="bg-card p-8 rounded-2xl border border-border/50 shadow-sm text-left">
                             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                                 <MessageSquare className="h-5 w-5 text-primary" />
                                 Partagez votre expérience
@@ -154,6 +157,16 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                         </div>
 
                                         <div className="space-y-2">
+                                            <label className="text-sm font-medium">Votre Nom (Optionnel)</label>
+                                            <Input
+                                                placeholder="Laissez vide pour rester anonyme"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                className="bg-background/50 border-border focus:border-primary"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
                                             <label className="text-sm font-medium">Votre commentaire</label>
                                             <Textarea
                                                 placeholder="Qu'avez-vous pensé de la fragrance, de sa tenue et de son sillage ?"
@@ -186,7 +199,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                     </div>
 
                     {/* Reviews List */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-8 text-left">
                         <h3 className="text-2xl font-bold flex items-center gap-2">
                             Avis ({reviews.length})
                         </h3>
@@ -205,13 +218,13 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-4">
                                                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
-                                                    {review.user?.profile?.first_name?.[0] || review.user?.name?.[0] || 'U'}
+                                                    {(review.title || review.user?.profile?.first_name || review.user?.name || 'U')[0]}
                                                 </div>
                                                 <div>
                                                     <h4 className="font-bold">
-                                                        {review.user?.profile?.first_name
+                                                        {review.title || (review.user?.profile?.first_name
                                                             ? `${review.user.profile.first_name} ${review.user.profile.last_name || ''}`
-                                                            : review.user?.name || 'Client Anonyme'}
+                                                            : (review.user?.name || 'Utilisateur Anonyme'))}
                                                     </h4>
                                                     <div className="flex items-center gap-2 mt-0.1">
                                                         <div className="flex gap-0.5">

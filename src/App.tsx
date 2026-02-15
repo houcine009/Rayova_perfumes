@@ -32,6 +32,7 @@ const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
+const AdminReviews = lazy(() => import("./pages/admin/AdminReviews"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -123,6 +124,11 @@ const App = () => (
                       <Route path="commandes" element={<AdminOrders />} />
                       <Route path="newsletter" element={<AdminNewsletter />} />
                       <Route path="utilisateurs" element={<AdminUsers />} />
+                      <Route path="reviews" element={
+                        <Suspense fallback={<PageLoader />}>
+                          <AdminReviews />
+                        </Suspense>
+                      } />
                       <Route path="parametres" element={<AdminSettings />} />
                     </Route>
 
