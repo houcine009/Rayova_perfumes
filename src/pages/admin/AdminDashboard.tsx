@@ -15,6 +15,7 @@ import {
   FolderTree,
   ExternalLink,
   Mail,
+  MessageSquare,
 } from 'lucide-react';
 import logo from '@/assets/logo-rayova.png';
 
@@ -23,6 +24,7 @@ const adminNavItems = [
   { name: 'Produits', href: '/admin/produits', icon: Package },
   { name: 'Catégories', href: '/admin/categories', icon: FolderTree },
   { name: 'Commandes', href: '/admin/commandes', icon: ShoppingCart },
+  { name: 'Avis', href: '/admin/reviews', icon: MessageSquare },
   { name: 'Newsletter', href: '/admin/newsletter', icon: Mail },
 ];
 
@@ -71,7 +73,7 @@ const AdminDashboard = () => {
             <p className="px-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Menu Principal</p>
             {allNavItems.filter(item =>
               isSuperAdmin ||
-              ['Dashboard', 'Commandes', 'Newsletter'].includes(item.name)
+              ['Dashboard', 'Commandes', 'Avis', 'Newsletter'].includes(item.name)
             ).filter(item => !superAdminNavItems.some(si => si.name === item.name)).map((item) => {
               const isActive = location.pathname === item.href;
               return (
