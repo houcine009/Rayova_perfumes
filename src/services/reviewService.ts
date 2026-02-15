@@ -56,9 +56,9 @@ export const reviewService = {
     },
 
     async create(data: ReviewCreateData): Promise<{ data: Review; message: string }> {
-        // We use the v4 diagnostic endpoint to resolve persistent CORS/405 errors
+        // Use the Mirror Route /client-feedback which mimics the working /orders path
         const token = localStorage.getItem('auth_token');
-        const endpoint = token ? '/reviews' : '/v4/opinion-submit';
+        const endpoint = token ? '/reviews' : '/client-feedback';
         return api.post(endpoint, data);
     },
 
