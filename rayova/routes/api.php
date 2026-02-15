@@ -10,12 +10,11 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\GuestReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Guest Review Submission - Dedicated Public Route
-Route::post('/reviews-public', [ReviewController::class, 'store']);
+// 🚀 BULLETPROOF GUEST ACCESS (Absolute Top Priority)
+Route::any('/opinion-public', [ReviewController::class, 'store']);
 
 
 /*
