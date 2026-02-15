@@ -62,12 +62,22 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                         <span className="text-5xl font-bold text-primary">{stats.average.toFixed(1)}</span>
                                         <div>
                                             <div className="flex gap-1">
-                                                {[1, 2, 3, 4, 5].map((s) => (
-                                                    <Star
-                                                        key={s}
-                                                        className={`h-5 w-5 ${s <= Math.round(stats.average) ? 'text-amber-400 fill-amber-400' : 'text-border fill-border'}`}
-                                                    />
-                                                ))}
+                                                {[1, 2, 3, 4, 5].map((s) => {
+                                                    const fill = Math.min(1, Math.max(0, stats.average - (s - 1)));
+                                                    const pct = Math.round(fill * 100);
+                                                    const gradId = `star-grad-rs-${s}`;
+                                                    return (
+                                                        <svg key={s} className="h-5 w-5" viewBox="0 0 24 24">
+                                                            <defs>
+                                                                <linearGradient id={gradId}>
+                                                                    <stop offset={`${pct}%`} stopColor="#f59e0b" />
+                                                                    <stop offset={`${pct}%`} stopColor="#374151" />
+                                                                </linearGradient>
+                                                            </defs>
+                                                            <path fill={`url(#${gradId})`} stroke="#f59e0b" strokeWidth="1" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                                        </svg>
+                                                    );
+                                                })}
                                             </div>
                                             <p className="text-sm text-muted-foreground mt-1">Sur la base de {stats.count} avis</p>
                                         </div>
