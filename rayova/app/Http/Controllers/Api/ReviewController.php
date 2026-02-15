@@ -12,6 +12,7 @@ class ReviewController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Review::with('user.profile', 'product');
+        $user = $request->user();
 
         // Filter by product
         if ($request->has('product_id')) {
@@ -19,12 +20,12 @@ class ReviewController extends Controller
         }
 
         // Non-admin users can only see approved reviews
-        if (!$request->user() || !$request->user()->isAdmin()) {
+        if (!$user || !$user->isAdmin()) {
             $query->approved();
         }
 
         // Filter for pending reviews (admin only)
-        if ($request->user() && $request->user()->isAdmin() && $request->has('pending')) {
+        if ($user && $user->isAdmin() && $request->has('pending')) {
             $query->pending();
         }
 
@@ -122,9 +123,14 @@ class ReviewController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $review = Review::findOrFail($id);
+        $user = request()->user();
+
+        // If not logged in, you can't delete anything (guests can't delete their own reviews without a session)
+        if (!$user) {
+            return response()->json(['message' => 'Non autorisé'], 403);
+        }
 
         // Non-admin can only delete their own reviews
-        $user = request()->user();
         if (!$user->isAdmin() && $review->user_id !== $user->id) {
             abort(403, 'Non autorisé');
         }
