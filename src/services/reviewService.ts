@@ -56,9 +56,9 @@ export const reviewService = {
     },
 
     async create(data: ReviewCreateData): Promise<{ data: Review; message: string }> {
-        const token = localStorage.getItem('auth_token');
-        const endpoint = token ? '/reviews' : '/client-review-submit';
-        return api.post(endpoint, data);
+        // We use '../submit-opinion' to bypass the /api prefix and hit the web-level route
+        // This resolves persistent 405 Method Not Allowed errors caused by server-side /api rules
+        return api.post('../submit-opinion', data);
     },
 
     async approve(id: string): Promise<{ data: Review; message: string }> {

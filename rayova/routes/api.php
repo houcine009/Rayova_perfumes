@@ -55,8 +55,7 @@ Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscrib
 // Order placement (Public)
 Route::post('/orders', [OrderController::class, 'store']);
 
-// Client Review Submission (Public)
-Route::post('/client-review-submit', [ReviewController::class, 'storePublic']);
+// 🚀 Guest Review Submission - Moved to web.php (Bypass)
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
