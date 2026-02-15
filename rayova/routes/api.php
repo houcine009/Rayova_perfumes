@@ -36,10 +36,9 @@ Route::get('/media/db/{type}/{id}{extension?}', [MediaController::class, 'serve'
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
-// Public review routes - Top Level for Guest Access
-Route::post('/product-reviews/submit', [ReviewController::class, 'store']); 
+// Public review routes - Bulletproof Guest Access
+Route::post('/submit-guest-review', [ReviewController::class, 'store']); 
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'productReviews']);
-Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
 // Public settings routes
 Route::get('/settings', [SettingsController::class, 'index']);
