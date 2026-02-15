@@ -20,9 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public routes
-Route::options('/{any}', function() {
-    return response()->json(['status' => 'ok']);
-})->where('any', '.*');
+
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -39,7 +37,7 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
 // Public review routes - Top Level for Guest Access
-Route::post('/public/reviews', [ReviewController::class, 'store']); // Dedicated Guest Route
+Route::post('/product-reviews/submit', [ReviewController::class, 'store']); 
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'productReviews']);
 Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
