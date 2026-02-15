@@ -36,8 +36,10 @@ Route::get('/media/db/{type}/{id}{extension?}', [MediaController::class, 'serve'
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
-// Public review routes - Bulletproof Guest Access
-Route::post('/submit-guest-review', [ReviewController::class, 'store']); 
+// 🚀 Guest Review Submission (Public - No Auth Required)
+Route::post('/v1/guest/reviews/submit', [ReviewController::class, 'store']);
+
+// Public review routes 
 Route::get('/products/{productId}/reviews', [ReviewController::class, 'productReviews']);
 
 // Public settings routes
