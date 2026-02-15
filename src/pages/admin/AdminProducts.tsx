@@ -63,7 +63,6 @@ interface ProductFormData {
   is_featured: boolean;
   is_new: boolean;
   is_active: boolean;
-  is_active: boolean;
   category_ids: string[];
 }
 
@@ -82,7 +81,6 @@ const defaultFormData: ProductFormData = {
   stock_quantity: null,
   is_featured: false,
   is_new: false,
-  is_active: true,
   is_active: true,
   category_ids: [],
 };
