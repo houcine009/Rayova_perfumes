@@ -18,6 +18,7 @@ import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ReviewSection } from '@/components/products/ReviewSection';
 
 const ProductDetails = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -346,6 +347,9 @@ const ProductDetails = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Reviews Section */}
+                <ReviewSection productId={product.id} />
             </main >
 
             <Footer />

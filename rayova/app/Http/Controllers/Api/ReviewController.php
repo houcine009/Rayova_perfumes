@@ -37,6 +37,7 @@ class ReviewController extends Controller
     {
         $reviews = Review::with('user.profile')
             ->where('product_id', $productId)
+            ->approved()
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -79,7 +80,9 @@ class ReviewController extends Controller
         }
 
         $validated['user_id'] = $request->user()->id;
-        $validated['is_approved'] = true; // Auto-approved as requested
+        
+        // Manual Moderation: All reviews from non-admin users must be approved by admin
+        $validated['is_approved'] = $request->user()->isAdmin() ? true : false;
 
         $review = Review::create($validated);
 

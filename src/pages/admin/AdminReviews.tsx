@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useReviews, useApproveReview, useDeleteReview } from '@/hooks/useReviews';
+import { useReviews, useApproveReview, useRejectReview, useDeleteReview } from '@/hooks/useReviews';
 import { useToast } from '@/hooks/use-toast';
 
 const AdminReviews = () => {
@@ -30,6 +30,7 @@ const AdminReviews = () => {
 
   const { data: reviews, isLoading } = useReviews();
   const approveReview = useApproveReview();
+  const rejectReview = useRejectReview();
   const deleteReview = useDeleteReview();
   const { toast } = useToast();
 
@@ -41,8 +42,13 @@ const AdminReviews = () => {
 
   const handleApprove = async (id: string, approved: boolean) => {
     try {
-      await approveReview.mutateAsync({ id, approved });
-      toast({ title: approved ? 'Avis approuvé' : 'Avis rejeté' });
+      if (approved) {
+        await approveReview.mutateAsync(id);
+        toast({ title: 'Avis approuvé' });
+      } else {
+        await rejectReview.mutateAsync(id);
+        toast({ title: 'Avis rejeté' });
+      }
     } catch (error: any) {
       toast({
         title: 'Erreur',
@@ -140,11 +146,10 @@ const AdminReviews = () => {
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            review.is_approved
+                          className={`px-2 py-1 rounded-full text-xs ${review.is_approved
                               ? 'bg-green-500/20 text-green-500'
                               : 'bg-orange-500/20 text-orange-500'
-                          }`}
+                            }`}
                         >
                           {review.is_approved ? 'Approuvé' : 'En attente'}
                         </span>
