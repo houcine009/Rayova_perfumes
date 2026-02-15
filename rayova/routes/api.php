@@ -13,8 +13,9 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// 🚀 BULLETPROOF GUEST ACCESS (Absolute Top Priority)
-Route::any('/opinion-public', [ReviewController::class, 'store']);
+// 🚀 BULLETPROOF GUEST ACCESS (Unique Path + Explicit Methods)
+Route::post('/pub-rev-submit', [ReviewController::class, 'storePublic']);
+Route::options('/pub-rev-submit', function() { return response()->json(['status' => 'ok']); });
 
 
 /*

@@ -64,14 +64,24 @@ class ReviewController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        return $this->processSubmission($request, $request->user());
+    }
+
+    public function storePublic(Request $request): JsonResponse
+    {
+        // Explicitly use sanctum guard to find user if present, but allow guests
+        $user = Auth::guard('sanctum')->user();
+        return $this->processSubmission($request, $user);
+    }
+
+    private function processSubmission(Request $request, $user): JsonResponse
+    {
         $validated = $request->validate([
             'product_id' => 'required|uuid|exists:products,id',
             'rating' => 'required|integer|min:1|max:5',
             'title' => 'nullable|string|max:255',
             'comment' => 'nullable|string',
         ]);
-
-        $user = Auth::guard('sanctum')->user();
 
         // Check for duplicate review only if user is logged in
         if ($user) {
