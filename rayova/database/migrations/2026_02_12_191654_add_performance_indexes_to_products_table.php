@@ -12,19 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $sm = Schema::getConnection()->getDoctrineSchemaManager();
-            $indexes = $sm->listTableIndexes('products');
+            $existingIndexes = collect(Illuminate\Support\Facades\DB::select("SHOW INDEXES FROM products"))->pluck('Key_name');
 
-            if (!array_key_exists('products_is_active_index', $indexes)) {
+            if (!$existingIndexes->contains('products_is_active_index')) {
                 $table->index('is_active');
             }
-            if (!array_key_exists('products_is_featured_index', $indexes)) {
+            if (!$existingIndexes->contains('products_is_featured_index')) {
                 $table->index('is_featured');
             }
-            if (!array_key_exists('products_gender_index', $indexes)) {
+            if (!$existingIndexes->contains('products_gender_index')) {
                 $table->index('gender');
             }
-            if (!array_key_exists('products_created_at_index', $indexes)) {
+            if (!$existingIndexes->contains('products_created_at_index')) {
                 $table->index('created_at');
             }
         });
