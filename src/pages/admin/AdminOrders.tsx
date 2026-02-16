@@ -75,7 +75,6 @@ const AdminOrders = () => {
   const { data: orders, isLoading } = useOrders();
   const updateStatus = useUpdateOrderStatus();
   const deleteOrder = useDeleteOrder();
-  const { toast } = useToast();
 
   const filteredOrders = orders?.filter((o) =>
     o.order_number.toLowerCase().includes(search.toLowerCase())
