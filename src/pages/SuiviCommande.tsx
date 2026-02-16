@@ -95,7 +95,7 @@ const SuiviCommande = () => {
                                     type="text"
                                     value={orderNumber}
                                     onChange={(e) => setOrderNumber(e.target.value)}
-                                    placeholder="RAY-20260216-XXXX"
+                                    placeholder="RAY-XXXXXXXX-XXXX"
                                     className="w-full pl-12 pr-4 py-4 rounded-xl bg-card border border-border/50 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base"
                                 />
                             </div>

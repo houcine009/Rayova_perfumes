@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Search, Eye, Trash } from 'lucide-react';
+import { Loader2, Search, Eye, Trash, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -59,7 +59,16 @@ const statusColors: Record<OrderStatus, string> = {
 
 const AdminOrders = () => {
   const [search, setSearch] = useState('');
+  const { toast } = useToast();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copié !",
+      description: "Le numéro de commande a été copié dans le presse-papiers.",
+    });
+  };
   const [orderToDelete, setOrderToDelete] = useState<OrderWithItems | null>(null);
 
   const { isSuperAdmin } = useAuth();
@@ -149,7 +158,17 @@ const AdminOrders = () => {
                   {filteredOrders?.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">
-                        {order.order_number}
+                        <div className="flex items-center gap-2 group">
+                          {order.order_number}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => copyToClipboard(order.order_number)}
+                          >
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </TableCell>
                       <TableCell>
                         {new Date(order.created_at!).toLocaleDateString('fr-FR')}
@@ -212,8 +231,16 @@ const AdminOrders = () => {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
               Commande {selectedOrder?.order_number}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => selectedOrder && copyToClipboard(selectedOrder.order_number)}
+              >
+                <Copy className="h-3 w-3" />
+              </Button>
             </DialogTitle>
           </DialogHeader>
           {selectedOrder && (
