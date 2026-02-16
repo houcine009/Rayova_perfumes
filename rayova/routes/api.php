@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\BlacklistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
