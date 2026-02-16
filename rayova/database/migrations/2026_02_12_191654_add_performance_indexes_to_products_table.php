@@ -12,10 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->index('is_active');
-            $table->index('is_featured');
-            $table->index('gender');
-            $table->index('created_at'); // Fast sorting by newest
+            $sm = Schema::getConnection()->getDoctrineSchemaManager();
+            $indexes = $sm->listTableIndexes('products');
+
+            if (!array_key_exists('products_is_active_index', $indexes)) {
+                $table->index('is_active');
+            }
+            if (!array_key_exists('products_is_featured_index', $indexes)) {
+                $table->index('is_featured');
+            }
+            if (!array_key_exists('products_gender_index', $indexes)) {
+                $table->index('gender');
+            }
+            if (!array_key_exists('products_created_at_index', $indexes)) {
+                $table->index('created_at');
+            }
         });
     }
 
