@@ -114,6 +114,17 @@ class OrderController extends Controller
             'items.*.subtotal' => 'nullable|numeric|min:0',
         ]);
 
+        // 🛡️ Blacklist Check
+        $isBlacklisted = \App\Models\BlacklistedPhone::where('phone', $validated['shipping_phone'])
+            ->orWhere('phone', $validated['whatsapp_phone'] ?? '')
+            ->exists();
+
+        if ($isBlacklisted) {
+            return response()->json([
+                'message' => 'Ce numéro est sur liste noire et ne peut pas passer de commande.',
+            ], 403);
+        }
+
         // Calculate totals
         $subtotal = 0;
         foreach ($validated['items'] as $item) {

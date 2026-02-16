@@ -121,6 +121,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/settings/upload', [SettingsController::class, 'uploadBackground']);
             Route::post('/settings/bulk', [SettingsController::class, 'bulkUpdate']);
             Route::get('/storage/status', [SettingsController::class, 'storageStatus']);
+
+            // Blacklist management
+            Route::get('/blacklist', [BlacklistController::class, 'index']);
+            Route::post('/blacklist', [BlacklistController::class, 'store']);
+            Route::delete('/blacklist/{id}', [BlacklistController::class, 'destroy']);
         });
     });
 });

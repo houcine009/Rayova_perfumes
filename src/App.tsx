@@ -34,6 +34,7 @@ const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
 const AdminReviews = lazy(() => import("./pages/admin/AdminReviews"));
+const AdminBlacklist = lazy(() => import('./pages/admin/AdminBlacklist'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -132,6 +133,7 @@ const App = () => (
                         </Suspense>
                       } />
                       <Route path="parametres" element={<AdminSettings />} />
+                      <Route path="blacklist" element={<AdminBlacklist />} />
                     </Route>
 
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

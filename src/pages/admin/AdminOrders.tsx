@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Search, Eye, Trash, Copy } from 'lucide-react';
+import { Loader2, Search, Eye, Trash, Copy, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -34,9 +34,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useOrders, useUpdateOrderStatus, useDeleteOrder, type OrderWithItems, type OrderStatus } from '@/hooks/useOrders';
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from '@/hooks/use-toast';
+import { useBlacklist } from '@/hooks/useBlacklist';
 import { formatWhatsAppLink, formatPhoneDisplay } from '@/lib/phoneUtils';
 
 const statusLabels: Record<OrderStatus, string> = {
@@ -75,6 +78,11 @@ const AdminOrders = () => {
   const { data: orders, isLoading } = useOrders();
   const updateStatus = useUpdateOrderStatus();
   const deleteOrder = useDeleteOrder();
+  const { addToBlacklist } = useBlacklist();
+
+  const [blacklistOrderId, setBlacklistOrderId] = useState<string | null>(null);
+  const [blacklistReason, setBlacklistReason] = useState('');
+  const [isBlacklisting, setIsBlacklisting] = useState(false);
 
   const filteredOrders = orders?.filter((o) =>
     o.order_number.toLowerCase().includes(search.toLowerCase())
@@ -104,6 +112,46 @@ const AdminOrders = () => {
         description: error.message || "Erreur lors de la suppression",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleBlacklist = async () => {
+    const order = orders?.find(o => o.id === blacklistOrderId);
+    if (!order) return;
+
+    setIsBlacklisting(true);
+    try {
+      // Blacklist the shipping phone
+      if (order.shipping_phone) {
+        await addToBlacklist.mutateAsync({
+          phone: order.shipping_phone,
+          reason: blacklistReason
+        });
+      }
+
+      // Also blacklist WhatsApp if different
+      if (order.whatsapp_phone && order.whatsapp_phone !== order.shipping_phone) {
+        await addToBlacklist.mutateAsync({
+          phone: order.whatsapp_phone,
+          reason: blacklistReason
+        });
+      }
+
+      toast({
+        title: "Numéro banni",
+        description: "Le client a été ajouté à la liste noire."
+      });
+      setBlacklistOrderId(null);
+      setBlacklistReason('');
+      setSelectedOrder(null);
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Erreur lors du bannissement",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBlacklisting(false);
     }
   };
 
@@ -386,8 +434,57 @@ const AdminOrders = () => {
                   <span className="text-primary">{Number(selectedOrder.total).toFixed(2)} MAD</span>
                 </div>
               </div>
+
+              {/* Blacklist Action for Cancelled Orders */}
+              {isSuperAdmin && selectedOrder.status === 'cancelled' && (
+                <div className="pt-4 border-t border-border mt-4">
+                  <Button
+                    variant="destructive"
+                    className="w-full gap-2 bg-red-600 hover:bg-red-700"
+                    onClick={() => setBlacklistOrderId(selectedOrder.id)}
+                  >
+                    <ShieldAlert className="h-4 w-4" />
+                    Bannir ce numéro (Liste Noire)
+                  </Button>
+                </div>
+              )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!blacklistOrderId} onOpenChange={(open) => !open && setBlacklistOrderId(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <ShieldAlert className="h-5 w-5" />
+              Bannir le client
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label>Motif du bannissement</Label>
+              <Textarea
+                placeholder="Ex: Client impoli, commande factice répétée, refus de livraison..."
+                value={blacklistReason}
+                onChange={(e) => setBlacklistReason(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setBlacklistOrderId(null)}>
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleBlacklist}
+                disabled={isBlacklisting || !blacklistReason.trim()}
+              >
+                {isBlacklisting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Confirmer le blocage
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

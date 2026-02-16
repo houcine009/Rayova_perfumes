@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Mail,
   MessageSquare,
+  ShieldAlert,
 } from 'lucide-react';
 import logo from '@/assets/logo-rayova.png';
 
@@ -29,6 +30,7 @@ const adminNavItems = [
 
 const superAdminNavItems = [
   { name: 'Newsletter', href: '/admin/newsletter', icon: Mail },
+  { name: 'Liste Noire', href: '/admin/blacklist', icon: ShieldAlert },
   { name: 'Utilisateurs', href: '/admin/utilisateurs', icon: Users },
   { name: 'Paramètres', href: '/admin/parametres', icon: Settings },
 ];
