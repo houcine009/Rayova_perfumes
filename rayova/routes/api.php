@@ -51,6 +51,7 @@ Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscrib
 
 // Order placement (Public)
 Route::post('/orders', [OrderController::class, 'store']);
+Route::post('/orders/track', [OrderController::class, 'track']);
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {

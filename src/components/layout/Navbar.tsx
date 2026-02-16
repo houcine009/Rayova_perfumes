@@ -91,6 +91,7 @@ export function Navbar() {
       href: `/categorie/${c.slug}`
     })) || []),
     { name: "À Propos", href: "/a-propos" },
+    { name: "Suivi Commande", href: "/suivi-commande" },
   ];
 
   return (

@@ -25,10 +25,10 @@ const adminNavItems = [
   { name: 'Catégories', href: '/admin/categories', icon: FolderTree },
   { name: 'Commandes', href: '/admin/commandes', icon: ShoppingCart },
   { name: 'Avis', href: '/admin/reviews', icon: MessageSquare },
-  { name: 'Newsletter', href: '/admin/newsletter', icon: Mail },
 ];
 
 const superAdminNavItems = [
+  { name: 'Newsletter', href: '/admin/newsletter', icon: Mail },
   { name: 'Utilisateurs', href: '/admin/utilisateurs', icon: Users },
   { name: 'Paramètres', href: '/admin/parametres', icon: Settings },
 ];
@@ -73,7 +73,7 @@ const AdminDashboard = () => {
             <p className="px-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-2">Menu Principal</p>
             {allNavItems.filter(item =>
               isSuperAdmin ||
-              ['Dashboard', 'Commandes', 'Avis', 'Newsletter'].includes(item.name)
+              ['Dashboard', 'Commandes', 'Avis'].includes(item.name)
             ).filter(item => !superAdminNavItems.some(si => si.name === item.name)).map((item) => {
               const isActive = location.pathname === item.href;
               return (

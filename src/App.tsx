@@ -22,6 +22,7 @@ const Panier = lazy(() => import("./pages/Panier"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const SuiviCommande = lazy(() => import("./pages/SuiviCommande"));
 
 // Admin Pages – lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -108,6 +109,7 @@ const App = () => (
                     <Route path="/panier" element={<Panier />} />
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/produit/:slug" element={<ProductDetails />} />
+                    <Route path="/suivi-commande" element={<SuiviCommande />} />
 
                     {/* Admin Routes */}
                     <Route

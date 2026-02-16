@@ -55,6 +55,42 @@ class OrderController extends Controller
         return response()->json(['data' => $order]);
     }
 
+    public function track(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'order_number' => 'required|string|max:30',
+        ]);
+
+        $order = Order::with('items.product')
+            ->where('order_number', $validated['order_number'])
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Aucune commande trouvée avec ce numéro.',
+            ], 404);
+        }
+
+        // Return only safe, non-sensitive data
+        return response()->json([
+            'data' => [
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'total' => $order->total,
+                'subtotal' => $order->subtotal,
+                'shipping_cost' => $order->shipping_cost,
+                'created_at' => $order->created_at,
+                'updated_at' => $order->updated_at,
+                'items' => $order->items->map(fn($item) => [
+                    'product_name' => $item->product_name,
+                    'product_price' => $item->product_price,
+                    'quantity' => $item->quantity,
+                    'subtotal' => $item->subtotal,
+                ]),
+            ],
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
