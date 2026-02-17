@@ -92,6 +92,21 @@ class OrderController extends Controller
         return response()->json(['message' => 'Commande supprimée avec succès']);
     }
 
+    public function track(Request $request): JsonResponse
+    {
+        $request->validate([
+            'order_number' => 'required|string',
+        ]);
+
+        $order = Order::with('items')->where('order_number', $request->order_number)->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Commande introuvable'], 404);
+        }
+
+        return response()->json(['data' => $order]);
+    }
+
     public function stats(Request $request): JsonResponse
     {
         $period = $request->get('period', 'all');

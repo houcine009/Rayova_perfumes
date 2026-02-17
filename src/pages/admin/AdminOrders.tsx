@@ -323,6 +323,9 @@ const AdminOrders = () => {
                 <Copy className="h-3 w-3" />
               </Button>
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Détails de la commande {selectedOrder?.order_number}
+            </DialogDescription>
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-6">
@@ -494,6 +497,9 @@ const AdminOrders = () => {
               <ShieldAlert className="h-5 w-5" />
               Bannir le client
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Ajouter ce client à la liste noire pour restreindre ses futures commandes.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
