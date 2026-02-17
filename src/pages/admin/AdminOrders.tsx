@@ -14,6 +14,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -249,9 +250,9 @@ const AdminOrders = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {new Date(order.created_at!).toLocaleDateString('fr-FR')}
+                        {order.created_at ? new Date(order.created_at).toLocaleDateString('fr-FR') : '-'}
                       </TableCell>
-                      <TableCell>{Number(order.total).toFixed(2)} MAD</TableCell>
+                      <TableCell>{(Number(order.total) || 0).toFixed(2)} MAD</TableCell>
                       <TableCell>
                         <Select
                           value={order.status || 'pending'}
@@ -306,7 +307,7 @@ const AdminOrders = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
+      <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -330,13 +331,13 @@ const AdminOrders = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Date</p>
                   <p className="font-medium">
-                    {new Date(selectedOrder.created_at!).toLocaleDateString('fr-FR', {
+                    {selectedOrder.created_at ? new Date(selectedOrder.created_at).toLocaleDateString('fr-FR', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit',
-                    })}
+                    }) : '-'}
                   </p>
                 </div>
                 <div>
@@ -445,10 +446,10 @@ const AdminOrders = () => {
                       <div>
                         <p className="font-medium">{item.product_name}</p>
                         <p className="text-sm text-muted-foreground">
-                          Qté: {item.quantity} × {Number(item.product_price).toFixed(2)} MAD
+                          Qté: {item.quantity} × {(Number(item.product_price) || 0).toFixed(2)} MAD
                         </p>
                       </div>
-                      <p className="font-medium">{Number(item.subtotal).toFixed(2)} MAD</p>
+                      <p className="font-medium">{(Number(item.subtotal) || 0).toFixed(2)} MAD</p>
                     </div>
                   ))}
                 </div>
@@ -457,15 +458,15 @@ const AdminOrders = () => {
               <div className="border-t border-border pt-4 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Sous-total</span>
-                  <span>{Number(selectedOrder.subtotal).toFixed(2)} MAD</span>
+                  <span>{(Number(selectedOrder.subtotal) || 0).toFixed(2)} MAD</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Livraison</span>
-                  <span>{Number(selectedOrder.shipping_cost || 0).toFixed(2)} MAD</span>
+                  <span>{(Number(selectedOrder.shipping_cost || 0) || 0).toFixed(2)} MAD</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span className="text-primary">{Number(selectedOrder.total).toFixed(2)} MAD</span>
+                  <span className="text-primary">{(Number(selectedOrder.total) || 0).toFixed(2)} MAD</span>
                 </div>
               </div>
 

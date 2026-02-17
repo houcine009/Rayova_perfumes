@@ -44,7 +44,7 @@ const SuiviCommande = () => {
             const res = await api.post<{ data: TrackedOrder }>('/orders/track', {
                 order_number: orderNumber.trim().toUpperCase(),
             });
-            setOrder(res.data);
+            setOrder((res as any).data);
         } catch (err: any) {
             setError(err.message || 'Commande introuvable.');
         } finally {
