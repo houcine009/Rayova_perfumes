@@ -99,7 +99,7 @@ export const ProductCard = memo(function ProductCard({
           <MediaDisplay
             src={displayImage}
             alt={name}
-            className="transition-transform duration-1000 group-hover:scale-110 object-contain p-4 mix-blend-multiply"
+            className="transition-transform duration-1000 group-hover:scale-110 object-cover"
             priority={priority}
             autoPlay={true}
             onHoverPlay={false}
