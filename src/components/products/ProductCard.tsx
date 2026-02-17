@@ -88,21 +88,26 @@ export const ProductCard = memo(function ProductCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "50px" }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="group"
+      className="group relative"
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 400px' }}
     >
       <Link to={`/produit/${slug}`} className="block">
-        {/* Image/Video Container */}
-        <div className="relative overflow-hidden aspect-[3/4] bg-card mb-2 sm:mb-4 group-hover:shadow-2xl transition-shadow duration-500">
+        {/* Image/Video Container - Luxury Styled */}
+        <div className="relative overflow-hidden aspect-[3/4] bg-[#f8f8f8] mb-4 
+                      border border-border/40 group-hover:border-primary/20 transition-all duration-500 
+                      rounded-2xl shadow-sm group-hover:shadow-xl group-hover:-translate-y-1">
           <MediaDisplay
             src={displayImage}
             alt={name}
-            className="transition-transform duration-700 group-hover:scale-105"
+            className="transition-transform duration-1000 group-hover:scale-110 object-contain p-4 mix-blend-multiply"
             priority={priority}
             autoPlay={true}
             onHoverPlay={false}
             isVideoHint={mediaMimeType?.startsWith('video/') || false}
           />
+
+          {/* Soft Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Overlay on Hover */}
           <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
@@ -149,13 +154,13 @@ export const ProductCard = memo(function ProductCard({
           <h3 className="font-display text-sm sm:text-lg text-foreground group-hover:text-primary transition-colors duration-300 mb-1 sm:mb-2 line-clamp-2 leading-tight">
             {name}
           </h3>
-          <div className="flex items-center justify-center gap-1.5 sm:gap-3 flex-wrap">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-3 flex-wrap mt-2">
             <span className="text-primary font-bold text-sm sm:text-lg">
-              {numericPrice.toLocaleString("fr-MA")} MAD
+              {numericPrice.toLocaleString("fr-MA")} dh
             </span>
             {numericOriginalPrice && (
               <span className="text-muted-foreground line-through text-[11px] sm:text-sm">
-                {numericOriginalPrice.toLocaleString("fr-MA")} MAD
+                {numericOriginalPrice.toLocaleString("fr-MA")} dh
               </span>
             )}
           </div>

@@ -19,6 +19,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReviewSection } from '@/components/products/ReviewSection';
+import { ProductSuggestions } from '@/components/products/ProductSuggestions';
 
 const ProductDetails = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -91,6 +92,7 @@ const ProductDetails = () => {
             price: product.price,
             image: images[0],
             volume_ml: product.volume_ml,
+            categories: product.categories,
         }, quantity);
         toast({
             title: "Ajouté au panier",
@@ -358,6 +360,16 @@ const ProductDetails = () => {
 
                 {/* Reviews Section */}
                 <ReviewSection productId={product.id} />
+
+                {/* Product Suggestions */}
+                <div className="container mx-auto px-4 pb-16">
+                    <ProductSuggestions
+                        currentProductId={product.id}
+                        categorySlug={product.categories?.[0]?.slug}
+                        gender={product.gender}
+                        limit={4}
+                    />
+                </div>
             </main >
 
             <Footer />

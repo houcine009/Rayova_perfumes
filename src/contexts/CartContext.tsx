@@ -7,6 +7,7 @@ export interface CartItem {
   quantity: number;
   image: string;
   volume_ml?: number | null;
+  categories?: Array<{ id: string; name: string; slug: string }>;
 }
 
 interface CartContextType {

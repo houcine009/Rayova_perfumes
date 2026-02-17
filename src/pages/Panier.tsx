@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { MediaDisplay } from "@/components/common/MediaDisplay";
+import { ProductSuggestions } from "@/components/products/ProductSuggestions";
 
 export default function Panier() {
   const { items, removeItem, updateQuantity, subtotal, shippingCost, total, itemCount } = useCart();
@@ -64,7 +65,7 @@ export default function Panier() {
                           <p className="text-sm text-muted-foreground">{item.volume_ml} ml</p>
                         )}
                         <p className="text-primary font-semibold mt-1">
-                          {item.price.toLocaleString("fr-MA")} MAD
+                          {item.price.toLocaleString("fr-MA")} dh
                         </p>
                       </div>
                       <div className="flex flex-col items-end justify-between">
@@ -111,16 +112,16 @@ export default function Panier() {
                         <span className="text-muted-foreground">
                           Sous-total ({itemCount} article{itemCount > 1 ? "s" : ""})
                         </span>
-                        <span className="font-medium">{subtotal.toLocaleString("fr-MA")} MAD</span>
+                        <span className="font-medium">{subtotal.toLocaleString("fr-MA")} dh</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Livraison</span>
-                        <span className="font-medium">{shippingCost} MAD</span>
+                        <span className="font-medium">{shippingCost} dh</span>
                       </div>
                       <div className="border-t border-border pt-3">
                         <div className="flex justify-between text-lg font-semibold">
                           <span>Total</span>
-                          <span className="text-primary">{total.toLocaleString("fr-MA")} MAD</span>
+                          <span className="text-primary">{total.toLocaleString("fr-MA")} dh</span>
                         </div>
                       </div>
                     </div>
@@ -140,6 +141,15 @@ export default function Panier() {
               </div>
             )}
           </motion.div>
+
+          {/* Product Suggestions in Cart */}
+          <div className="mt-16">
+            <ProductSuggestions
+              currentProductId={items[0]?.id || ''}
+              categorySlug={items[0]?.categories?.[0]?.slug}
+              title={items.length > 0 ? "Complétez votre collection" : "Découvrez nos best-sellers"}
+            />
+          </div>
         </div>
       </main>
       <Footer />

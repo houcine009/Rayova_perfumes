@@ -13,20 +13,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $existingIndexes = collect(DB::select("SHOW INDEXES FROM products"))->pluck('Key_name');
-
-            if (!$existingIndexes->contains('products_is_active_index')) {
-                $table->index('is_active');
-            }
-            if (!$existingIndexes->contains('products_is_featured_index')) {
-                $table->index('is_featured');
-            }
-            if (!$existingIndexes->contains('products_gender_index')) {
-                $table->index('gender');
-            }
-            if (!$existingIndexes->contains('products_created_at_index')) {
-                $table->index('created_at');
-            }
+            try { $table->index('is_active'); } catch (\Exception $e) {}
+            try { $table->index('is_featured'); } catch (\Exception $e) {}
+            try { $table->index('gender'); } catch (\Exception $e) {}
+            try { $table->index('created_at'); } catch (\Exception $e) {}
         });
     }
 

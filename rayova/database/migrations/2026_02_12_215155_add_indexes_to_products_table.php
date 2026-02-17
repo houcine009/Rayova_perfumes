@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,22 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $existingIndexes = collect(DB::select("SHOW INDEXES FROM products"))->pluck('Key_name');
-
-            if (!$existingIndexes->contains('products_is_active_index')) {
-                $table->index('is_active');
-            }
-            if (!$existingIndexes->contains('products_is_featured_index')) {
-                $table->index('is_featured');
-            }
-            if (!$existingIndexes->contains('products_gender_index')) {
-                $table->index('gender');
-            }
-            if (!$existingIndexes->contains('products_created_at_index')) {
-                $table->index('created_at');
-            }
-        });
+        // Handled by 2026_02_12_191654_add_performance_indexes_to_products_table.php
     }
 
     /**
@@ -35,11 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropIndex(['is_active']);
-            $table->dropIndex(['is_featured']);
-            $table->dropIndex(['gender']);
-            $table->dropIndex(['created_at']);
-        });
+        //
     }
 };
