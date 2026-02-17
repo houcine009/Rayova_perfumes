@@ -88,12 +88,15 @@ const defaultFormData: ProductFormData = {
 const AdminProducts = () => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [chosenCategory, setChosenCategory] = useState<string>('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(defaultFormData);
 
-  const { data: products, isLoading } = useAdminProducts();
+  const { data: products, isLoading } = useAdminProducts({
+    category: chosenCategory === 'all' ? undefined : chosenCategory
+  });
   const { data: categories } = useCategories();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
@@ -595,6 +598,20 @@ const AdminProducts = () => {
                 className="pl-10"
               />
             </div>
+
+            <Select value={chosenCategory} onValueChange={setChosenCategory}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Catégorie" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes les catégories</SelectItem>
+                {categories?.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.slug}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
         <CardContent>

@@ -24,6 +24,22 @@ class UserController extends Controller
             });
         }
 
+        // Period filter
+        if ($request->has('period')) {
+            $period = $request->period;
+            switch ($period) {
+                case 'day':
+                    $query->whereDate('created_at', today());
+                    break;
+                case 'month':
+                    $query->whereMonth('created_at', now()->month);
+                    break;
+                case 'year':
+                    $query->whereYear('created_at', now()->year);
+                    break;
+            }
+        }
+
         // Filter by role
         if ($request->has('role')) {
             $query->where('role', $request->role);
@@ -133,13 +149,30 @@ class UserController extends Controller
         ]);
     }
 
-    public function stats(): JsonResponse
+    public function stats(Request $request): JsonResponse
     {
+        $period = $request->get('period', 'all');
+        $query = User::query();
+
+        if ($period !== 'all') {
+            switch ($period) {
+                case 'day':
+                    $query->whereDate('created_at', today());
+                    break;
+                case 'month':
+                    $query->whereMonth('created_at', now()->month);
+                    break;
+                case 'year':
+                    $query->whereYear('created_at', now()->year);
+                    break;
+            }
+        }
+
         $stats = [
-            'total' => User::count(),
-            'users' => User::where('role', 'user')->count(),
-            'admins' => User::where('role', 'admin')->count(),
-            'super_admins' => User::where('role', 'super_admin')->count(),
+            'total' => (clone $query)->count(),
+            'users' => (clone $query)->where('role', 'user')->count(),
+            'admins' => (clone $query)->where('role', 'admin')->count(),
+            'super_admins' => (clone $query)->where('role', 'super_admin')->count(),
             'today' => User::whereDate('created_at', today())->count(),
             'this_month' => User::whereMonth('created_at', now()->month)->count(),
         ];

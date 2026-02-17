@@ -62,6 +62,7 @@ const statusColors: Record<OrderStatus, string> = {
 
 const AdminOrders = () => {
   const [search, setSearch] = useState('');
+  const [period, setPeriod] = useState<string>('all');
   const { toast } = useToast();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
 
@@ -75,7 +76,10 @@ const AdminOrders = () => {
   const [orderToDelete, setOrderToDelete] = useState<OrderWithItems | null>(null);
 
   const { isSuperAdmin } = useAuth();
-  const { data: orders, isLoading } = useOrders();
+  const { data: orders, isLoading } = useOrders({
+    search: search === '' ? undefined : search,
+    period: period === 'all' ? undefined : period
+  });
   const updateStatus = useUpdateOrderStatus();
   const deleteOrder = useDeleteOrder();
   const { addToBlacklist } = useBlacklist();
@@ -178,6 +182,18 @@ const AdminOrders = () => {
                 className="pl-10"
               />
             </div>
+
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Période" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes les dates</SelectItem>
+                <SelectItem value="day">Aujourd'hui</SelectItem>
+                <SelectItem value="month">Ce mois</SelectItem>
+                <SelectItem value="year">Cette année</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
         <CardContent>

@@ -51,6 +51,7 @@ const roleLabels: Record<AppRole, string> = {
 
 const AdminUsers = () => {
   const [search, setSearch] = useState('');
+  const [period, setPeriod] = useState<string>('all');
   const [removeUserId, setRemoveUserId] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [addAdminEmail, setAddAdminEmail] = useState('');
@@ -58,7 +59,10 @@ const AdminUsers = () => {
   const [addAdminRole, setAddAdminRole] = useState<'admin' | 'super_admin'>('admin');
   const [isAdding, setIsAdding] = useState(false);
 
-  const { data: users, isLoading, refetch } = useAdminUsers({ search: search });
+  const { data: users, isLoading, refetch } = useAdminUsers({ 
+    search: search === '' ? undefined : search,
+    period: period === 'all' ? undefined : period
+  });
   const updateRole = useUpdateUserRole();
   const deleteUser = useDeleteUser();
   const { toast } = useToast();
@@ -214,6 +218,18 @@ const AdminUsers = () => {
                 className="pl-10"
               />
             </div>
+
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Période" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les temps</SelectItem>
+                <SelectItem value="day">Aujourd'hui</SelectItem>
+                <SelectItem value="month">Ce mois</SelectItem>
+                <SelectItem value="year">Cette année</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
         <CardContent>

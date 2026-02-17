@@ -12,8 +12,31 @@ use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
 {
-    public function stats(): JsonResponse
+    public function stats(\Illuminate\Http\Request $request): JsonResponse
     {
+        $period = $request->get('period', 'month'); // Default to month
+        $startDate = null;
+
+        switch ($period) {
+            case 'day':
+                $startDate = now()->startOfDay();
+                break;
+            case 'month':
+                $startDate = now()->startOfMonth();
+                break;
+            case 'year':
+                $startDate = now()->startOfYear();
+                break;
+            case 'all':
+                $startDate = null;
+                break;
+        }
+
+        $query = Order::query();
+        if ($startDate) {
+            $query->where('created_at', '>=', $startDate);
+        }
+
         $stats = [
             'products' => [
                 'total' => Product::count(),
@@ -26,18 +49,20 @@ class DashboardController extends Controller
                 'active' => Category::active()->count(),
             ],
             'orders' => [
-                'total' => Order::count(),
-                'pending' => Order::byStatus('pending')->count(),
-                'processing' => Order::whereIn('status', ['confirmed', 'processing'])->count(),
-                'completed' => Order::where('status', 'delivered')->count(),
-                'revenue' => (float) Order::where('status', 'delivered')->sum('subtotal'),
-                'total_shipping' => (float) Order::where('status', 'delivered')->sum('shipping_cost'),
-                'today' => Order::where('status', 'delivered')->whereDate('created_at', today())->count(),
-                'this_month' => Order::where('status', 'delivered')->whereMonth('created_at', now()->month)->count(),
+                'total' => (clone $query)->count(),
+                'pending' => (clone $query)->where('status', 'pending')->count(),
+                'processing' => (clone $query)->whereIn('status', ['confirmed', 'processing'])->count(),
+                'completed' => (clone $query)->where('status', 'delivered')->count(),
+                'revenue' => (float) (clone $query)->where('status', 'delivered')->sum('subtotal'),
+                'total_shipping' => (float) (clone $query)->where('status', 'delivered')->sum('shipping_cost'),
+                'today' => Order::whereDate('created_at', today())->count(),
+                'this_month' => Order::whereMonth('created_at', now()->month)->count(),
+                'period_label' => $period,
             ],
             'users' => [
                 'total' => User::count(),
                 'admins' => User::whereIn('role', ['admin', 'super_admin'])->count(),
+                'new_period' => $startDate ? User::where('created_at', '>=', $startDate)->count() : User::count(),
             ],
             'reviews' => [
                 'total' => Review::count(),
@@ -59,10 +84,32 @@ class DashboardController extends Controller
         return response()->json(['data' => $orders]);
     }
 
-    public function topProducts(): JsonResponse
+    public function topProducts(\Illuminate\Http\Request $request): JsonResponse
     {
-        $products = Product::withCount('orderItems')
-            ->orderBy('order_items_count', 'desc')
+        $period = $request->get('period', 'month');
+        $startDate = null;
+
+        switch ($period) {
+            case 'day':
+                $startDate = now()->startOfDay();
+                break;
+            case 'month':
+                $startDate = now()->startOfMonth();
+                break;
+            case 'year':
+                $startDate = now()->startOfYear();
+                break;
+        }
+
+        $query = Product::withCount(['orderItems' => function ($q) use ($startDate) {
+            if ($startDate) {
+                $q->whereHas('order', function ($oq) use ($startDate) {
+                    $oq->where('created_at', '>=', $startDate);
+                });
+            }
+        }]);
+
+        $products = $query->orderBy('order_items_count', 'desc')
             ->limit(5)
             ->get();
 

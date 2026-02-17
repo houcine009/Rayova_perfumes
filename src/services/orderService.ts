@@ -90,7 +90,7 @@ export interface OrderStats {
 }
 
 export const orderService = {
-    async getAll(params?: { status?: OrderStatus; search?: string; per_page?: number; page?: number }): Promise<PaginatedResponse<Order>> {
+    async getAll(params?: { status?: OrderStatus; search?: string; period?: string; per_page?: number; page?: number }): Promise<PaginatedResponse<Order>> {
         return api.get('/orders', params as Record<string, string | number | boolean>);
     },
 
@@ -110,7 +110,7 @@ export const orderService = {
         return api.delete(`/admin/orders/${id}`);
     },
 
-    async getStats(): Promise<{ data: OrderStats }> {
-        return api.get('/admin/orders/stats');
+    async getStats(period?: string): Promise<{ data: OrderStats }> {
+        return api.get('/admin/orders/stats', period ? { period } : undefined);
     },
 };

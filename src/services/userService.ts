@@ -25,7 +25,7 @@ export interface UserCreateData {
 }
 
 export const userService = {
-    async getAll(params?: { search?: string; role?: string; per_page?: number; page?: number }): Promise<PaginatedResponse<UserWithProfile>> {
+    async getAll(params?: { search?: string; role?: string; period?: string; per_page?: number; page?: number }): Promise<PaginatedResponse<UserWithProfile>> {
         return api.get('/admin/users', params as Record<string, string | number | boolean>);
     },
 
@@ -45,7 +45,7 @@ export const userService = {
         return api.delete(`/admin/users/${id}`);
     },
 
-    async getStats(): Promise<{ data: UserStats }> {
-        return api.get('/admin/users/stats');
+    async getStats(period?: string): Promise<{ data: UserStats }> {
+        return api.get('/admin/users/stats', period ? { period } : undefined);
     },
 };

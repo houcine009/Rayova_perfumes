@@ -36,15 +36,15 @@ export interface DashboardStats {
 }
 
 export const dashboardService = {
-    async getStats(): Promise<{ data: DashboardStats }> {
-        return api.get('/admin/dashboard/stats');
+    async getStats(period?: string): Promise<{ data: DashboardStats }> {
+        return api.get('/admin/dashboard/stats', period ? { period } : undefined);
     },
 
     async getRecentOrders(): Promise<{ data: Order[] }> {
         return api.get('/admin/dashboard/recent-orders');
     },
 
-    async getTopProducts(): Promise<{ data: Product[] }> {
-        return api.get('/admin/dashboard/top-products');
+    async getTopProducts(period?: string): Promise<{ data: Product[] }> {
+        return api.get('/admin/dashboard/top-products', period ? { period } : undefined);
     },
 };

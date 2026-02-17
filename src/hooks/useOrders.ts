@@ -5,11 +5,11 @@ export type { Order, OrderCreateData, OrderStatus };
 
 export interface OrderWithItems extends Order { }
 
-export const useOrders = () => {
+export const useOrders = (params?: { status?: OrderStatus; search?: string; period?: string }) => {
   return useQuery({
-    queryKey: ['orders'],
+    queryKey: ['orders', params],
     queryFn: async () => {
-      const response = await orderService.getAll();
+      const response = await orderService.getAll(params);
       return response.data as OrderWithItems[];
     },
   });
@@ -82,11 +82,11 @@ export const useDeleteOrder = () => {
   });
 };
 
-export const useOrderStats = () => {
+export const useOrderStats = (period?: string) => {
   return useQuery({
-    queryKey: ['orders', 'stats'],
+    queryKey: ['orders', 'stats', period],
     queryFn: async () => {
-      const response = await orderService.getStats();
+      const response = await orderService.getStats(period);
       return response.data;
     },
   });

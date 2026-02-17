@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Package,
@@ -12,6 +13,13 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardService } from '@/services/dashboardService';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,10 +47,12 @@ const statusColors: Record<string, string> = {
 
 const AdminHome = () => {
   const { isSuperAdmin } = useAuth();
+  const [period, setPeriod] = useState<string>('month');
+
   const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ['dashboard-stats'],
+    queryKey: ['dashboard-stats', period],
     queryFn: async () => {
-      const response = await dashboardService.getStats();
+      const response = await dashboardService.getStats(period);
       return response.data;
     },
   });
@@ -138,7 +148,20 @@ const AdminHome = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
+          className="flex flex-wrap items-center gap-4"
         >
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-[180px] bg-card/50 backdrop-blur-sm border-border/50">
+              <SelectValue placeholder="Période" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Aujourd'hui</SelectItem>
+              <SelectItem value="month">Ce mois</SelectItem>
+              <SelectItem value="year">Cette année</SelectItem>
+              <SelectItem value="all">Tout le temps</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Button asChild>
             <Link to="/admin/produits">
               <Package className="mr-2 h-4 w-4" />

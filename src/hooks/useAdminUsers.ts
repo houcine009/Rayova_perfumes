@@ -3,7 +3,7 @@ import { userService, type UserWithProfile, type UserCreateData } from '@/servic
 
 export type { UserWithProfile, UserCreateData };
 
-export const useAdminUsers = (params?: { search?: string; role?: string }) => {
+export const useAdminUsers = (params?: { search?: string; role?: string; period?: string }) => {
   return useQuery({
     queryKey: ['admin-users', params],
     queryFn: async () => {
@@ -65,11 +65,11 @@ export const useDeleteUser = () => {
   });
 };
 
-export const useUserStats = () => {
+export const useUserStats = (period?: string) => {
   return useQuery({
-    queryKey: ['admin-users', 'stats'],
+    queryKey: ['admin-users', 'stats', period],
     queryFn: async () => {
-      const response = await userService.getStats();
+      const response = await userService.getStats(period);
       return response.data;
     },
   });
