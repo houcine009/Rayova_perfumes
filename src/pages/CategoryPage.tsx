@@ -74,25 +74,31 @@ const CategoryPage = () => {
       <Navbar />
       <main className="pt-20 lg:pt-24">
         {/* Category Hero */}
-        <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
-          {isVideo ? (
-            <video
-              className="absolute inset-0 w-full h-full object-cover"
-              src={categoryInfo.image}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-            />
+        <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-muted/20">
+          {!allCategories ? (
+            <div className="absolute inset-0 bg-muted animate-pulse" />
           ) : (
-            <img
-              src={categoryInfo.image}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="eager"
-              alt={categoryInfo.name}
-              style={{ objectPosition: 'center' }}
-            />
+            <>
+              {isVideo ? (
+                <video
+                  className="absolute inset-0 w-full h-full object-cover"
+                  src={categoryInfo.image}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                />
+              ) : (
+                <img
+                  src={categoryInfo.image}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="eager"
+                  alt={categoryInfo.name}
+                  style={{ objectPosition: 'center' }}
+                />
+              )}
+            </>
           )}
 
           <div className="absolute inset-0 bg-background/60" />
@@ -102,15 +108,25 @@ const CategoryPage = () => {
             transition={{ duration: 0.8 }}
             className="relative z-10 text-center"
           >
-            <p className="text-primary font-medium tracking-[0.3em] uppercase text-sm mb-4">
-              Collection
-            </p>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mb-4">
-              {categoryInfo.name}
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              {categoryInfo.description}
-            </p>
+            {!allCategories ? (
+              <div className="space-y-4">
+                <div className="h-4 w-32 bg-muted animate-pulse mx-auto" />
+                <div className="h-12 w-64 bg-muted animate-pulse mx-auto" />
+                <div className="h-4 w-96 bg-muted animate-pulse mx-auto" />
+              </div>
+            ) : (
+              <>
+                <p className="text-primary font-medium tracking-[0.3em] uppercase text-sm mb-4">
+                  Collection
+                </p>
+                <h1 className="font-display text-4xl md:text-5xl lg:text-6xl mb-4 text-white">
+                  {categoryInfo.name}
+                </h1>
+                <p className="text-white/80 text-lg max-w-xl mx-auto">
+                  {categoryInfo.description}
+                </p>
+              </>
+            )}
           </motion.div>
         </section>
 
@@ -118,8 +134,17 @@ const CategoryPage = () => {
         <section className="section-padding section-optimize">
           <div className="container-luxury">
             {isLoading ? (
-              <div className="flex justify-center py-20">
-                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="space-y-4">
+                    <div className="aspect-[3/4] w-full bg-muted animate-pulse rounded-2xl" />
+                    <div className="space-y-2 px-2">
+                      <div className="h-4 w-1/2 bg-muted animate-pulse mx-auto" />
+                      <div className="h-4 w-3/4 bg-muted animate-pulse mx-auto" />
+                      <div className="h-4 w-1/4 bg-muted animate-pulse mx-auto" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <>
@@ -146,8 +171,8 @@ const CategoryPage = () => {
                 </div>
 
                 <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
-                  {displayedProducts.map((product) => (
-                    <ProductCard key={product.id} {...product} contextCategory={categoryInfo.name} />
+                  {displayedProducts.map((product, index) => (
+                    <ProductCard key={product.id} {...product} priority={index < 4} contextCategory={categoryInfo.name} />
                   ))}
                 </div>
               </>
