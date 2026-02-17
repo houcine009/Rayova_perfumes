@@ -63,6 +63,7 @@ const statusColors: Record<OrderStatus, string> = {
 const AdminOrders = () => {
   const [search, setSearch] = useState('');
   const [period, setPeriod] = useState<string>('all');
+  const [status, setStatus] = useState<string>('all');
   const { toast } = useToast();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
 
@@ -78,7 +79,8 @@ const AdminOrders = () => {
   const { isSuperAdmin } = useAuth();
   const { data: orders, isLoading } = useOrders({
     search: search === '' ? undefined : search,
-    period: period === 'all' ? undefined : period
+    period: period === 'all' ? undefined : period,
+    status: status === 'all' ? undefined : status as OrderStatus
   });
   const updateStatus = useUpdateOrderStatus();
   const deleteOrder = useDeleteOrder();
@@ -184,7 +186,7 @@ const AdminOrders = () => {
             </div>
 
             <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[160px] bg-card/50">
                 <SelectValue placeholder="Période" />
               </SelectTrigger>
               <SelectContent>
@@ -192,6 +194,20 @@ const AdminOrders = () => {
                 <SelectItem value="day">Aujourd'hui</SelectItem>
                 <SelectItem value="month">Ce mois</SelectItem>
                 <SelectItem value="year">Cette année</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-[160px] bg-card/50">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                {Object.entries(statusLabels).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

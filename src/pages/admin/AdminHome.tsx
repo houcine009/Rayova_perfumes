@@ -198,46 +198,48 @@ const AdminHome = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap items-center gap-4"
+          className="flex flex-col sm:items-end gap-3"
         >
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[180px] bg-card/50 backdrop-blur-sm border-border/50">
-              <SelectValue placeholder="Période" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="day">Aujourd'hui</SelectItem>
-              <SelectItem value="month">Ce mois</SelectItem>
-              <SelectItem value="year">Cette année</SelectItem>
-              <SelectItem value="all">Tout le temps</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-[140px] sm:w-[160px] bg-card/50 backdrop-blur-sm border-border/50">
+                <SelectValue placeholder="Période" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">Aujourd'hui</SelectItem>
+                <SelectItem value="month">Ce mois</SelectItem>
+                <SelectItem value="year">Cette année</SelectItem>
+                <SelectItem value="all">Tout le temps</SelectItem>
+              </SelectContent>
+            </Select>
 
-          {['day', 'month', 'year'].includes(period) && (
-            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={handlePrev}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-medium px-2 min-w-[120px] text-center capitalize">
-                {getLabel()}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                disabled={isFuture()}
-                onClick={handleNext}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+            {['day', 'month', 'year'].includes(period) && (
+              <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={handlePrev}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-xs sm:text-sm font-medium px-2 min-w-[100px] sm:min-w-[120px] text-center capitalize">
+                  {getLabel()}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  disabled={isFuture()}
+                  onClick={handleNext}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
 
-          <Button asChild>
+          <Button asChild className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all">
             <Link to="/admin/produits">
               <Package className="mr-2 h-4 w-4" />
               Ajouter un produit
