@@ -57,7 +57,40 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
-    /* ... (show and track methods) ... */
+    public function show(string $id): JsonResponse
+    {
+        $order = Order::with('items.product', 'user.profile')->findOrFail($id);
+
+        // Non-admin users can only see their own orders
+        if (!auth()->user()->isAdmin() && $order->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return response()->json(['data' => $order]);
+    }
+
+    public function updateStatus(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'status' => 'required|string|in:pending,confirmed,processing,shipped,delivered,cancelled',
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update(['status' => $request->status]);
+
+        return response()->json([
+            'message' => 'Statut de la commande mis à jour avec succès',
+            'data' => $order
+        ]);
+    }
+
+    public function destroy(string $id): JsonResponse
+    {
+        $order = Order::findOrFail($id);
+        $order->delete();
+
+        return response()->json(['message' => 'Commande supprimée avec succès']);
+    }
 
     public function stats(Request $request): JsonResponse
     {

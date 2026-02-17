@@ -174,42 +174,44 @@ const AdminOrders = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="relative flex-1 w-full sm:max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Rechercher par numéro..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 w-full"
               />
             </div>
 
-            <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="w-[160px] bg-card/50">
-                <SelectValue placeholder="Période" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toutes les dates</SelectItem>
-                <SelectItem value="day">Aujourd'hui</SelectItem>
-                <SelectItem value="month">Ce mois</SelectItem>
-                <SelectItem value="year">Cette année</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+              <Select value={period} onValueChange={setPeriod}>
+                <SelectTrigger className="flex-1 sm:w-[160px] bg-card/50">
+                  <SelectValue placeholder="Période" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes les dates</SelectItem>
+                  <SelectItem value="day">Aujourd'hui</SelectItem>
+                  <SelectItem value="month">Ce mois</SelectItem>
+                  <SelectItem value="year">Cette année</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-[160px] bg-card/50">
-                <SelectValue placeholder="Statut" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                {Object.entries(statusLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger className="flex-1 sm:w-[160px] bg-card/50">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  {Object.entries(statusLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
