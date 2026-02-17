@@ -90,9 +90,6 @@ const AdminOrders = () => {
   const [blacklistReason, setBlacklistReason] = useState('');
   const [isBlacklisting, setIsBlacklisting] = useState(false);
 
-  const filteredOrders = orders?.filter((o) =>
-    o.order_number.toLowerCase().includes(search.toLowerCase())
-  );
 
   const handleStatusChange = async (orderId: string, status: OrderStatus) => {
     try {
@@ -219,7 +216,7 @@ const AdminOrders = () => {
             <div className="flex justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : filteredOrders?.length === 0 ? (
+          ) : orders?.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
               Aucune commande trouvée
             </p>
@@ -236,7 +233,7 @@ const AdminOrders = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredOrders?.map((order) => (
+                  {orders?.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2 group">
