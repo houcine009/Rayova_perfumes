@@ -11,6 +11,8 @@ import {
   BarChart3,
   ArrowUpRight,
   ArrowDownRight,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
@@ -48,14 +50,62 @@ const statusColors: Record<string, string> = {
 const AdminHome = () => {
   const { isSuperAdmin } = useAuth();
   const [period, setPeriod] = useState<string>('month');
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ['dashboard-stats', period],
+    queryKey: ['dashboard-stats', period, selectedDate],
     queryFn: async () => {
-      const response = await dashboardService.getStats(period);
-      return response.data;
+      const date = new Date(selectedDate);
+      const rowStats = await dashboardService.getStats(
+        period,
+        period === 'day' ? selectedDate : undefined,
+        period === 'month' ? date.getMonth() + 1 : undefined,
+        period === 'year' || period === 'month' ? date.getFullYear() : undefined
+      );
+      return rowStats.data;
     },
   });
+
+  const handlePrev = () => {
+    const d = new Date(selectedDate);
+    if (period === 'day') d.setDate(d.getDate() - 1);
+    else if (period === 'month') d.setMonth(d.getMonth() - 1);
+    else if (period === 'year') d.setFullYear(d.getFullYear() - 1);
+    setSelectedDate(d.toISOString().split('T')[0]);
+  };
+
+  const handleNext = () => {
+    const d = new Date(selectedDate);
+    if (period === 'day') d.setDate(d.getDate() + 1);
+    else if (period === 'month') d.setMonth(d.getMonth() + 1);
+    else if (period === 'year') d.setFullYear(d.getFullYear() + 1);
+    setSelectedDate(d.toISOString().split('T')[0]);
+  };
+
+  const now = new Date();
+  const isFuture = () => {
+    const d = new Date(selectedDate);
+    if (period === 'day') return d >= new Date(now.setHours(0, 0, 0, 0));
+    if (period === 'month') return d.getMonth() >= now.getMonth() && d.getFullYear() >= now.getFullYear();
+    if (period === 'year') return d.getFullYear() >= now.getFullYear();
+    return false;
+  };
+
+  const getLabel = () => {
+    const d = new Date(selectedDate);
+    if (period === 'day') {
+      return d.toDateString() === new Date().toDateString()
+        ? "Aujourd'hui"
+        : d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    }
+    if (period === 'month') {
+      return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    }
+    if (period === 'year') {
+      return d.getFullYear().toString();
+    }
+    return "";
+  };
 
   const { data: recentOrders, isLoading: ordersLoading } = useQuery({
     queryKey: ['dashboard-recent-orders'],
@@ -161,6 +211,31 @@ const AdminHome = () => {
               <SelectItem value="all">Tout le temps</SelectItem>
             </SelectContent>
           </Select>
+
+          {['day', 'month', 'year'].includes(period) && (
+            <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handlePrev}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium px-2 min-w-[120px] text-center capitalize">
+                {getLabel()}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                disabled={isFuture()}
+                onClick={handleNext}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
 
           <Button asChild>
             <Link to="/admin/produits">

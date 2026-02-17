@@ -15,26 +15,34 @@ class DashboardController extends Controller
     public function stats(\Illuminate\Http\Request $request): JsonResponse
     {
         $period = $request->get('period', 'month'); // Default to month
+        $date = $request->get('date');
         $startDate = null;
+        $endDate = null;
 
-        switch ($period) {
-            case 'day':
-                $startDate = now()->startOfDay();
-                break;
-            case 'month':
-                $startDate = now()->startOfMonth();
-                break;
-            case 'year':
-                $startDate = now()->startOfYear();
-                break;
-            case 'all':
-                $startDate = null;
-                break;
+        if ($period === 'day') {
+            $startDate = $date ? \Carbon\Carbon::parse($date)->startOfDay() : now()->startOfDay();
+            $endDate = (clone $startDate)->endOfDay();
+        } elseif ($period === 'month') {
+            $month = $request->get('month', now()->month);
+            $year = $request->get('year', now()->year);
+            $startDate = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $endDate = (clone $startDate)->endOfMonth();
+        } elseif ($period === 'year') {
+            $year = $request->get('year', now()->year);
+            $startDate = \Carbon\Carbon::createFromDate($year, 1, 1)->startOfYear();
+            $endDate = (clone $startDate)->endOfYear();
+        } else {
+            // 'all'
+            $startDate = null;
+            $endDate = null;
         }
 
         $query = Order::query();
         if ($startDate) {
             $query->where('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->where('created_at', '<=', $endDate);
         }
 
         $stats = [
@@ -87,24 +95,31 @@ class DashboardController extends Controller
     public function topProducts(\Illuminate\Http\Request $request): JsonResponse
     {
         $period = $request->get('period', 'month');
+        $date = $request->get('date');
         $startDate = null;
+        $endDate = null;
 
-        switch ($period) {
-            case 'day':
-                $startDate = now()->startOfDay();
-                break;
-            case 'month':
-                $startDate = now()->startOfMonth();
-                break;
-            case 'year':
-                $startDate = now()->startOfYear();
-                break;
+        if ($period === 'day') {
+            $startDate = $date ? \Carbon\Carbon::parse($date)->startOfDay() : now()->startOfDay();
+            $endDate = (clone $startDate)->endOfDay();
+        } elseif ($period === 'month') {
+            $month = $request->get('month', now()->month);
+            $year = $request->get('year', now()->year);
+            $startDate = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $endDate = (clone $startDate)->endOfMonth();
+        } elseif ($period === 'year') {
+            $year = $request->get('year', now()->year);
+            $startDate = \Carbon\Carbon::createFromDate($year, 1, 1)->startOfYear();
+            $endDate = (clone $startDate)->endOfYear();
         }
 
-        $query = Product::withCount(['orderItems' => function ($q) use ($startDate) {
+        $query = Product::withCount(['orderItems' => function ($q) use ($startDate, $endDate) {
             if ($startDate) {
-                $q->whereHas('order', function ($oq) use ($startDate) {
+                $q->whereHas('order', function ($oq) use ($startDate, $endDate) {
                     $oq->where('created_at', '>=', $startDate);
+                    if ($endDate) {
+                        $oq->where('created_at', '<=', $endDate);
+                    }
                 });
             }
         }]);

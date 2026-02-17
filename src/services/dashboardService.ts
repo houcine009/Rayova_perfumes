@@ -36,15 +36,25 @@ export interface DashboardStats {
 }
 
 export const dashboardService = {
-    async getStats(period?: string): Promise<{ data: DashboardStats }> {
-        return api.get('/admin/dashboard/stats', period ? { period } : undefined);
+    async getStats(period?: string, date?: string, month?: number, year?: number): Promise<{ data: DashboardStats }> {
+        const params: Record<string, string | number> = {};
+        if (period) params.period = period;
+        if (date) params.date = date;
+        if (month) params.month = month;
+        if (year) params.year = year;
+        return api.get('/admin/dashboard/stats', Object.keys(params).length > 0 ? params : undefined);
     },
 
     async getRecentOrders(): Promise<{ data: Order[] }> {
         return api.get('/admin/dashboard/recent-orders');
     },
 
-    async getTopProducts(period?: string): Promise<{ data: Product[] }> {
-        return api.get('/admin/dashboard/top-products', period ? { period } : undefined);
+    async getTopProducts(period?: string, date?: string, month?: number, year?: number): Promise<{ data: Product[] }> {
+        const params: Record<string, string | number> = {};
+        if (period) params.period = period;
+        if (date) params.date = date;
+        if (month) params.month = month;
+        if (year) params.year = year;
+        return api.get('/admin/dashboard/top-products', Object.keys(params).length > 0 ? params : undefined);
     },
 };
