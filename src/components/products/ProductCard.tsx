@@ -93,7 +93,7 @@ export const ProductCard = memo(function ProductCard({
     >
       <Link to={`/produit/${slug}`} className="block">
         {/* Image/Video Container - Luxury Styled */}
-        <div className="relative overflow-hidden aspect-[3/4] bg-[#f8f8f8] mb-4 
+        <div className="relative overflow-hidden aspect-[3/4] mb-4 
                       border border-border/40 group-hover:border-primary/20 transition-all duration-500 
                       rounded-2xl shadow-sm group-hover:shadow-xl group-hover:-translate-y-1">
           <MediaDisplay
