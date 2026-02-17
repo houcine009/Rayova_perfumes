@@ -11,12 +11,20 @@ import { useProducts } from "@/hooks/useProducts";
 
 const Boutique = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("featured");
   const [gridCols, setGridCols] = useState<1 | 2>(2);
 
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const { data: products, isLoading } = useProducts({
-    search: searchQuery || undefined,
+    search: debouncedSearch || undefined,
     category: categoryFilter === "all" ? undefined : categoryFilter.toLowerCase(),
     sort_by: sortBy === "price-asc" || sortBy === "price-desc" ? "price" : (sortBy === "name" ? "name" : "created_at"),
     sort_order: sortBy === "price-asc" ? "asc" : "desc",
@@ -101,9 +109,17 @@ const Boutique = () => {
         <section className="section-padding section-optimize">
           <div className="container-luxury">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-                <p className="text-muted-foreground">Chargement des parfums...</p>
+              <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="space-y-4">
+                    <div className="aspect-[3/4] w-full bg-muted animate-pulse rounded-2xl" />
+                    <div className="space-y-2 px-2">
+                      <div className="h-4 w-1/2 bg-muted animate-pulse mx-auto" />
+                      <div className="h-4 w-3/4 bg-muted animate-pulse mx-auto" />
+                      <div className="h-4 w-1/4 bg-muted animate-pulse mx-auto" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <>
@@ -131,8 +147,12 @@ const Boutique = () => {
 
                 {displayedProducts.length > 0 ? (
                   <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
-                    {displayedProducts.map((product) => (
-                      <ProductCard key={product.id} {...product} />
+                    {displayedProducts.map((product, index) => (
+                      <ProductCard
+                        key={product.id}
+                        {...product}
+                        priority={index < 4}
+                      />
                     ))}
                   </div>
                 ) : (

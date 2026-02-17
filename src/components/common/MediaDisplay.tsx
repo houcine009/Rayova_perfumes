@@ -108,7 +108,11 @@ export function MediaDisplay({
                 <img
                     src={src}
                     alt={alt}
-                    className={cn("w-full h-full object-cover", className)}
+                    className={cn(
+                        "w-full h-full object-cover transition-opacity duration-500",
+                        isVisible ? "opacity-100" : "opacity-0",
+                        className
+                    )}
                     onError={() => setIsError(true)}
                     loading={priority ? "eager" : "lazy"}
                     decoding="async"

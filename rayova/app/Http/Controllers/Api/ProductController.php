@@ -52,9 +52,8 @@ class ProductController extends Controller
         // Prune fields for listing to reduce payload size
         $query = Product::select([
             'id', 'name', 'slug', 'brand', 'price', 'original_price', 
-            'short_description', 'gender', 'stock_quantity', 
-            'is_featured', 'is_new', 'is_active', 'volume_ml', 
-            'created_at'
+            'gender', 'stock_quantity', 
+            'is_featured', 'is_new', 'is_active', 'volume_ml'
         ])->with('media', 'categories');
 
         // Filter by active status for public

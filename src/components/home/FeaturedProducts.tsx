@@ -65,8 +65,17 @@ export function FeaturedProducts() {
 
         {/* Products Grid */}
         {isLoading ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="space-y-4">
+                <div className="aspect-[3/4] w-full bg-muted animate-pulse rounded-2xl" />
+                <div className="space-y-2 px-2">
+                  <div className="h-4 w-1/2 bg-muted animate-pulse mx-auto" />
+                  <div className="h-4 w-3/4 bg-muted animate-pulse mx-auto" />
+                  <div className="h-4 w-1/4 bg-muted animate-pulse mx-auto" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className={`grid ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8`}>
