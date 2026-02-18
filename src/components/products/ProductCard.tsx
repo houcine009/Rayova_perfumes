@@ -48,8 +48,14 @@ export const ProductCard = memo(function ProductCard({
   const numericPrice = Number(price);
   const numericOriginalPrice = original_price ? Number(original_price) : undefined;
 
+  const getStorageUrl = (url: string | null | undefined) => {
+    if (!url) return "";
+    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
+    return `/storage/${url}`;
+  };
+
   const primaryMedia = media?.find(m => m.is_primary) || media?.[0];
-  const displayImage = primaryMedia?.url || image || '';
+  const displayImage = getStorageUrl(primaryMedia?.url || image || '');
   const mediaMimeType = primaryMedia?.mime_type || null;
 
   const catNames = categories?.map(c => c.name.toLowerCase()) || [];

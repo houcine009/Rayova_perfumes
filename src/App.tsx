@@ -24,6 +24,7 @@ const ProductDetails = lazy(() => import("./pages/ProductDetails"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const SuiviCommande = lazy(() => import("./pages/SuiviCommande"));
 const ClientOrders = lazy(() => import("./pages/ClientOrders"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // Admin Pages – lazy loaded
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -118,6 +119,7 @@ const App = () => (
                         <ClientOrders />
                       </ProtectedRoute>
                     } />
+                    <Route path="/reset-password/:token" element={<ResetPassword />} />
 
                     {/* Admin Routes */}
                     <Route

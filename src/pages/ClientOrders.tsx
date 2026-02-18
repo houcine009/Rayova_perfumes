@@ -106,8 +106,8 @@ const ClientOrders = () => {
                                 Découvrez nos collections exclusives et trouvez votre prochaine signature olfactive.
                             </p>
                         </div>
-                        <Button asChild size="lg" className="rounded-full px-8">
-                            <Link to="/boutique">Explorer la boutique</Link>
+                        <Button onClick={() => navigate('/boutique')} size="lg" className="rounded-full px-8">
+                            Explorer la boutique
                         </Button>
                     </motion.div>
                 ) : (
@@ -150,7 +150,7 @@ const ClientOrders = () => {
                                                             <div className="h-14 w-14 rounded-xl bg-black/40 border border-white/10 flex-shrink-0 overflow-hidden shadow-inner group-hover:border-primary/30 transition-colors">
                                                                 {item.product?.media?.[0]?.url && (
                                                                     <img
-                                                                        src={`/storage/${item.product.media[0].url}`}
+                                                                        src={item.product.media[0].url.startsWith('http') ? item.product.media[0].url : (item.product.media[0].url.startsWith('/storage') ? item.product.media[0].url : `/storage/${item.product.media[0].url}`)}
                                                                         alt={item.product_name}
                                                                         className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                                                                     />

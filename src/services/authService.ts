@@ -92,6 +92,14 @@ export const authService = {
         return api.put('/user/profile', data);
     },
 
+    async forgotPassword(email: string): Promise<{ message: string }> {
+        return api.post('/forgot-password', { email });
+    },
+
+    async resetPassword(data: any): Promise<{ message: string }> {
+        return api.post('/reset-password', data);
+    },
+
     isAuthenticated(): boolean {
         return !!api.getToken();
     },

@@ -38,6 +38,15 @@ export function HeroSection() {
 
   const isLoadingFinal = isLoading; // Placeholder for logic if we want to bypass
 
+  const getStorageUrl = (url: string | null | undefined) => {
+    if (!url) return "";
+    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
+    return `/storage/${url}`;
+  };
+
+  const finalVideoUrl = getStorageUrl(videoUrl);
+  const finalImageUrl = getStorageUrl(imageUrl);
+
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background">
       {/* Background Media */}
@@ -45,16 +54,16 @@ export function HeroSection() {
         {/* CSS Placeholder to fix LCP/White flash */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] z-0" />
 
-        {videoUrl ? (
+        {finalVideoUrl ? (
           <video
             autoPlay
             loop
             muted
             playsInline
             preload="auto"
-            poster={imageUrl || undefined}
+            poster={finalImageUrl || undefined}
             className="w-full h-full object-cover relative z-10"
-            key={videoUrl}
+            key={finalVideoUrl}
             disablePictureInPicture
             controlsList="nodownload nofullscreen noremoteplayback"
             // @ts-ignore
@@ -62,13 +71,13 @@ export function HeroSection() {
             width="1920"
             height="1080"
           >
-            <source src={videoUrl} type="video/mp4" />
+            <source src={finalVideoUrl} type="video/mp4" />
           </video>
-        ) : imageUrl ? (
+        ) : finalImageUrl ? (
           <motion.img
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            src={imageUrl}
+            src={finalImageUrl}
             alt={title}
             className="absolute inset-0 w-full h-full object-cover z-10"
             // @ts-ignore
@@ -156,16 +165,22 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link to="/boutique">
-              <Button variant="hero" size="xl">
-                {ctaPrimary}
-              </Button>
-            </Link>
-            <Link to="/boutique">
-              <Button variant="heroOutline" size="xl">
-                {ctaSecondary}
-              </Button>
-            </Link>
+            <Button
+              variant="hero"
+              size="xl"
+              onClick={() => (window.location.href = "/boutique")}
+              className="cursor-pointer pointer-events-auto"
+            >
+              {ctaPrimary}
+            </Button>
+            <Button
+              variant="heroOutline"
+              size="xl"
+              onClick={() => (window.location.href = "/boutique")}
+              className="cursor-pointer pointer-events-auto"
+            >
+              {ctaSecondary}
+            </Button>
           </motion.div>
         </motion.div>
 

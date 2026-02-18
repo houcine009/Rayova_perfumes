@@ -27,6 +27,8 @@ Route::match(['POST', 'OPTIONS'], '/feedback', [\App\Http\Controllers\Api\GuestF
 
 Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:6,1');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:6,1');
 
 // Public product routes
 Route::get('/products', [ProductController::class, 'index']);

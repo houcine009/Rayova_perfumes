@@ -80,12 +80,18 @@ export function CollectionsSection() {
 
   const activeCategories = categories?.filter(c => c.is_active) || [];
 
+  const getStorageUrl = (url: string | null | undefined) => {
+    if (!url) return "";
+    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
+    return `/storage/${url}`;
+  };
+
   const collections = activeCategories.length > 0
     ? activeCategories.map(cat => ({
       slug: cat.slug,
       name: cat.name,
       description: cat.description || "Découvrez notre collection exclusive",
-      image: cat.image_url || null,
+      image: cat.image_url ? getStorageUrl(cat.image_url) : null,
       href: `/categorie/${cat.slug}`,
     }))
     : defaultCollections;

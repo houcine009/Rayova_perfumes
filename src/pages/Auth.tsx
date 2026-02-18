@@ -10,12 +10,13 @@ import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { authService } from '@/services/authService';
 
 const emailSchema = z.string().email('Email invalide');
 const passwordSchema = z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères');
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -24,6 +25,10 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+
+  const isLogin = mode === 'login';
+  const isSignUp = mode === 'signup';
+  const isForgot = mode === 'forgot';
 
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -57,7 +62,7 @@ const Auth = () => {
       }
     }
 
-    if (!isLogin && password !== confirmPassword) {
+    if (isSignUp && password !== confirmPassword) {
       newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
     }
 
@@ -67,6 +72,31 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isForgot) {
+      if (!email) {
+        setErrors({ email: 'L\'email est requis' });
+        return;
+      }
+      setIsLoading(true);
+      try {
+        await authService.forgotPassword(email);
+        toast({
+          title: 'Demande envoyée',
+          description: 'Si cet email existe, un lien de réinitialisation vous a été envoyé.',
+        });
+        setMode('login');
+      } catch (error) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible d\'envoyer le mail de réinitialisation.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     if (!validateForm()) return;
 
@@ -82,7 +112,7 @@ const Auth = () => {
             variant: 'destructive',
           });
         }
-      } else {
+      } else if (isSignUp) {
         // Split name into first and last name for the backend
         const nameParts = name.trim().split(' ');
         const firstName = nameParts[0];
@@ -127,20 +157,22 @@ const Auth = () => {
           >
             <div className="bg-card border border-border/50 rounded-[2rem] p-10 shadow-2xl backdrop-blur-sm relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
-              
+
               <div className="text-center mb-10">
                 <h1 className="text-4xl font-playfair font-black text-foreground mb-3 tracking-tight">
-                  {isLogin ? 'Authentification' : 'Rejoindre Rayova'}
+                  {isLogin ? 'Authentification' : isSignUp ? 'Rejoindre Rayova' : 'Mot de passe oublié'}
                 </h1>
                 <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest opacity-70">
                   {isLogin
                     ? 'L\'élégance commence ici'
-                    : 'Créez votre signature olfactive'}
+                    : isSignUp
+                      ? 'Créez votre signature olfactive'
+                      : 'Récupérez l\'accès à votre compte'}
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                {!isLogin && (
+                {isSignUp && (
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest ml-1">Nom Complet</Label>
@@ -149,7 +181,7 @@ const Auth = () => {
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Jean Dupont"
+                        placeholder="Votre nom complet"
                         className="bg-muted/30 border-border/50 rounded-xl h-12"
                         required
                       />
@@ -185,32 +217,45 @@ const Auth = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest ml-1">Mot de passe</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="bg-muted/30 border-border/50 rounded-xl h-12 pr-10"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
+                {!isForgot && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between px-1">
+                      <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest">Mot de passe</Label>
+                      {isLogin && (
+                        <button
+                          type="button"
+                          onClick={() => setMode('forgot')}
+                          className="text-[9px] font-bold uppercase tracking-widest text-primary hover:underline underline-offset-4 decoration-primary/30"
+                        >
+                          Mot de passe oublié ?
+                        </button>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="bg-muted/30 border-border/50 rounded-xl h-12 pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <p className="text-[10px] text-destructive font-bold uppercase">{errors.password}</p>
+                    )}
                   </div>
-                  {errors.password && (
-                    <p className="text-[10px] text-destructive font-bold uppercase">{errors.password}</p>
-                  )}
-                </div>
+                )}
 
-                {!isLogin && (
+                {isSignUp && (
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-widest ml-1">Confirmer</Label>
                     <Input
@@ -239,7 +284,7 @@ const Auth = () => {
                       Patientez...
                     </>
                   ) : (
-                    isLogin ? 'Se connecter' : 'S\'inscrire'
+                    isLogin ? 'Se connecter' : isSignUp ? 'S\'inscrire' : 'Envoyer le lien'
                   )}
                 </Button>
               </form>
@@ -247,15 +292,17 @@ const Auth = () => {
               <div className="mt-8 pt-8 border-t border-border/30 text-center">
                 <button
                   onClick={() => {
-                    setIsLogin(!isLogin);
+                    setMode(isLogin ? 'signup' : 'login');
                     setErrors({});
                   }}
                   className="text-sm font-bold text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2"
                 >
                   {isLogin ? (
                     <>Pas encore de compte ? <span className="text-primary underline underline-offset-4 decoration-primary/30">S'inscrire</span></>
-                  ) : (
+                  ) : isSignUp ? (
                     <>Déjà membre ? <span className="text-primary underline underline-offset-4 decoration-primary/30">Se connecter</span></>
+                  ) : (
+                    <>Retour à la <span className="text-primary underline underline-offset-4 decoration-primary/30">Connexion</span></>
                   )}
                 </button>
               </div>

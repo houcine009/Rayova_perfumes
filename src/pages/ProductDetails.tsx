@@ -70,8 +70,14 @@ const ProductDetails = () => {
         );
     }
 
+    const getStorageUrl = (url: string | null | undefined) => {
+        if (!url) return "";
+        if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
+        return `/storage/${url}`;
+    };
+
     const images = product.media && product.media.length > 0
-        ? product.media.map(m => m.url)
+        ? product.media.map(m => getStorageUrl(m.url))
         : ['/placeholder.svg'];
 
     const mimeTypes = product.media && product.media.length > 0
