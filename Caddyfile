@@ -1,16 +1,7 @@
-# Rayova Perfumes - Optimized Production Configuration
+# Rayova Perfumes - Professional Production Configuration
 
-# Frontend - Main domains with automatic HTTPS & Optimized SPA Routing
-rayovaparfums.com, www.rayovaparfums.com {
-    root * /var/www/frontend
-    file_server {
-        precompressed zstd gzip
-    }
-    
-    # Robust SPA Routing
-    try_files { path } { path }/ /index.html
-    
-    # Ultimate Security Headers
+# Config Snippets
+(security_headers) {
     header {
         # Prevent MIME type sniffing
         X-Content-Type-Options nosniff
@@ -20,53 +11,77 @@ rayovaparfums.com, www.rayovaparfums.com {
         X-XSS-Protection "1; mode=block"
         # Referrer Policy
         Referrer-Policy no-referrer-when-downgrade
-        # HSTS (Enable after testing)
+        # HSTS (Enable ONLY after HTTPS is verified)
         # Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-    }
-    
-    # Global compression
-    encode zstd gzip
-
-    # Modern Asset Caching (Hashed assets)
-    @static_hashed {
-        path_regexp \.(js | css | woff2 | png | jpg | jpeg | gif | svg | ico | webp | avif)$
-    }
-    header @static_hashed {
-        Cache-Control "public, max-age=31536000, immutable"
-    }
-
-    # Media Asset Caching
-    @static_media {
-        path_regexp \.(mp4 | webm | mov | ogg | mp3 | wav)$
-    }
-    header @static_media {
-        Cache-Control "public, max-age=86400, must-revalidate"
     }
 }
 
-# Backend API - Secure Reverse Proxy
+(compression) {
+    encode zstd gzip
+}
+
+# 1. SEO: Redirect www to non-www
+www.rayovaparfums.com {
+    redir https://rayovaparfums.com { uri }
+}
+
+# 2. Principal Frontend - SPA
+rayovaparfums.com {
+    root * /var/www/frontend
+    import compression
+    import security_headers
+    
+    # Precise SPA Routing: Don't serve index.html for missing assets
+    @assets path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.woff2 *.avif *.mp4 *.webm
+    handle @assets {
+        file_server
+        header Cache-Control "public, max-age=31536000, immutable"
+    }
+    
+    handle {
+        try_files { path } /index.html
+        file_server
+    }
+
+    # Logging
+    log {
+        output file /var/log/caddy/frontend.log
+    }
+}
+
+# 3. Backend API - Secure Proxy
 api.rayovaparfums.com {
+    # Proxy to backend container (Adjust port to 8000 if using artisan serve)
     reverse_proxy backend:80 {
-        # Passing real client IP and info
         header_up Host { host }
         header_up X-Real-IP { remote_host }
         header_up X-Forwarded-Proto { scheme }
     }
     
-    # Advanced CORS (Supports both www and root domains)
+    import compression
+    import security_headers
+
+    # Professional CORS - Matches Origins dynamically
     @cors_origin header Origin {
         regexp https:\/\/((www\.)?rayovaparfums\.com)
     }
     
-    header @cors_origin {
-        Access-Control-Allow-Origin { header.Origin }
-        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-        Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With, X-CSRF-TOKEN"
-        Access-Control-Allow-Credentials true
-        Access-Control-Max-Age 3600
+    handle @cors_origin {
+        header {
+            Access-Control-Allow-Origin { header.Origin }
+            Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+            Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With, X-CSRF-TOKEN"
+            Access-Control-Allow-Credentials true
+            Access-Control-Max-Age 3600
+        }
     }
     
-    # Lean preflight handler
+    # Preflight fix
     @options method OPTIONS
     respond @options 204
+
+    # Logging
+    log {
+        output file /var/log/caddy/api.log
+    }
 }
