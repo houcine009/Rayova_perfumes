@@ -1,22 +1,4 @@
-# Rayova Perfumes - Professional Production Configuration
-
-# Config Snippets
-(security_headers) {
-    header {
-        # Prevent MIME type sniffing
-        X-Content-Type-Options nosniff
-        # Clickjacking protection
-        X-Frame-Options SAMEORIGIN
-        # XSS filtering
-        X-XSS-Protection "1; mode=block"
-        # Referrer Policy
-        Referrer-Policy no-referrer-when-downgrade
-    }
-}
-
-(compression) {
-    encode zstd gzip
-}
+# Rayova Perfumes - Professional Caddy Configuration
 
 # 1. SEO: Redirect www to non-www
 www.rayovaparfums.com {
@@ -26,8 +8,17 @@ www.rayovaparfums.com {
 # 2. Principal Frontend - SPA
 rayovaparfums.com {
     root * /var/www/frontend
-    import compression
-    import security_headers
+    
+    # Global compression
+    encode zstd gzip
+
+    # Ultimate Security Headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy no-referrer-when-downgrade
+    }
     
     # Precise SPA Routing: Don't serve index.html for missing assets
     @assets path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.woff2 *.avif *.mp4 *.webm
@@ -47,24 +38,29 @@ rayovaparfums.com {
     }
 }
 
-# 3. Backend API - Secure Proxy
+# 3. Backend API
 api.rayovaparfums.com {
-    # Proxy to backend container
     reverse_proxy backend:80 {
         header_up Host { host }
         header_up X-Real-IP { remote_host }
         header_up X-Forwarded-Proto { scheme }
     }
     
-    import compression
-    import security_headers
+    encode zstd gzip
 
-    # Professional CORS - Matches Origins dynamically
-    @cors_origin header Origin regexp https:\/\/((www\.)?rayovaparfums\.com)
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options SAMEORIGIN
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy no-referrer-when-downgrade
+    }
+
+    # Robust CORS for both domains
+    @cors_origin header Origin https://rayovaparfums.com https://www.rayovaparfums.com
     
     handle @cors_origin {
         header {
-            Access-Control-Allow-Origin { header.Origin }
+            Access-Control-Allow-Origin { http.request.header.Origin }
             Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
             Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With, X-CSRF-TOKEN"
             Access-Control-Allow-Credentials true
