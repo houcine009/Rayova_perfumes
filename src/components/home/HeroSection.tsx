@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useHeroSettings } from "@/hooks/useSiteSettings";
 import { useState, useEffect } from "react";
+import { getMediaUrl } from "@/lib/api";
 
 export function HeroSection() {
   const { data: heroSettings, isLoading } = useHeroSettings();
@@ -38,14 +39,8 @@ export function HeroSection() {
 
   const isLoadingFinal = isLoading; // Placeholder for logic if we want to bypass
 
-  const getStorageUrl = (url: string | null | undefined) => {
-    if (!url) return "";
-    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
-    return `/storage/${url}`;
-  };
-
-  const finalVideoUrl = getStorageUrl(videoUrl);
-  const finalImageUrl = getStorageUrl(imageUrl);
+  const finalVideoUrl = getMediaUrl(videoUrl);
+  const finalImageUrl = getMediaUrl(imageUrl);
 
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-background">

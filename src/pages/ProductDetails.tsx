@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReviewSection } from '@/components/products/ReviewSection';
 import { ProductSuggestions } from '@/components/products/ProductSuggestions';
+import { getMediaUrl } from '@/lib/api';
 
 const ProductDetails = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -70,14 +71,8 @@ const ProductDetails = () => {
         );
     }
 
-    const getStorageUrl = (url: string | null | undefined) => {
-        if (!url) return "";
-        if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
-        return `/storage/${url}`;
-    };
-
     const images = product.media && product.media.length > 0
-        ? product.media.map(m => getStorageUrl(m.url))
+        ? product.media.map(m => getMediaUrl(m.url))
         : ['/placeholder.svg'];
 
     const mimeTypes = product.media && product.media.length > 0

@@ -182,5 +182,29 @@ class ApiClient {
 // Export singleton instance
 export const api = new ApiClient();
 
+/**
+ * Robust helper to get absolute media URLs pointing to the backend storage.
+ * This ensures media loads correctly even when frontend and backend are on different domains.
+ */
+export const getMediaUrl = (url: string | null | undefined): string => {
+  if (!url) return "";
+
+  // Handle absolute URLs or data URIs
+  if (url.startsWith('http') || url.startsWith('data:')) return url;
+
+  // Clean URL: remove leading slash if present
+  const cleanPath = url.startsWith('/') ? url.substring(1) : url;
+
+  // Remove '/api' from the base URL to get the root backend domain
+  const apiBase = API_BASE_URL.replace(/\/api$/, '');
+
+  // If the path already includes 'storage/', don't double it
+  if (cleanPath.startsWith('storage/')) {
+    return `${apiBase}/${cleanPath}`;
+  }
+
+  return `${apiBase}/storage/${cleanPath}`;
+};
+
 // Export types
 export type { ApiResponse, PaginatedResponse };

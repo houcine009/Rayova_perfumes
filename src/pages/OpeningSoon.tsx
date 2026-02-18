@@ -4,7 +4,7 @@ import { Mail, Phone, Loader2, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { api } from "@/lib/api";
+import { api, getMediaUrl } from "@/lib/api";
 import { useSiteSettings, type OpeningSoonSettings } from "@/hooks/useSiteSettings";
 
 export default function OpeningSoon() {
@@ -34,17 +34,11 @@ export default function OpeningSoon() {
         }
     };
 
-    const getStorageUrl = (url: string | null | undefined) => {
-        if (!url) return "";
-        if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
-        return `/storage/${url}`;
-    };
-
     const title = osSettings?.title || "Bientôt Disponible";
     const subtitle = osSettings?.subtitle || "Rayova Luxury Fragrance";
     const description = osSettings?.description || "Nous préparons une expérience olfactive inégalée. Soyez les premiers au courant de notre lancement.";
-    const videoUrl = osSettings?.video_url ? getStorageUrl(osSettings.video_url) : null;
-    const imageUrl = osSettings?.image_url ? getStorageUrl(osSettings.image_url) : (osSettings?.image_url || "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80");
+    const videoUrl = osSettings?.video_url ? getMediaUrl(osSettings.video_url) : null;
+    const imageUrl = osSettings?.image_url ? getMediaUrl(osSettings.image_url) : (osSettings?.image_url || "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80");
 
     return (
         <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black text-white">

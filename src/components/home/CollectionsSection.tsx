@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
 import { useRef, useState, useEffect } from "react";
+import { getMediaUrl } from "@/lib/api";
 
 interface Collection {
   slug: string;
@@ -81,9 +82,7 @@ export function CollectionsSection() {
   const activeCategories = categories?.filter(c => c.is_active) || [];
 
   const getStorageUrl = (url: string | null | undefined) => {
-    if (!url) return "";
-    if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('/storage')) return url;
-    return `/storage/${url}`;
+    return getMediaUrl(url);
   };
 
   const collections = activeCategories.length > 0
