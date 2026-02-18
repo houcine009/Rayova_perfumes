@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Package, Truck, CheckCircle2, Clock, XCircle, Loader2, ShoppingBag, MapPin } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -25,11 +26,13 @@ const STATUS_STEPS = [
 ];
 
 const SuiviCommande = () => {
+    const [searchParams] = useSearchParams();
     const [orderNumber, setOrderNumber] = useState('');
     const [order, setOrder] = useState<TrackedOrder | null>(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);
+    const autoSearched = useRef(false);
 
     const handleTrack = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -51,6 +54,32 @@ const SuiviCommande = () => {
             setLoading(false);
         }
     };
+
+    // Auto-search if order number is passed via URL query param
+    useEffect(() => {
+        const orderParam = searchParams.get('order');
+        if (orderParam && !autoSearched.current) {
+            autoSearched.current = true;
+            setOrderNumber(orderParam);
+            // Trigger search programmatically
+            (async () => {
+                setLoading(true);
+                setError('');
+                setOrder(null);
+                setSearched(true);
+                try {
+                    const res = await api.post<{ data: TrackedOrder }>('/orders/track', {
+                        order_number: orderParam.trim().toUpperCase(),
+                    });
+                    setOrder((res as any).data);
+                } catch (err: any) {
+                    setError(err.message || 'Commande introuvable.');
+                } finally {
+                    setLoading(false);
+                }
+            })();
+        }
+    }, [searchParams]);
 
     const isCancelled = order?.status === 'cancelled';
 

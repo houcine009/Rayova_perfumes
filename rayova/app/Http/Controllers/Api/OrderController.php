@@ -122,7 +122,7 @@ class OrderController extends Controller
                     'subtotal' => $validated['subtotal'],
                     'shipping_cost' => $validated['shipping_cost'] ?? 0,
                     'total' => $validated['total'],
-                    'user_id' => auth()->id(),
+                    'user_id' => auth('sanctum')->id(),
                     'status' => 'pending',
                 ];
                 

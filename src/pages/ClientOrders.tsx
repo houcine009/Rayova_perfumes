@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ShoppingBag, Package, Truck, Calendar, ArrowRight, ArrowLeft, Star } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { api, getMediaUrl } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -150,7 +150,7 @@ const ClientOrders = () => {
                                                             <div className="h-14 w-14 rounded-xl bg-black/40 border border-white/10 flex-shrink-0 overflow-hidden shadow-inner group-hover:border-primary/30 transition-colors">
                                                                 {item.product?.media?.[0]?.url && (
                                                                     <img
-                                                                        src={item.product.media[0].url.startsWith('http') ? item.product.media[0].url : (item.product.media[0].url.startsWith('/storage') ? item.product.media[0].url : `/storage/${item.product.media[0].url}`)}
+                                                                        src={getMediaUrl(item.product.media[0].url)}
                                                                         alt={item.product_name}
                                                                         className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                                                                     />
@@ -189,7 +189,7 @@ const ClientOrders = () => {
                                                     <p className="text-[10px] text-muted-foreground font-bold">Paiement à la livraison (COD)</p>
                                                 </div>
                                                 <Button size="sm" variant="ghost" className="rounded-full gap-2 hover:bg-primary/10 hover:text-primary transition-colors pr-0" asChild>
-                                                    <Link to={`/suivi-commande`}>
+                                                    <Link to={`/suivi-commande?order=${order.order_number}`}>
                                                         Suivre le colis <ArrowRight className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
