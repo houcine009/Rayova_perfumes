@@ -252,6 +252,202 @@ const AdminHome = () => {
         </motion.div>
       </div>
 
+      {/* Super Admin Advanced Stats - MOVED TO TOP */}
+      {isSuperAdmin && stats?.super_admin && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="space-y-8"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+              <div className="w-full border-t border-border/50"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-background px-4 text-xs font-bold uppercase tracking-widest text-primary">
+                📊 Insights Stratégiques Super Admin
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            {/* Top Best Sellers */}
+            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-emerald-500/10">
+              <CardHeader className="border-b border-border/50 bg-emerald-500/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
+                      <TrendingUp className="h-5 w-5 text-emerald-500" />
+                      Meilleures Ventes
+                    </CardTitle>
+                    <CardDescription>Les 5 produits les plus performants</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-border/30">
+                  {stats.super_admin.best_sellers.map((product: any, idx: number) => (
+                    <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-emerald-500/5 transition-colors group">
+                      <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border border-border/50 bg-muted">
+                        {product.media && product.media[0] ? (
+                          <img
+                            src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
+                            alt={product.name}
+                            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center text-muted-foreground/30">
+                            <Package className="h-8 w-8" />
+                          </div>
+                        )}
+                        <div className="absolute top-0 left-0 bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg shadow-md">
+                          #{idx + 1}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">{product.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">{Number(product.price).toFixed(2)} MAD</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-emerald-500">{product.sales_count}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">Ventes</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Worst Sellers (Low Rotation) */}
+            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-red-500/10">
+              <CardHeader className="border-b border-border/50 bg-red-500/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
+                      <TrendingDown className="h-5 w-5 text-red-500" />
+                      Basse Rotation
+                    </CardTitle>
+                    <CardDescription>Produits avec peu d'engagement (Morts)</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-border/30">
+                  {stats.super_admin.worst_sellers.map((product: any) => (
+                    <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-red-500/5 transition-colors group">
+                      <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border border-border/50 bg-muted">
+                        {product.media && product.media[0] ? (
+                          <img
+                            src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
+                            alt={product.name}
+                            className="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center text-muted-foreground/30">
+                            <Package className="h-8 w-8" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-foreground truncate">{product.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`h-1.5 w-1.5 rounded-full ${product.stock_quantity < 5 ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                          <p className="text-[10px] text-muted-foreground">Stock Actuel: {product.stock_quantity}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-red-500">{product.sales_count}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">Ventes</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Top Loyal Clients */}
+            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-blue-500/10">
+              <CardHeader className="border-b border-border/50 bg-blue-500/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
+                      <UserCheck className="h-5 w-5 text-blue-500" />
+                      Clients Fidèles
+                    </CardTitle>
+                    <CardDescription>Top contributeurs (Chiffre d'affaires)</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-4">
+                  {stats.super_admin.best_clients.map((client: any) => (
+                    <div key={client.shipping_phone} className="flex items-center justify-between p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 transition-all hover:border-blue-500/30">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-600 font-bold border border-blue-500/40">
+                          {client.customer_name?.charAt(0) || 'C'}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold">{client.customer_name || 'Client Inconnu'}</p>
+                          <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-black text-blue-600">{Number(client.total_spent).toLocaleString('fr-FR')} MAD</p>
+                        <p className="text-[10px] text-muted-foreground">{client.orders_count} commandes livrées</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Top Cancelled Clients (Alert) */}
+            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-amber-500/10">
+              <CardHeader className="border-b border-border/50 bg-amber-500/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
+                      <UserX className="h-5 w-5 text-amber-500" />
+                      Clients à Risque
+                    </CardTitle>
+                    <CardDescription>Plus grand nombre d'annulations</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-4">
+                  {stats.super_admin.cancelled_clients.map((client: any) => (
+                    <div key={client.shipping_phone} className="flex items-center justify-between p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 transition-all hover:border-amber-500/30">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600 font-bold border border-amber-500/40">
+                          {client.customer_name?.charAt(0) || 'C'}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold">{client.customer_name || 'Client Inconnu'}</p>
+                          <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-sm font-black text-amber-600">{client.cancellations_count}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase">Annulations</p>
+                        </div>
+                        <Button variant="ghost" size="icon" asChild className="h-8 w-8 rounded-full bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white transition-all">
+                          <a href={`tel:${client.shipping_phone}`}>
+                            <Phone className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {mainStats.map((stat, index) => (
@@ -482,202 +678,6 @@ const AdminHome = () => {
           </CardContent>
         </Card>
       </motion.div>
-
-      {/* Super Admin Advanced Stats */}
-      {isSuperAdmin && stats?.super_admin && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="space-y-8 pb-12"
-        >
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-border/50"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-background px-4 text-xs font-semibold uppercase tracking-widest text-primary/70">
-                Super Admin Insights
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {/* Top Best Sellers */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500">
-              <CardHeader className="border-b border-border/50 bg-primary/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <TrendingUp className="h-5 w-5 text-emerald-500" />
-                      Best Sellers
-                    </CardTitle>
-                    <CardDescription>Les produits les plus performants</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/30">
-                  {stats.super_admin.best_sellers.map((product: any, idx: number) => (
-                    <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors group">
-                      <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border border-border/50 bg-muted">
-                        {product.media && product.media[0] ? (
-                          <img
-                            src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
-                            alt={product.name}
-                            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-muted-foreground/30">
-                            <Package className="h-8 w-8" />
-                          </div>
-                        )}
-                        <div className="absolute top-0 left-0 bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg shadow-md">
-                          #{idx + 1}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">{product.name}</p>
-                        <p className="text-xs text-muted-foreground font-mono">{Number(product.price).toFixed(2)} MAD</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-emerald-500">{product.sales_count}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">Ventes</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Worst Sellers (Stock Dead) */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500">
-              <CardHeader className="border-b border-border/50 bg-red-500/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <TrendingDown className="h-5 w-5 text-red-500" />
-                      Worst Sellers
-                    </CardTitle>
-                    <CardDescription>Produits avec peu d'engagement</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/30">
-                  {stats.super_admin.worst_sellers.map((product: any) => (
-                    <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors group">
-                      <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border border-border/50 bg-muted">
-                        {product.media && product.media[0] ? (
-                          <img
-                            src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
-                            alt={product.name}
-                            className="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-muted-foreground/30">
-                            <Package className="h-8 w-8" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate">{product.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`h-1.5 w-1.5 rounded-full ${product.stock_quantity < 5 ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`}></span>
-                          <p className="text-[10px] text-muted-foreground">Stock: {product.stock_quantity}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-red-500">{product.sales_count}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">Ventes</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Top Loyal Clients */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500">
-              <CardHeader className="border-b border-border/50 bg-blue-500/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <UserCheck className="h-5 w-5 text-blue-500" />
-                      Clients Fidèles
-                    </CardTitle>
-                    <CardDescription>Ceux qui aiment Rayova</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-4">
-                  {stats.super_admin.best_clients.map((client: any) => (
-                    <div key={client.shipping_phone} className="flex items-center justify-between p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 transition-all hover:border-blue-500/30">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-600 font-bold">
-                          {client.customer_name?.charAt(0) || 'C'}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold">{client.customer_name || 'Client Inconnu'}</p>
-                          <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-black text-blue-600">{Number(client.total_spent).toLocaleString('fr-FR')} MAD</p>
-                        <p className="text-[10px] text-muted-foreground">{client.orders_count} commandes</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Top Cancelled Clients (Alert) */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500">
-              <CardHeader className="border-b border-border/50 bg-amber-500/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <UserX className="h-5 w-5 text-amber-500" />
-                      Clients à Risque
-                    </CardTitle>
-                    <CardDescription>Plus grand nombre d'annulations</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-4">
-                  {stats.super_admin.cancelled_clients.map((client: any) => (
-                    <div key={client.shipping_phone} className="flex items-center justify-between p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 transition-all hover:border-amber-500/30">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600 font-bold">
-                          {client.customer_name?.charAt(0) || 'C'}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold">{client.customer_name || 'Client Inconnu'}</p>
-                          <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="text-sm font-black text-amber-600">{client.cancellations_count}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase">Annulations</p>
-                        </div>
-                        <Button variant="ghost" size="icon" asChild className="h-8 w-8 rounded-full bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white transition-all">
-                          <a href={`tel:${client.shipping_phone}`}>
-                            <Phone className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 };
