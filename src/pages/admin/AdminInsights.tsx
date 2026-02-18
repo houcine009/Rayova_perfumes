@@ -182,26 +182,28 @@ const AdminInsights = () => {
             <div className="relative group rounded-3xl overflow-hidden border border-primary/20 bg-gradient-to-b from-primary/5 via-background to-background p-1">
                 <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,black)] pointer-events-none" />
 
-                <div className="relative bg-background/60 backdrop-blur-3xl rounded-[22px] p-6 sm:p-8">
+                <div className="relative bg-background/60 backdrop-blur-3xl rounded-[22px] p-4 sm:p-8">
                     <Tabs defaultValue="products" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 max-w-[800px] mb-8 bg-muted/40 p-1 border border-border/50">
-                            <TabsTrigger value="products" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
-                                <Package className="h-4 w-4" />
-                                Performances Produits
-                            </TabsTrigger>
-                            <TabsTrigger value="clients" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
-                                <LayoutDashboard className="h-4 w-4" />
-                                Profils Clients
-                            </TabsTrigger>
-                            <TabsTrigger value="reviews" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
-                                <Star className="h-4 w-4" />
-                                Avis Clients
-                            </TabsTrigger>
-                            <TabsTrigger value="growth" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
-                                <TrendingUp className="h-4 w-4" />
-                                Croissance
-                            </TabsTrigger>
-                        </TabsList>
+                        <div className="overflow-x-auto pb-4 mb-4 -mx-2 px-2 scrollbar-hide">
+                            <TabsList className="flex w-fit lg:grid lg:w-full lg:grid-cols-4 max-w-[800px] bg-muted/40 p-1 border border-border/50 rounded-xl">
+                                <TabsTrigger value="products" className="whitespace-nowrap gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-4 sm:px-6">
+                                    <Package className="h-4 w-4" />
+                                    Performances Produits
+                                </TabsTrigger>
+                                <TabsTrigger value="clients" className="whitespace-nowrap gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-4 sm:px-6">
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Profils Clients
+                                </TabsTrigger>
+                                <TabsTrigger value="reviews" className="whitespace-nowrap gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-4 sm:px-6">
+                                    <Star className="h-4 w-4" />
+                                    Avis Clients
+                                </TabsTrigger>
+                                <TabsTrigger value="growth" className="whitespace-nowrap gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all px-4 sm:px-6">
+                                    <TrendingUp className="h-4 w-4" />
+                                    Croissance
+                                </TabsTrigger>
+                            </TabsList>
+                        </div>
 
                         <TabsContent value="products" className="mt-0 space-y-8 animate-in fade-in-50 duration-500">
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

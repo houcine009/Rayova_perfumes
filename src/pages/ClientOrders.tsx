@@ -51,26 +51,34 @@ const ClientOrders = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50/50">
+        <div className="min-h-screen bg-[#0a0a0a] text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#1a1a1a_0%,#0a0a0a_100%)] pointer-events-none" />
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} 
+            />
             <div className="container mx-auto px-4 py-24 space-y-12">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div className="space-y-2">
-                        <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5 uppercase tracking-widest text-[10px]">Espace Client</Badge>
-                        <h1 className="text-4xl md:text-5xl font-playfair font-black text-foreground uppercase tracking-tight">
-                            Mes Commandes
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 relative">
+                    <div className="space-y-4">
+                        <Badge variant="outline" className="text-primary border-primary/40 bg-primary/10 uppercase tracking-[0.2em] text-[10px] font-black px-4 py-1">Espace Privé</Badge>
+                        <h1 className="text-5xl md:text-7xl font-playfair font-black text-white uppercase tracking-tighter leading-none">
+                            Mes <span className="text-primary italic">Commandes</span>
                         </h1>
-                        <p className="text-muted-foreground">Retrouvez l'historique de vos achats chez Rayova Luxury.</p>
+                        <p className="text-muted-foreground/80 font-medium text-lg max-w-xl border-l-2 border-primary/30 pl-6">
+                            L'excellence de la parfumerie Rayova, <br className="hidden sm:block" />
+                            retrouvez l'historique de vos acquisitions précieuses.
+                        </p>
                     </div>
                 </div>
 
                 {!orders || orders.length === 0 ? (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center py-24 space-y-6 bg-white rounded-3xl border border-border/50 shadow-sm"
+                        className="text-center py-32 space-y-8 bg-white/[0.02] backdrop-blur-3xl rounded-[40px] border border-white/10 shadow-3xl relative overflow-hidden group"
                     >
-                        <div className="h-24 w-24 bg-primary/5 rounded-full flex items-center justify-center mx-auto text-primary/40">
-                            <ShoppingBag className="h-12 w-12" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                        <div className="h-32 w-32 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary border border-primary/20 shadow-2xl shadow-primary/20 relative">
+                            <ShoppingBag className="h-14 w-14" />
                         </div>
                         <div className="space-y-2">
                             <h3 className="text-2xl font-bold italic font-serif">Vous n'avez pas encore de commandes</h3>
@@ -91,8 +99,8 @@ const ClientOrders = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.1 }}
                             >
-                                <Card className="overflow-hidden border-border/50 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-primary/5 group bg-white rounded-3xl">
-                                    <CardHeader className="border-b border-border/50 bg-slate-50/50 p-6 sm:p-8">
+                                <Card className="overflow-hidden border-white/10 hover:border-primary/40 transition-all duration-700 hover:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.8)] group bg-white/[0.03] backdrop-blur-3xl rounded-[32px] ring-1 ring-white/5">
+                                    <CardHeader className="border-b border-white/5 bg-white/[0.02] p-8 sm:p-10">
                                         <div className="flex flex-wrap items-center justify-between gap-4">
                                             <div className="flex items-center gap-6">
                                                 <div className="h-12 w-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
@@ -106,7 +114,7 @@ const ClientOrders = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Badge className={`px-4 py-1.5 rounded-full font-bold uppercase tracking-wider text-[10px] ${getStatusColor(order.status)}`}>
+                                            <Badge className={`px-6 py-2 rounded-full font-black uppercase tracking-[0.15em] text-[9px] border-none shadow-lg ${getStatusColor(order.status)}`}>
                                                 {getStatusLabel(order.status)}
                                             </Badge>
                                         </div>
@@ -118,11 +126,19 @@ const ClientOrders = () => {
                                                 <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground italic">Articles</h4>
                                                 <div className="space-y-3">
                                                     {order.items?.map((item: any) => (
-                                                        <div key={item.id} className="flex items-center gap-3">
-                                                            <div className="h-10 w-10 rounded-lg bg-slate-50 border border-border/30 flex-shrink-0" />
+                                                        <div key={item.id} className="flex items-center gap-5">
+                                                            <div className="h-14 w-14 rounded-xl bg-black/40 border border-white/10 flex-shrink-0 overflow-hidden shadow-inner group-hover:border-primary/30 transition-colors">
+                                                                {item.product?.media?.[0]?.url && (
+                                                                    <img 
+                                                                        src={`/storage/${item.product.media[0].url}`} 
+                                                                        alt={item.product_name}
+                                                                        className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                                                    />
+                                                                )}
+                                                            </div>
                                                             <div className="min-w-0">
-                                                                <p className="text-sm font-bold truncate">{item.product_name || 'Produit'}</p>
-                                                                <p className="text-[10px] text-muted-foreground">Qté: {item.quantity} × {Number(item.price).toFixed(2)} MAD</p>
+                                                                <p className="text-base font-bold text-white group-hover:text-primary transition-colors truncate">{item.product_name || 'Produit d\'exception'}</p>
+                                                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1">Qté: {item.quantity} × {Number(item.product_price).toLocaleString('fr-FR')} MAD</p>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -147,8 +163,8 @@ const ClientOrders = () => {
                                             <div className="flex flex-col justify-end items-end space-y-4">
                                                 <div className="text-right space-y-1">
                                                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total de la commande</p>
-                                                    <p className="text-3xl font-black text-primary font-serif italic tracking-tighter">
-                                                        {Number(order.total).toLocaleString('fr-FR')} MAD
+                                                    <p className="text-5xl font-black text-primary font-serif italic tracking-tighter shadow-primary/20 drop-shadow-2xl">
+                                                        {Number(order.total).toLocaleString('fr-FR')} <span className="text-2xl not-italic ml-1">MAD</span>
                                                     </p>
                                                     <p className="text-[10px] text-muted-foreground font-bold">Paiement à la livraison (COD)</p>
                                                 </div>

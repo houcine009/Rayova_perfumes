@@ -330,7 +330,7 @@ const AdminHome = () => {
 
         {/* Recent Operations */}
         <Card className="lg:col-span-2 rounded-3xl border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
-          <CardHeader className="bg-muted/30 border-b border-border/50 flex flex-row items-center justify-between">
+          <CardHeader className="bg-muted/30 border-b border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <CardTitle className="flex items-center gap-3 text-lg font-black tracking-tight uppercase">
                 <Clock className="h-5 w-5 text-primary" />
@@ -338,8 +338,8 @@ const AdminHome = () => {
               </CardTitle>
               <CardDescription className="uppercase text-[9px] tracking-widest font-black">Flux de commandes</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" asChild className="rounded-lg text-[10px] font-black uppercase border border-border/50 hover:bg-primary hover:text-white transition-all">
-              <Link to="/admin/commandes text-white">Archives</Link>
+            <Button variant="outline" size="sm" asChild className="rounded-lg text-[10px] font-black uppercase border-primary/20 hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/5">
+              <Link to="/admin/commandes">Archives</Link>
             </Button>
           </CardHeader>
           <CardContent className="p-0">
