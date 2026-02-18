@@ -17,6 +17,7 @@ import {
   Mail,
   MessageSquare,
   ShieldAlert,
+  TrendingUp,
 } from 'lucide-react';
 import logo from '@/assets/logo-rayova.png';
 
@@ -29,6 +30,7 @@ const adminNavItems = [
 ];
 
 const superAdminNavItems = [
+  { name: 'Intelligence', href: '/admin/insights', icon: TrendingUp },
   { name: 'Newsletter', href: '/admin/newsletter', icon: Mail },
   { name: 'Liste Noire', href: '/admin/blacklist', icon: ShieldAlert },
   { name: 'Utilisateurs', href: '/admin/utilisateurs', icon: Users },
