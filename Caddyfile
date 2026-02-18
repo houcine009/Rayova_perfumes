@@ -1,52 +1,72 @@
-# Frontend - Main domain with automatic HTTPS
+# Rayova Perfumes - Optimized Production Configuration
+
+# Frontend - Main domains with automatic HTTPS & Optimized SPA Routing
 rayovaparfums.com, www.rayovaparfums.com {
     root * /var/www/frontend
-    file_server
-    
-    # Handle React Router (SPA)
-    try_files {path} /index.html
-    
-    # Security headers
-    header {
-        X-Content-Type-Options nosniff
-        X-Frame-Options DENY
-        X-XSS-Protection "1; mode=block"
+    file_server {
+        precompressed zstd gzip
     }
     
-    # Compression (zstd is generally better/faster than gzip)
+    # Robust SPA Routing
+    try_files { path } { path }/ /index.html
+    
+    # Ultimate Security Headers
+    header {
+        # Prevent MIME type sniffing
+        X-Content-Type-Options nosniff
+        # Clickjacking protection
+        X-Frame-Options SAMEORIGIN
+        # XSS filtering
+        X-XSS-Protection "1; mode=block"
+        # Referrer Policy
+        Referrer-Policy no-referrer-when-downgrade
+        # HSTS (Enable after testing)
+        # Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+    
+    # Global compression
     encode zstd gzip
 
-    # Browser Caching
-    # Aggressive caching for fingerprinted assets (JS, CSS)
+    # Modern Asset Caching (Hashed assets)
     @static_hashed {
-        path_regexp \.(js|css|woff2|png|jpg|jpeg|gif|svg|ico|webp)$
+        path_regexp \.(js | css | woff2 | png | jpg | jpeg | gif | svg | ico | webp | avif)$
     }
     header @static_hashed {
         Cache-Control "public, max-age=31536000, immutable"
     }
 
-    # Moderate caching for other assets (videos, etc.)
+    # Media Asset Caching
     @static_media {
-        path_regexp \.(mp4|webm|mov|ogg)$
+        path_regexp \.(mp4 | webm | mov | ogg | mp3 | wav)$
     }
     header @static_media {
         Cache-Control "public, max-age=86400, must-revalidate"
     }
 }
 
-# Backend API - Subdomain with automatic HTTPS
+# Backend API - Secure Reverse Proxy
 api.rayovaparfums.com {
-    reverse_proxy backend:80
-    
-    # CORS headers
-    header {
-        Access-Control-Allow-Origin https://rayovaparfums.com
-        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-        Access-Control-Allow-Headers "Content-Type, Authorization, Accept"
-        Access-Control-Allow-Credentials true
+    reverse_proxy backend:80 {
+        # Passing real client IP and info
+        header_up Host { host }
+        header_up X-Real-IP { remote_host }
+        header_up X-Forwarded-Proto { scheme }
     }
     
-    # Handle preflight requests
+    # Advanced CORS (Supports both www and root domains)
+    @cors_origin header Origin {
+        regexp https:\/\/((www\.)?rayovaparfums\.com)
+    }
+    
+    header @cors_origin {
+        Access-Control-Allow-Origin { header.Origin }
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With, X-CSRF-TOKEN"
+        Access-Control-Allow-Credentials true
+        Access-Control-Max-Age 3600
+    }
+    
+    # Lean preflight handler
     @options method OPTIONS
     respond @options 204
 }

@@ -33,6 +33,21 @@ export interface DashboardStats {
         pending: number;
         approved: number;
     };
+    super_admin?: {
+        best_sellers: (Product & { sales_count: number })[];
+        worst_sellers: (Product & { sales_count: number })[];
+        best_clients: {
+            shipping_phone: string;
+            customer_name: string;
+            orders_count: number;
+            total_spent: number;
+        }[];
+        cancelled_clients: {
+            shipping_phone: string;
+            customer_name: string;
+            cancellations_count: number;
+        }[];
+    };
 }
 
 export const dashboardService = {
