@@ -91,7 +91,7 @@ class DashboardController extends Controller
                         });
                     }])
                     ->orderBy('sales_count', 'desc')
-                    ->limit(5)
+                    ->limit(20)
                     ->get(),
 
                 'worst_sellers' => Product::with(['media' => function($q) { $q->orderBy('is_primary', 'desc')->orderBy('display_order', 'asc'); }])
@@ -104,21 +104,21 @@ class DashboardController extends Controller
                         });
                     }])
                     ->orderBy('sales_count', 'asc')
-                    ->limit(5)
+                    ->limit(20)
                     ->get(),
 
                 'best_clients' => Order::select('shipping_phone', 'customer_name', \Illuminate\Support\Facades\DB::raw('count(*) as orders_count'), \Illuminate\Support\Facades\DB::raw('sum(total) as total_spent'))
                     ->where('status', 'delivered')
                     ->groupBy('shipping_phone', 'customer_name')
-                    ->orderBy('orders_count', 'desc')
-                    ->limit(5)
+                    ->orderBy('total_spent', 'desc')
+                    ->limit(20)
                     ->get(),
 
                 'cancelled_clients' => Order::select('shipping_phone', 'customer_name', \Illuminate\Support\Facades\DB::raw('count(*) as cancellations_count'))
                     ->where('status', 'cancelled')
                     ->groupBy('shipping_phone', 'customer_name')
                     ->orderBy('cancellations_count', 'desc')
-                    ->limit(5)
+                    ->limit(20)
                     ->get(),
             ];
         }

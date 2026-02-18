@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package,
   ShoppingCart,
@@ -17,6 +17,8 @@ import {
   UserCheck,
   UserX,
   Phone,
+  LayoutDashboard,
+  ShieldCheck,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
@@ -32,6 +34,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const statusLabels: Record<string, string> = {
   pending: 'En attente',
@@ -178,25 +182,227 @@ const AdminHome = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-12">
+      {/* 🚀 SUPER ADMIN STRATEGIC ANALYSIS SECTION (HIGH PRIORITY) */}
+      {isSuperAdmin && stats?.super_admin && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative group rounded-3xl overflow-hidden border border-primary/20 bg-gradient-to-b from-primary/10 via-background to-background p-1"
+        >
+          <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,black)] pointer-events-none" />
+
+          <div className="relative bg-background/60 backdrop-blur-3xl rounded-[22px] p-6 sm:p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary ring-1 ring-primary/30 shadow-2xl shadow-primary/20">
+                  <ShieldCheck className="h-8 w-8" />
+                </div>
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-playfair font-black text-foreground uppercase tracking-tight">
+                    Strategic Intelligence
+                  </h2>
+                  <p className="text-muted-foreground text-sm flex items-center gap-2">
+                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Analyse en temps réel du catalogue et de la clientèle
+                  </p>
+                </div>
+              </div>
+              <Badge variant="outline" className="w-fit h-fit px-4 py-1.5 border-primary/30 text-primary font-mono text-[10px] uppercase tracking-widest bg-primary/5">
+                Super Admin Access Only
+              </Badge>
+            </div>
+
+            <Tabs defaultValue="products" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-8 bg-muted/40 p-1 border border-border/50">
+                <TabsTrigger value="products" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+                  <Package className="h-4 w-4" />
+                  Performances Produits
+                </TabsTrigger>
+                <TabsTrigger value="clients" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+                  <Users className="h-4 w-4" />
+                  Profils Clients
+                </TabsTrigger>
+              </TabsList>
+
+              {/* 📊 TAB 1: PRODUCT PERFORMANCE (ALL 20 BEST/WORST) */}
+              <TabsContent value="products" className="mt-0 space-y-8 animate-in fade-in-50 duration-500">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  {/* BEST SELLERS (TOP 20) */}
+                  <Card className="border-border/50 bg-card/10 backdrop-blur-md overflow-hidden ring-1 ring-emerald-500/10">
+                    <CardHeader className="bg-emerald-500/5 border-b border-border/50 py-4">
+                      <CardTitle className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400">
+                        <TrendingUp className="h-6 w-6" />
+                        MEILLEURES VENTES (TOP 20)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="max-h-[600px] overflow-y-auto divide-y divide-border/20 custom-scrollbar">
+                        {stats.super_admin.best_sellers.map((product: any, idx: number) => (
+                          <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-emerald-500/5 transition-all group">
+                            <div className="relative h-14 w-14 flex-shrink-0 rounded-xl overflow-hidden border border-border/30 bg-muted">
+                              {product.media?.[0] ? (
+                                <img
+                                  src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
+                                  alt={product.name}
+                                  className="h-full w-full object-cover group-hover:scale-110 transition-all duration-500"
+                                />
+                              ) : <Package className="h-6 w-6 m-auto text-muted-foreground/30" />}
+                              <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all" />
+                              <div className="absolute top-0 left-0 bg-emerald-600 text-[9px] font-black text-white px-1.5 py-0.5 rounded-br-lg shadow">
+                                #{idx + 1}
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-sm text-foreground truncate group-hover:text-primary transition-colors">{product.name}</p>
+                              <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{Number(product.price).toFixed(2)} MAD</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xl font-black text-emerald-500 leading-none">{product.sales_count}</p>
+                              <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold mt-1">Livrés</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* WORST SELLERS (TOP 20) */}
+                  <Card className="border-border/50 bg-card/10 backdrop-blur-md overflow-hidden ring-1 ring-red-500/10">
+                    <CardHeader className="bg-red-500/5 border-b border-border/50 py-4">
+                      <CardTitle className="flex items-center gap-3 text-red-600 dark:text-red-400">
+                        <TrendingDown className="h-6 w-6" />
+                        POINTS MORTS (TOP 20)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="max-h-[600px] overflow-y-auto divide-y divide-border/20 custom-scrollbar">
+                        {stats.super_admin.worst_sellers.map((product: any, idx: number) => (
+                          <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-red-500/5 transition-all group">
+                            <div className="relative h-14 w-14 flex-shrink-0 rounded-xl overflow-hidden border border-border/30 bg-muted grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+                              {product.media?.[0] ? (
+                                <img
+                                  src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
+                                  alt={product.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : <Package className="h-6 w-6 m-auto text-muted-foreground/30" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-sm text-foreground truncate">{product.name}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className={`h-1.5 w-1.5 rounded-full ${product.stock_quantity < 5 ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`} />
+                                <p className="text-[10px] text-muted-foreground">Stock: {product.stock_quantity}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xl font-black text-red-500 leading-none">{product.sales_count}</p>
+                              <p className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold mt-1">Ventes</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* 👥 TAB 2: CLIENT INSIGHTS (ALL 20 BEST/CANCELLED) */}
+              <TabsContent value="clients" className="mt-0 space-y-8 animate-in fade-in-50 duration-500">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  {/* TOP CLIENTS (TOP 20) */}
+                  <Card className="border-border/50 bg-card/10 backdrop-blur-md overflow-hidden ring-1 ring-blue-500/10">
+                    <CardHeader className="bg-blue-500/5 border-b border-border/50 py-4">
+                      <CardTitle className="flex items-center gap-3 text-blue-600 dark:text-blue-400">
+                        <UserCheck className="h-6 w-6" />
+                        CLIENTS FIDÈLES (TOP 20)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="max-h-[600px] overflow-y-auto divide-y divide-border/20 custom-scrollbar">
+                        {stats.super_admin.best_clients.map((client: any, idx: number) => (
+                          <div key={client.shipping_phone} className="flex items-center justify-between p-4 hover:bg-blue-500/5 transition-all group">
+                            <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-600 font-black border border-blue-500/30">
+                                {client.customer_name?.charAt(0) || 'C'}
+                              </div>
+                              <div>
+                                <p className="font-bold text-sm text-foreground">{client.customer_name || 'Client Inconnu'}</p>
+                                <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-base font-black text-blue-600">{Number(client.total_spent).toLocaleString('fr-FR')} <span className="text-[10px] font-normal">MAD</span></p>
+                              <p className="text-[9px] text-muted-foreground uppercase">{client.orders_count} commandes livrées</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* AT-RISK CLIENTS (TOP 20) */}
+                  <Card className="border-border/50 bg-card/10 backdrop-blur-md overflow-hidden ring-1 ring-amber-500/10">
+                    <CardHeader className="bg-amber-500/5 border-b border-border/50 py-4">
+                      <CardTitle className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
+                        <UserX className="h-6 w-6" />
+                        CLIENTS À RISQUE (ANNULATIONS 20)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="max-h-[600px] overflow-y-auto divide-y divide-border/20 custom-scrollbar">
+                        {stats.super_admin.cancelled_clients.map((client: any, idx: number) => (
+                          <div key={client.shipping_phone} className="flex items-center justify-between p-4 hover:bg-amber-500/5 transition-all group">
+                            <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600 font-black border border-amber-500/30">
+                                {client.customer_name?.charAt(0) || 'C'}
+                              </div>
+                              <div>
+                                <p className="font-bold text-sm text-foreground">{client.customer_name || 'Client Inconnu'}</p>
+                                <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <div className="text-right">
+                                <p className="text-xl font-black text-amber-600 leading-none">{client.cancellations_count}</p>
+                                <p className="text-[9px] text-muted-foreground uppercase font-bold mt-1">Annulations</p>
+                              </div>
+                              <Button variant="ghost" size="icon" asChild className="h-9 w-9 rounded-full bg-amber-500/20 text-amber-600 hover:bg-amber-600 hover:text-white transition-all shadow-sm">
+                                <a href={`tel:${client.shipping_phone}`}>
+                                  <Phone className="h-4 w-4" />
+                                </a>
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </motion.div>
+      )}
+
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pt-4">
         <div>
-          <motion.h1
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-playfair font-bold text-foreground"
-          >
-            Tableau de bord
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-muted-foreground mt-1"
-          >
-            Bienvenue dans votre espace d'administration Rayova
-          </motion.p>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+              <LayoutDashboard className="h-5 w-5" />
+            </div>
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-3xl font-playfair font-black text-foreground tracking-tight"
+              >
+                Tableau de bord
+              </motion.h1>
+              <p className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Rayova Luxury Admin Panel</p>
+            </div>
+          </div>
         </div>
         <motion.div
           initial={{ opacity: 0, x: 20 }}
@@ -206,7 +412,7 @@ const AdminHome = () => {
         >
           <div className="flex flex-wrap items-center gap-3">
             <Select value={period} onValueChange={setPeriod}>
-              <SelectTrigger className="w-[140px] sm:w-[160px] bg-card/50 backdrop-blur-sm border-border/50">
+              <SelectTrigger className="w-[140px] sm:w-[160px] bg-card/50 backdrop-blur-sm border-border/50 rounded-xl font-bold text-xs uppercase tracking-wider">
                 <SelectValue placeholder="Période" />
               </SelectTrigger>
               <SelectContent>
@@ -218,466 +424,163 @@ const AdminHome = () => {
             </Select>
 
             {['day', 'month', 'year'].includes(period) && (
-              <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={handlePrev}
-                >
+              <div className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-1 shadow-sm">
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={handlePrev}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-xs sm:text-sm font-medium px-2 min-w-[100px] sm:min-w-[120px] text-center capitalize">
+                <span className="text-[10px] font-black px-2 min-w-[100px] sm:min-w-[120px] text-center capitalize tracking-tighter text-foreground/80">
                   {getLabel()}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  disabled={isFuture()}
-                  onClick={handleNext}
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" disabled={isFuture()} onClick={handleNext}>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             )}
           </div>
 
-          <Button asChild className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all">
+          <Button asChild className="w-full sm:w-auto shadow-xl hover:shadow-primary/20 transition-all rounded-xl border border-primary/20">
             <Link to="/admin/produits">
               <Package className="mr-2 h-4 w-4" />
-              Ajouter un produit
+              NOUVEAU PRODUIT
             </Link>
           </Button>
         </motion.div>
       </div>
 
-      {/* Super Admin Advanced Stats - MOVED TO TOP */}
-      {isSuperAdmin && stats?.super_admin && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="space-y-8"
-        >
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-border/50"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-background px-4 text-xs font-bold uppercase tracking-widest text-primary">
-                📊 Insights Stratégiques Super Admin
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            {/* Top Best Sellers */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-emerald-500/10">
-              <CardHeader className="border-b border-border/50 bg-emerald-500/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <TrendingUp className="h-5 w-5 text-emerald-500" />
-                      Meilleures Ventes
-                    </CardTitle>
-                    <CardDescription>Les 5 produits les plus performants</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/30">
-                  {stats.super_admin.best_sellers.map((product: any, idx: number) => (
-                    <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-emerald-500/5 transition-colors group">
-                      <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border border-border/50 bg-muted">
-                        {product.media && product.media[0] ? (
-                          <img
-                            src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
-                            alt={product.name}
-                            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-muted-foreground/30">
-                            <Package className="h-8 w-8" />
-                          </div>
-                        )}
-                        <div className="absolute top-0 left-0 bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg shadow-md">
-                          #{idx + 1}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">{product.name}</p>
-                        <p className="text-xs text-muted-foreground font-mono">{Number(product.price).toFixed(2)} MAD</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-emerald-500">{product.sales_count}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">Ventes</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Worst Sellers (Low Rotation) */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-red-500/10">
-              <CardHeader className="border-b border-border/50 bg-red-500/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <TrendingDown className="h-5 w-5 text-red-500" />
-                      Basse Rotation
-                    </CardTitle>
-                    <CardDescription>Produits avec peu d'engagement (Morts)</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/30">
-                  {stats.super_admin.worst_sellers.map((product: any) => (
-                    <div key={product.id} className="flex items-center gap-4 p-4 hover:bg-red-500/5 transition-colors group">
-                      <div className="relative h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border border-border/50 bg-muted">
-                        {product.media && product.media[0] ? (
-                          <img
-                            src={product.media[0].url.startsWith('http') ? product.media[0].url : `/storage/${product.media[0].url}`}
-                            alt={product.name}
-                            className="h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-muted-foreground/30">
-                            <Package className="h-8 w-8" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground truncate">{product.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`h-1.5 w-1.5 rounded-full ${product.stock_quantity < 5 ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`}></span>
-                          <p className="text-[10px] text-muted-foreground">Stock Actuel: {product.stock_quantity}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-red-500">{product.sales_count}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">Ventes</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Top Loyal Clients */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-blue-500/10">
-              <CardHeader className="border-b border-border/50 bg-blue-500/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <UserCheck className="h-5 w-5 text-blue-500" />
-                      Clients Fidèles
-                    </CardTitle>
-                    <CardDescription>Top contributeurs (Chiffre d'affaires)</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-4">
-                  {stats.super_admin.best_clients.map((client: any) => (
-                    <div key={client.shipping_phone} className="flex items-center justify-between p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 transition-all hover:border-blue-500/30">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-600 font-bold border border-blue-500/40">
-                          {client.customer_name?.charAt(0) || 'C'}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold">{client.customer_name || 'Client Inconnu'}</p>
-                          <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-black text-blue-600">{Number(client.total_spent).toLocaleString('fr-FR')} MAD</p>
-                        <p className="text-[10px] text-muted-foreground">{client.orders_count} commandes livrées</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Top Cancelled Clients (Alert) */}
-            <Card className="border-border/50 bg-card/30 backdrop-blur-md overflow-hidden hover:shadow-2xl transition-all duration-500 ring-1 ring-amber-500/10">
-              <CardHeader className="border-b border-border/50 bg-amber-500/5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-xl font-playfair uppercase tracking-wide">
-                      <UserX className="h-5 w-5 text-amber-500" />
-                      Clients à Risque
-                    </CardTitle>
-                    <CardDescription>Plus grand nombre d'annulations</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="space-y-4">
-                  {stats.super_admin.cancelled_clients.map((client: any) => (
-                    <div key={client.shipping_phone} className="flex items-center justify-between p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 transition-all hover:border-amber-500/30">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600 font-bold border border-amber-500/40">
-                          {client.customer_name?.charAt(0) || 'C'}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold">{client.customer_name || 'Client Inconnu'}</p>
-                          <p className="text-[10px] text-muted-foreground font-mono">{client.shipping_phone}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="text-sm font-black text-amber-600">{client.cancellations_count}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase">Annulations</p>
-                        </div>
-                        <Button variant="ghost" size="icon" asChild className="h-8 w-8 rounded-full bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white transition-all">
-                          <a href={`tel:${client.shipping_phone}`}>
-                            <Phone className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      {/* Main Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {mainStats.map((stat, index) => (
           <motion.div
             key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
+            transition={{ duration: 0.4, delay: index * 0.05 }}
           >
-            <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm h-full">
-              <div className={`absolute inset-0 ${stat.bg} opacity-5 group-hover:opacity-10 transition-opacity`} />
-              <CardContent className="relative p-4 sm:p-6 flex flex-col h-full justify-between min-h-[120px] sm:min-h-[140px]">
+            <Card className="group relative overflow-hidden hover:shadow-2xl transition-all duration-500 border-border/50 bg-card/50 backdrop-blur-sm h-full rounded-2xl ring-1 ring-border/5 border-none">
+              <div className={`absolute inset-0 ${stat.bg} opacity-10 group-hover:opacity-20 transition-opacity`} />
+              <CardContent className="relative p-5 flex flex-col h-full justify-between gap-6">
                 {statsLoading ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-10 w-32" />
                     <Skeleton className="h-3 w-20" />
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`p-2.5 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
-                        <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                    <div className="flex items-start justify-between">
+                      <div className={`p-3 rounded-xl ${stat.bg} ring-1 ring-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                        <stat.icon className={`h-6 w-6 ${stat.color}`} />
                       </div>
                       {stat.trend && (
-                        <span className={`flex items-center text-xs font-semibold px-2 py-1 rounded-full ${stat.trendUp ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
-                          {stat.trendUp ? <ArrowUpRight className="h-3 w-3 mr-0.5" /> : <ArrowDownRight className="h-3 w-3 mr-0.5" />}
+                        <span className="flex items-center text-[10px] font-black px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 uppercase tracking-widest">
+                          <ArrowUpRight className="h-3 w-3 mr-0.5" />
                           {stat.trend}
                         </span>
                       )}
                     </div>
                     <div>
-                      <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">{stat.title}</p>
-                      <div className="flex items-baseline gap-2">
-                        <p className="text-xl sm:text-2xl font-bold text-foreground">
-                          {stat.value}
-                        </p>
-                      </div>
-                      <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 sm:mt-1 font-medium">{stat.subValue}</p>
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider mb-2">{stat.title}</p>
+                      <p className="text-2xl font-black text-foreground tracking-tight break-words">
+                        {stat.value}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-1 font-bold italic opacity-60 uppercase">{stat.subValue}</p>
                     </div>
                   </>
                 )}
-                {stat.link && (
-                  <Link
-                    to={stat.link}
-                    className="absolute inset-0 z-10"
-                    aria-label={`Voir ${stat.title}`}
-                  />
-                )}
+                {stat.link && <Link to={stat.link} className="absolute inset-0 z-10" />}
               </CardContent>
             </Card>
           </motion.div>
         ))}
       </div>
 
-      {/* Order Pipeline & Recent Orders */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Order Pipeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                Pipeline des commandes
-              </CardTitle>
-              <CardDescription>
-                Répartition par statut
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {orderStats.map((stat) => (
-                  <div key={stat.label} className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{stat.label}</span>
-                      <span className="font-medium text-foreground">{stat.value}</span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${(stat.value / (stats?.orders.total || 1)) * 100}%` }}
-                        transition={{ duration: 0.8, delay: 0.5 }}
-                        className={`h-full ${stat.color} rounded-full`}
-                      />
-                    </div>
+      {/* Rest of the dashboard... */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Pipeline Analytics */}
+        <Card className="rounded-3xl border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
+          <CardHeader className="bg-muted/30 border-b border-border/50">
+            <CardTitle className="flex items-center gap-3 text-lg font-black tracking-tight">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              LOGISTIQUE
+            </CardTitle>
+            <CardDescription className="uppercase text-[9px] tracking-widest font-black">Répartition du flux</CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-6">
+              {orderStats.map((stat) => (
+                <div key={stat.label} className="space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-muted-foreground uppercase tracking-tighter">{stat.label}</span>
+                    <span className="text-foreground">{stat.value}</span>
                   </div>
-                ))}
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-border">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Ce mois</span>
-                  <span className="font-bold text-foreground">{stats?.orders.this_month || 0} commandes</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Recent Orders */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="lg:col-span-2"
-        >
-          <Card className="h-full">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Commandes récentes
-                </CardTitle>
-                <CardDescription>
-                  Les 10 dernières commandes
-                </CardDescription>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/admin/commandes">Voir tout</Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {ordersLoading ? (
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-24" />
-                      </div>
-                      <div className="space-y-2 text-right">
-                        <Skeleton className="h-4 w-20 ml-auto" />
-                        <Skeleton className="h-5 w-16 ml-auto" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : recentOrders?.length === 0 ? (
-                <div className="text-center py-12">
-                  <ShoppingCart className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Aucune commande pour le moment
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {recentOrders?.slice(0, 5).map((order, index) => (
+                  <div className="h-2.5 bg-muted/50 rounded-full overflow-hidden p-[2px]">
                     <motion.div
-                      key={order.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.6 + index * 0.05 }}
-                      className="flex items-center justify-between p-4 bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-lg ${statusColors[order.status] || 'bg-muted'}`}>
-                          {order.status === 'delivered' ? (
-                            <CheckCircle className="h-4 w-4" />
-                          ) : order.status === 'pending' ? (
-                            <Clock className="h-4 w-4" />
-                          ) : order.status === 'cancelled' ? (
-                            <AlertCircle className="h-4 w-4" />
-                          ) : (
-                            <ShoppingCart className="h-4 w-4" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground group-hover:text-primary transition-colors">
-                            {order.order_number}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(order.created_at).toLocaleDateString('fr-FR', {
-                              day: 'numeric',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-foreground">
-                          {Number(order.total).toLocaleString('fr-FR')} MAD
-                        </p>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[order.status] || 'bg-muted text-muted-foreground'}`}>
-                          {statusLabels[order.status] || order.status}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(stat.value / (stats?.orders.total || 1)) * 100}%` }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className={`h-full ${stat.color} rounded-full shadow-[0_0_10px_rgba(0,0,0,0.1)]`}
+                    />
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Quick Stats Footer */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-      >
-        <Card className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-none">
-          <CardContent className="py-4 sm:py-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
-              <div>
-                <p className="text-3xl font-bold text-primary">{stats?.products.featured || 0}</p>
-                <p className="text-sm text-muted-foreground">Produits vedettes</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-primary">{stats?.categories.active || 0}</p>
-                <p className="text-sm text-muted-foreground">Catégories actives</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-primary">{stats?.users.total || 0}</p>
-                <p className="text-sm text-muted-foreground">Utilisateurs</p>
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-primary">{stats?.products.low_stock || 0}</p>
-                <p className="text-sm text-muted-foreground">Stock faible</p>
-              </div>
+              ))}
+            </div>
+            <div className="mt-8 pt-6 border-t border-border/30 flex items-center justify-between">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Total Période</p>
+              <p className="text-lg font-black text-foreground">{stats?.orders.total || 0}</p>
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+
+        {/* Recent Operations */}
+        <Card className="lg:col-span-2 rounded-3xl border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
+          <CardHeader className="bg-muted/30 border-b border-border/50 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-3 text-lg font-black tracking-tight uppercase">
+                <Clock className="h-5 w-5 text-primary" />
+                Opérations Récentes
+              </CardTitle>
+              <CardDescription className="uppercase text-[9px] tracking-widest font-black">Flux de commandes</CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" asChild className="rounded-lg text-[10px] font-black uppercase border border-border/50 hover:bg-primary hover:text-white transition-all">
+              <Link to="/admin/commandes text-white">Archives</Link>
+            </Button>
+          </CardHeader>
+          <CardContent className="p-0">
+            {ordersLoading ? (
+              <div className="p-6 space-y-4">
+                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+              </div>
+            ) : recentOrders?.length === 0 ? (
+              <div className="p-12 text-center text-muted-foreground/30 font-black italic">No activity detected</div>
+            ) : (
+              <div className="divide-y divide-border/20">
+                {recentOrders?.slice(0, 6).map((order, index) => (
+                  <motion.div
+                    key={order.id}
+                    className="flex items-center justify-between p-4 px-6 hover:bg-primary/5 transition-all group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-5">
+                      <div className={`h-11 w-11 rounded-xl flex items-center justify-center shadow-inner ${statusColors[order.status] || 'bg-muted'}`}>
+                        <ShoppingCart className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-black text-sm tracking-tight text-foreground group-hover:text-primary transition-colors">{order.order_number}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground opacity-60 uppercase">{new Date(order.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-black text-sm text-foreground">{Number(order.total).toLocaleString()} MAD</p>
+                      <Badge variant="outline" className={`mt-1 h-5 px-3 uppercase text-[8px] font-black border-none shadow-sm ${statusColors[order.status]}`}>
+                        {statusLabels[order.status]}
+                      </Badge>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
