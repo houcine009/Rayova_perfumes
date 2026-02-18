@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
 
+        // API rate limiting: 60 requests per minute per user/IP
+        $middleware->throttleApi('60,1');
+
         $middleware->validateCsrfTokens(except: [
             'submit-opinion',
         ]);

@@ -478,15 +478,17 @@ const AdminInsights = () => {
                                 <CardContent className="p-6">
                                     <div className="h-[300px] w-full flex items-end justify-between gap-1 sm:gap-2 pt-10 px-2 lg:px-10">
                                         {userStats?.trend?.map((day: any) => {
-                                            const height = (day.count / Math.max(...userStats.trend.map((d: any) => d.count), 1)) * 100;
+                                            const maxCount = Math.max(...userStats.trend.map((d: any) => d.count), 1);
+                                            const height = day.count > 0 ? Math.max((day.count / maxCount) * 100, 8) : 3;
                                             return (
                                                 <div key={day.date} className="group relative flex-1">
                                                     <motion.div
                                                         initial={{ height: 0 }}
                                                         animate={{ height: `${height}%` }}
-                                                        className="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg relative"
+                                                        transition={{ duration: 0.5, delay: 0.01 * userStats.trend.indexOf(day) }}
+                                                        className={`w-full ${day.count > 0 ? 'bg-primary/40 hover:bg-primary' : 'bg-primary/10 hover:bg-primary/20'} transition-all rounded-t-lg relative`}
                                                     >
-                                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                                             {day.count}
                                                         </div>
                                                     </motion.div>

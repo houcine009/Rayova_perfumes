@@ -60,7 +60,7 @@ const ClientOrders = () => {
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}
             />
-            <div className="container mx-auto px-4 py-24 space-y-12 relative">
+            <div className="container mx-auto px-4 py-24 space-y-12 relative z-10">
                 <div className="flex flex-col gap-8 relative">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
@@ -109,7 +109,7 @@ const ClientOrders = () => {
                                 Découvrez nos collections exclusives et trouvez votre prochaine signature olfactive.
                             </p>
                         </div>
-                        <Button onClick={() => { window.location.href = '/boutique'; }} size="lg" className="rounded-full px-8">
+                        <Button onClick={() => { window.location.href = '/boutique'; }} size="lg" className="rounded-full px-8 relative z-20">
                             Explorer la boutique
                         </Button>
                     </motion.div>

@@ -168,6 +168,25 @@ class UserController extends Controller
             }
         }
 
+        // Build full 30-day trend (fill in days with 0 signups)
+        $trendRaw = User::where('role', 'user')
+            ->where('created_at', '>=', now()->subDays(30))
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->pluck('count', 'date')
+            ->toArray();
+
+        $trend = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $trend[] = [
+                'date' => $date,
+                'count' => $trendRaw[$date] ?? 0,
+            ];
+        }
+
         $stats = [
             'total' => (clone $query)->count(),
             'users' => (clone $query)->where('role', 'user')->count(),
@@ -175,12 +194,7 @@ class UserController extends Controller
             'super_admins' => (clone $query)->where('role', 'super_admin')->count(),
             'today' => User::whereDate('created_at', today())->count(),
             'this_month' => User::whereMonth('created_at', now()->month)->count(),
-            'trend' => User::where('role', 'user')
-                ->where('created_at', '>=', now()->subDays(30))
-                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get(),
+            'trend' => $trend,
         ];
 
         return response()->json(['data' => $stats]);
