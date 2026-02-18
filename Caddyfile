@@ -11,8 +11,6 @@
         X-XSS-Protection "1; mode=block"
         # Referrer Policy
         Referrer-Policy no-referrer-when-downgrade
-        # HSTS (Enable ONLY after HTTPS is verified)
-        # Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     }
 }
 
@@ -51,7 +49,7 @@ rayovaparfums.com {
 
 # 3. Backend API - Secure Proxy
 api.rayovaparfums.com {
-    # Proxy to backend container (Adjust port to 8000 if using artisan serve)
+    # Proxy to backend container
     reverse_proxy backend:80 {
         header_up Host { host }
         header_up X-Real-IP { remote_host }
@@ -62,9 +60,7 @@ api.rayovaparfums.com {
     import security_headers
 
     # Professional CORS - Matches Origins dynamically
-    @cors_origin header Origin {
-        regexp https:\/\/((www\.)?rayovaparfums\.com)
-    }
+    @cors_origin header Origin regexp https:\/\/((www\.)?rayovaparfums\.com)
     
     handle @cors_origin {
         header {
