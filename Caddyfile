@@ -2,7 +2,7 @@
 
 # 1. SEO: Redirect www to non-www
 www.rayovaparfums.com {
-    redir https://rayovaparfums.com { uri }
+    redir https://rayovaparfums.com{uri}
 }
 
 # 2. Principal Frontend - SPA
@@ -28,7 +28,7 @@ rayovaparfums.com {
     }
     
     handle {
-        try_files { path } /index.html
+        try_files {path} /index.html
         file_server
     }
 
@@ -41,9 +41,9 @@ rayovaparfums.com {
 # 3. Backend API
 api.rayovaparfums.com {
     reverse_proxy backend:80 {
-        header_up Host { host }
-        header_up X-Real-IP { remote_host }
-        header_up X-Forwarded-Proto { scheme }
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-Proto {scheme}
     }
     
     encode zstd gzip
@@ -60,7 +60,7 @@ api.rayovaparfums.com {
     
     handle @cors_origin {
         header {
-            Access-Control-Allow-Origin { http.request.header.Origin }
+            Access-Control-Allow-Origin {http.request.header.Origin}
             Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
             Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With, X-CSRF-TOKEN"
             Access-Control-Allow-Credentials true
