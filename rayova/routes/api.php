@@ -65,6 +65,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
 
+    // User reviews
+    Route::post('/reviews', [ReviewController::class, 'store']);
+
     // Admin routes
     Route::middleware('admin')->prefix('admin')->group(function () {
         // Dashboard
@@ -113,8 +116,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/users/stats', [UserController::class, 'stats']);
             Route::get('/users/{id}', [UserController::class, 'show']);
             Route::post('/users', [UserController::class, 'store']);
+            Route::get('/users/stats', [UserController::class, 'stats']);
             Route::put('/users/{id}/role', [UserController::class, 'updateRole']);
             Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+            Route::get('/reviews/stats', [ReviewController::class, 'stats']);
 
             // Settings management
             Route::put('/settings/{key}', [SettingsController::class, 'update']);

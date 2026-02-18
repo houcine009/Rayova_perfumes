@@ -175,6 +175,12 @@ class UserController extends Controller
             'super_admins' => (clone $query)->where('role', 'super_admin')->count(),
             'today' => User::whereDate('created_at', today())->count(),
             'this_month' => User::whereMonth('created_at', now()->month)->count(),
+            'trend' => User::where('role', 'user')
+                ->where('created_at', '>=', now()->subDays(30))
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get(),
         ];
 
         return response()->json(['data' => $stats]);

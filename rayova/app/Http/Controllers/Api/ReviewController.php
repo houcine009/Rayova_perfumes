@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
@@ -64,7 +65,11 @@ class ReviewController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        return $this->processSubmission($request, $request->user());
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Veuillez vous connecter pour laisser un avis'], 401);
+        }
+        return $this->processSubmission($request, $user);
     }
 
 
@@ -92,8 +97,8 @@ class ReviewController extends Controller
             $validated['user_id'] = $user->id;
         }
 
-        // Manual Moderation: All reviews from guests or non-admin users must be approved
-        $validated['is_approved'] = ($user && $user->isAdmin()) ? true : false;
+        // Auto-Approval: Reviews are now visible immediately
+        $validated['is_approved'] = true;
 
         $review = Review::create($validated);
 
@@ -146,6 +151,32 @@ class ReviewController extends Controller
 
         return response()->json([
             'message' => 'Avis supprimé',
+        ]);
+    }
+
+    public function stats(Request $request): JsonResponse
+    {
+        $bestRatedProducts = Review::select('product_id', DB::raw('AVG(rating) as avg_rating'), DB::raw('COUNT(*) as reviews_count'))
+            ->approved()
+            ->groupBy('product_id')
+            ->with('product.media')
+            ->orderBy('avg_rating', 'desc')
+            ->orderBy('reviews_count', 'desc')
+            ->take(20)
+            ->get();
+
+        $mostCommentedProducts = Review::select('product_id', DB::raw('COUNT(*) as reviews_count'))
+            ->groupBy('product_id')
+            ->with('product.media')
+            ->orderBy('reviews_count', 'desc')
+            ->take(20)
+            ->get();
+
+        return response()->json([
+            'data' => [
+                'best_rated' => $bestRatedProducts,
+                'most_commented' => $mostCommentedProducts,
+            ]
         ]);
     }
 }

@@ -188,6 +188,10 @@ export function Navbar() {
                       {user.email}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/mes-commandes")}>
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      Mes Commandes
+                    </DropdownMenuItem>
                     {isAdmin && (
                       <DropdownMenuItem onClick={() => navigate("/admin")}>
                         <Settings className="mr-2 h-4 w-4" />
@@ -279,6 +283,14 @@ export function Navbar() {
 
                 {user ? (
                   <div className="flex flex-col gap-4">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => navigate("/mes-commandes")}
+                    >
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      Mes Commandes
+                    </Button>
                     {isAdmin && (
                       <Button
                         variant="outline"

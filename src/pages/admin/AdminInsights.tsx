@@ -11,7 +11,9 @@ import {
     ChevronLeft,
     ChevronRight,
     LayoutDashboard,
+    Star,
 } from 'lucide-react';
+import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
     Select,
@@ -51,6 +53,22 @@ const AdminInsights = () => {
                 period === 'year' || period === 'month' ? date.getFullYear() : undefined
             );
             return rowStats.data;
+        },
+    });
+
+    const { data: userStats, isLoading: userStatsLoading } = useQuery({
+        queryKey: ['admin-user-stats'],
+        queryFn: async () => {
+            const response = await api.get<any>('/admin/users/stats');
+            return response.data;
+        },
+    });
+
+    const { data: reviewStats, isLoading: reviewStatsLoading } = useQuery({
+        queryKey: ['admin-review-stats'],
+        queryFn: async () => {
+            const response = await api.get<any>('/admin/reviews/stats');
+            return response.data;
         },
     });
 
@@ -95,7 +113,9 @@ const AdminInsights = () => {
         return "";
     };
 
-    if (statsLoading) {
+    const isPageLoading = statsLoading || userStatsLoading || reviewStatsLoading;
+
+    if (isPageLoading) {
         return (
             <div className="space-y-8">
                 <div className="flex flex-col gap-4">
@@ -164,7 +184,7 @@ const AdminInsights = () => {
 
                 <div className="relative bg-background/60 backdrop-blur-3xl rounded-[22px] p-6 sm:p-8">
                     <Tabs defaultValue="products" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-8 bg-muted/40 p-1 border border-border/50">
+                        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 max-w-[800px] mb-8 bg-muted/40 p-1 border border-border/50">
                             <TabsTrigger value="products" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
                                 <Package className="h-4 w-4" />
                                 Performances Produits
@@ -172,6 +192,14 @@ const AdminInsights = () => {
                             <TabsTrigger value="clients" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
                                 <LayoutDashboard className="h-4 w-4" />
                                 Profils Clients
+                            </TabsTrigger>
+                            <TabsTrigger value="reviews" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+                                <Star className="h-4 w-4" />
+                                Avis Clients
+                            </TabsTrigger>
+                            <TabsTrigger value="growth" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
+                                <TrendingUp className="h-4 w-4" />
+                                Croissance
                             </TabsTrigger>
                         </TabsList>
 
@@ -326,6 +354,149 @@ const AdminInsights = () => {
                                     </CardContent>
                                 </Card>
                             </div>
+                        </TabsContent>
+
+                        <TabsContent value="reviews" className="mt-0 space-y-8 animate-in fade-in-50 duration-500">
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                                {/* BEST RATED */}
+                                <Card className="border-border/50 bg-card/10 backdrop-blur-md overflow-hidden ring-1 ring-amber-500/10">
+                                    <CardHeader className="bg-amber-500/5 border-b border-border/50 py-4">
+                                        <CardTitle className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
+                                            <Star className="h-6 w-6 fill-amber-500/20" />
+                                            MEILLEURES NOTES (TOP 20)
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-0">
+                                        <div className="max-h-[700px] overflow-y-auto divide-y divide-border/20 custom-scrollbar">
+                                            {reviewStats?.best_rated?.map((item: any) => (
+                                                <div key={item.product_id} className="flex items-center justify-between p-4 hover:bg-amber-500/5 transition-all group">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border/30">
+                                                            {item.product?.media?.[0] ? (
+                                                                <img
+                                                                    src={getProductImageUrl(item.product.media[0].url)}
+                                                                    alt={item.product.name}
+                                                                    className="h-full w-full object-cover"
+                                                                />
+                                                            ) : <Package className="h-5 w-5 m-auto text-muted-foreground/30" />}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-sm text-foreground truncate max-w-[150px]">{item.product?.name || 'Produit Inconnu'}</p>
+                                                            <div className="flex items-center gap-1">
+                                                                {[1, 2, 3, 4, 5].map((s) => (
+                                                                    <Star key={s} className={`h-2.5 w-2.5 ${s <= Math.round(item.avg_rating) ? 'text-amber-500 fill-amber-500' : 'text-muted-foreground/20'}`} />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-lg font-black text-amber-500Leading-none">{Number(item.avg_rating).toFixed(1)}</p>
+                                                        <p className="text-[9px] text-muted-foreground uppercase font-bold">{item.reviews_count} avis</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* MOST COMMENTED */}
+                                <Card className="border-border/50 bg-card/10 backdrop-blur-md overflow-hidden ring-1 ring-purple-500/10">
+                                    <CardHeader className="bg-purple-500/5 border-b border-border/50 py-4">
+                                        <CardTitle className="flex items-center gap-3 text-purple-600 dark:text-purple-400">
+                                            <LayoutDashboard className="h-6 w-6" />
+                                            LES PLUS COMMENTÉS (TOP 20)
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-0">
+                                        <div className="max-h-[700px] overflow-y-auto divide-y divide-border/20 custom-scrollbar">
+                                            {reviewStats?.most_commented?.map((item: any) => (
+                                                <div key={item.product_id} className="flex items-center justify-between p-4 hover:bg-purple-500/5 transition-all group">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-border/30">
+                                                            {item.product?.media?.[0] ? (
+                                                                <img
+                                                                    src={getProductImageUrl(item.product.media[0].url)}
+                                                                    alt={item.product.name}
+                                                                    className="h-full w-full object-cover"
+                                                                />
+                                                            ) : <Package className="h-5 w-5 m-auto text-muted-foreground/30" />}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-sm text-foreground truncate max-w-[150px]">{item.product?.name || 'Produit Inconnu'}</p>
+                                                            <p className="text-[10px] text-muted-foreground italic truncate max-w-[150px]">{item.product?.brand || 'Rayova'}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-lg font-black text-purple-500 leading-none">{item.reviews_count}</p>
+                                                        <p className="text-[9px] text-muted-foreground uppercase font-bold">Contributions</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </TabsContent>
+                        <TabsContent value="growth" className="mt-0 space-y-8 animate-in fade-in-50 duration-500">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <Card className="border-border/50 bg-card/10 backdrop-blur-md">
+                                    <CardHeader>
+                                        <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Total Comptes</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-4xl font-black text-primary font-serif italic">{userStats?.total || 0}</p>
+                                    </CardContent>
+                                </Card>
+                                <Card className="border-border/50 bg-card/10 backdrop-blur-md">
+                                    <CardHeader>
+                                        <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Inscriptions Aujourd'hui</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-4xl font-black text-primary font-serif italic">{userStats?.today || 0}</p>
+                                    </CardContent>
+                                </Card>
+                                <Card className="border-border/50 bg-card/10 backdrop-blur-md">
+                                    <CardHeader>
+                                        <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Ce Mois</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-4xl font-black text-primary font-serif italic">{userStats?.this_month || 0}</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            <Card className="border-border/50 bg-card/10 backdrop-blur-md overflow-hidden">
+                                <CardHeader className="bg-primary/5 border-b border-border/50">
+                                    <CardTitle className="flex items-center gap-3 text-primary">
+                                        <TrendingUp className="h-6 w-6" />
+                                        CROISSANCE DES COMPTES (DERNIERS 30 JOURS)
+                                    </CardTitle>
+                                    <CardDescription>Évolution journalière des nouvelles créations de comptes clients.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-6">
+                                    <div className="h-[300px] w-full flex items-end justify-between gap-1 sm:gap-2 pt-10 px-2 lg:px-10">
+                                        {userStats?.trend?.map((day: any) => {
+                                            const height = (day.count / Math.max(...userStats.trend.map((d: any) => d.count), 1)) * 100;
+                                            return (
+                                                <div key={day.date} className="group relative flex-1">
+                                                    <motion.div
+                                                        initial={{ height: 0 }}
+                                                        animate={{ height: `${height}%` }}
+                                                        className="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg relative"
+                                                    >
+                                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] font-black px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            {day.count}
+                                                        </div>
+                                                    </motion.div>
+                                                    <div className="mt-2 text-[8px] sm:text-[10px] text-muted-foreground font-medium -rotate-45 sm:rotate-0 origin-right sm:text-center truncate w-full">
+                                                        {new Date(day.date).getDate()}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </TabsContent>
                     </Tabs>
                 </div>

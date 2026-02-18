@@ -4,8 +4,10 @@ import { Star, MessageSquare, Send, CheckCircle2, AlertCircle } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { useProductReviews, useCreateReview } from '@/hooks/useReviews';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 interface ReviewSectionProps {
@@ -22,6 +24,7 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
     const [name, setName] = useState('');
     const [comment, setComment] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -138,24 +141,55 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                             Écrire un autre avis
                                         </Button>
                                     </motion.div>
+                                ) : !user ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="text-center py-10 space-y-6 bg-primary/5 rounded-2xl border border-primary/10 px-6"
+                                    >
+                                        <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
+                                            <Star className="h-8 w-8 fill-primary" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h4 className="font-bold text-lg">Votre avis nous est précieux</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Inscrivez-vous ou connectez-vous pour partager votre avis sur ce parfum d'exception.
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col gap-3">
+                                            <Button
+                                                onClick={() => navigate('/auth?mode=login')}
+                                                className="w-full"
+                                            >
+                                                Se Connecter
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => navigate('/auth?mode=register')}
+                                                className="w-full"
+                                            >
+                                                S'Inscrire
+                                            </Button>
+                                        </div>
+                                    </motion.div>
                                 ) : (
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-3">
-                                            <label className="text-sm font-medium">Votre note</label>
-                                            <div className="flex gap-2">
-                                                {[1, 2, 3, 4, 5].map((s) => (
+                                            <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground italic">Votre Note</Label>
+                                            <div className="flex gap-2 p-4 bg-primary/5 rounded-2xl border border-primary/10 w-fit">
+                                                {[1, 2, 3, 4, 5].map((star) => (
                                                     <button
-                                                        key={s}
+                                                        key={star}
                                                         type="button"
-                                                        onMouseEnter={() => setHoverRating(s)}
+                                                        onClick={() => setRating(star)}
+                                                        onMouseEnter={() => setHoverRating(star)}
                                                         onMouseLeave={() => setHoverRating(0)}
-                                                        onClick={() => setRating(s)}
-                                                        className="transition-transform active:scale-90"
+                                                        className="transition-all hover:scale-125 focus:outline-none"
                                                     >
                                                         <Star
-                                                            className={`h-8 w-8 transition-colors ${s <= (hoverRating || rating)
-                                                                ? 'text-amber-400 fill-amber-400'
-                                                                : 'text-border fill-transparent'
+                                                            className={`h-8 w-8 transition-colors ${star <= (hoverRating || rating)
+                                                                ? 'fill-primary text-primary'
+                                                                : 'text-muted-foreground/30'
                                                                 }`}
                                                         />
                                                     </button>
@@ -163,23 +197,13 @@ export function ReviewSection({ productId }: ReviewSectionProps) {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium">Votre Nom / Pseudo (Optionnel)</label>
-                                            <Input
-                                                placeholder="Laissez vide pour rester anonyme"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                className="bg-background/50 border-border focus:border-primary"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium">Votre commentaire</label>
+                                        <div className="space-y-3">
+                                            <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground italic">Votre Témoignage</Label>
                                             <Textarea
-                                                placeholder="Qu'avez-vous pensé de la fragrance, de sa tenue et de son sillage ?"
+                                                placeholder="Partagez votre expérience avec cette fragrance..."
                                                 value={comment}
                                                 onChange={(e) => setComment(e.target.value)}
-                                                className="min-h-[120px] bg-background/50 border-border focus:border-primary resize-none"
+                                                className="min-h-[150px] bg-slate-50/50 border-border/50 rounded-2xl focus:ring-primary/20 transition-all text-base leading-relaxed"
                                                 required
                                             />
                                         </div>

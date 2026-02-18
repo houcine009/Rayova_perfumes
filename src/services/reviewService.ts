@@ -56,10 +56,7 @@ export const reviewService = {
     },
 
     async create(data: ReviewCreateData): Promise<{ data: Review; message: string }> {
-        // Use the clean GuestFeedbackController route
-        const token = localStorage.getItem('auth_token');
-        const endpoint = token ? '/reviews' : '/feedback';
-        return api.post(endpoint, data);
+        return api.post('/reviews', data);
     },
 
     async approve(id: string): Promise<{ data: Review; message: string }> {
