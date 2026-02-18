@@ -358,7 +358,7 @@ export function Navbar() {
                   </div>
                 ) : (
                   <Button
-                    variant="primary"
+                    variant="default"
                     className="w-full"
                     onClick={() => navigate("/auth")}
                   >
