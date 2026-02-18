@@ -59,7 +59,7 @@ const AdminUsers = () => {
   const [addAdminRole, setAddAdminRole] = useState<'admin' | 'super_admin'>('admin');
   const [isAdding, setIsAdding] = useState(false);
 
-  const { data: users, isLoading, refetch } = useAdminUsers({ 
+  const { data: users, isLoading, refetch } = useAdminUsers({
     search: search === '' ? undefined : search,
     period: period === 'all' ? undefined : period
   });
@@ -243,56 +243,75 @@ const AdminUsers = () => {
             </p>
           ) : (
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Rôle</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+              <TableHeader className="bg-muted/50">
+                <TableRow className="hover:bg-transparent border-border/50">
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest p-4 text-foreground/70">Utilisateur</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest p-4 text-foreground/70">Email</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest p-4 text-foreground/70">Téléphone</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest p-4 text-foreground/70">Date Inscription</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest p-4 text-foreground/70">Rôle</TableHead>
+                  <TableHead className="text-right text-[10px] font-black uppercase tracking-widest p-4 text-foreground/70">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers?.map((user) => {
-                  const currentRole = user.role;
+                {filteredUsers.map((user) => {
+                  const currentRole = user.role as AppRole;
                   return (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          {currentRole === 'super_admin' ? (
-                            <ShieldCheck className="h-4 w-4 text-primary" />
-                          ) : (
-                            <Shield className="h-4 w-4 text-muted-foreground" />
-                          )}
-                          {user.profile?.first_name} {user.profile?.last_name}
+                    <TableRow key={user.id} className="border-border/40 hover:bg-muted/30 transition-colors">
+                      <TableCell className="font-medium p-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center shadow-inner ${currentRole === 'super_admin' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-muted-foreground border border-border'}`}>
+                            {currentRole === 'super_admin' ? (
+                              <ShieldCheck className="h-5 w-5" />
+                            ) : (
+                              <Shield className="h-5 w-5" />
+                            )}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-black text-sm tracking-tight text-foreground uppercase">{user.profile?.first_name} {user.profile?.last_name || user.name}</span>
+                            <span className="text-[9px] text-muted-foreground font-black tracking-widest uppercase opacity-60">ID: {user.id.toString().substring(0, 8)}</span>
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
+                      <TableCell className="p-4">
+                        <span className="text-xs font-bold text-foreground/80">{user.email}</span>
+                      </TableCell>
+                      <TableCell className="p-4">
+                        <span className="text-xs font-mono text-primary font-black tracking-wider">
+                          {user.profile?.phone || <span className="text-muted-foreground/30 italic font-medium">N/A</span>}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-4">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                          {new Date(user.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-4">
                         <Select
                           value={currentRole}
-                          onValueChange={(value: AppRole) =>
-                            handleRoleChange(user.id.toString(), value)
-                          }
+                          onValueChange={(value: AppRole) => handleRoleChange(user.id.toString(), value)}
                         >
-                          <SelectTrigger className="w-[140px]">
+                          <SelectTrigger className="w-[140px] bg-background/50 border-border/50 rounded-xl h-9 font-black text-[9px] uppercase tracking-widest hover:bg-background transition-all">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="super_admin">Super Admin</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="user">Utilisateur</SelectItem>
+                          <SelectContent className="rounded-xl border-border/50 shadow-2xl backdrop-blur-xl bg-popover/80">
+                            <SelectItem value="super_admin" className="font-black text-[9px] uppercase tracking-widest text-primary">Super Admin</SelectItem>
+                            <SelectItem value="admin" className="font-black text-[9px] uppercase tracking-widest">Admin</SelectItem>
+                            <SelectItem value="user" className="font-black text-[9px] uppercase tracking-widest">Utilisateur</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive"
-                          onClick={() => setRemoveUserId(user.id.toString())}
-                        >
-                          <UserMinus className="h-4 w-4" />
-                        </Button>
+                      <TableCell className="text-right p-4">
+                        {user.role !== 'super_admin' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive rounded-xl transition-all h-9 w-9"
+                            onClick={() => setRemoveUserId(user.id.toString())}
+                          >
+                            <UserMinus className="h-4 w-4" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
@@ -322,7 +341,7 @@ const AdminUsers = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </div >
   );
 };
 

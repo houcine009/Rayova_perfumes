@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
-import { ShoppingBag, Package, Truck, Calendar, ArrowRight, Star } from 'lucide-react';
+import { ShoppingBag, Package, Truck, Calendar, ArrowRight, ArrowLeft, Star } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -31,6 +31,7 @@ const getStatusLabel = (status: string) => {
 };
 
 const ClientOrders = () => {
+    const navigate = useNavigate();
     const { data: orders, isLoading } = useQuery({
         queryKey: ['client-orders'],
         queryFn: async () => {
@@ -53,20 +54,39 @@ const ClientOrders = () => {
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-white">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#1a1a1a_0%,#0a0a0a_100%)] pointer-events-none" />
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} 
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}
             />
-            <div className="container mx-auto px-4 py-24 space-y-12">
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 relative">
-                    <div className="space-y-4">
-                        <Badge variant="outline" className="text-primary border-primary/40 bg-primary/10 uppercase tracking-[0.2em] text-[10px] font-black px-4 py-1">Espace Privé</Badge>
-                        <h1 className="text-5xl md:text-7xl font-playfair font-black text-white uppercase tracking-tighter leading-none">
-                            Mes <span className="text-primary italic">Commandes</span>
-                        </h1>
-                        <p className="text-muted-foreground/80 font-medium text-lg max-w-xl border-l-2 border-primary/30 pl-6">
-                            L'excellence de la parfumerie Rayova, <br className="hidden sm:block" />
-                            retrouvez l'historique de vos acquisitions précieuses.
-                        </p>
+            <div className="container mx-auto px-4 py-24 space-y-12 relative">
+                <div className="flex flex-col gap-8 relative">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                    >
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(-1)}
+                            className="text-muted-foreground hover:text-primary gap-2 p-0 h-auto hover:bg-transparent transition-all group"
+                        >
+                            <div className="h-8 w-8 rounded-full border border-white/10 flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/10 transition-all">
+                                <ArrowLeft className="h-4 w-4" />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Retour</span>
+                        </Button>
+                    </motion.div>
+
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div className="space-y-4">
+                            <Badge variant="outline" className="text-primary border-primary/40 bg-primary/10 uppercase tracking-[0.2em] text-[10px] font-black px-4 py-1">Espace Privé</Badge>
+                            <h1 className="text-5xl md:text-7xl font-playfair font-black text-white uppercase tracking-tighter leading-none">
+                                Mes <span className="text-primary italic">Commandes</span>
+                            </h1>
+                            <p className="text-muted-foreground/80 font-medium text-lg max-w-xl border-l-2 border-primary/30 pl-6">
+                                L'excellence de la parfumerie Rayova, <br className="hidden sm:block" />
+                                retrouvez l'historique de vos acquisitions précieuses.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -129,10 +149,10 @@ const ClientOrders = () => {
                                                         <div key={item.id} className="flex items-center gap-5">
                                                             <div className="h-14 w-14 rounded-xl bg-black/40 border border-white/10 flex-shrink-0 overflow-hidden shadow-inner group-hover:border-primary/30 transition-colors">
                                                                 {item.product?.media?.[0]?.url && (
-                                                                    <img 
-                                                                        src={`/storage/${item.product.media[0].url}`} 
+                                                                    <img
+                                                                        src={`/storage/${item.product.media[0].url}`}
                                                                         alt={item.product_name}
-                                                                        className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                                                                        className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                                                                     />
                                                                 )}
                                                             </div>

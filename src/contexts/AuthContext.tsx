@@ -12,7 +12,7 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, firstName?: string, lastName?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -68,14 +68,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string, firstName?: string, lastName?: string) => {
+  const signUp = async (email: string, password: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
       const response = await authService.register({
         email,
         password,
-        password_confirmation: password,
+        password_confirmation: password, // Default behavior, can be overridden in UI
         first_name: firstName,
         last_name: lastName,
+        phone,
       });
       setUser(response.user);
       setProfile(response.user.profile || null);

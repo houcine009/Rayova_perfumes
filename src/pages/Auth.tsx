@@ -18,11 +18,12 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
 
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const Auth = () => {
   }, [user, navigate, from]);
 
   const validateForm = () => {
-    const newErrors: { email?: string; password?: string } = {};
+    const newErrors: { email?: string; password?: string; confirmPassword?: string } = {};
 
     try {
       emailSchema.parse(email);
@@ -56,6 +57,10 @@ const Auth = () => {
       }
     }
 
+    if (!isLogin && password !== confirmPassword) {
+      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -71,45 +76,29 @@ const Auth = () => {
       if (isLogin) {
         const { error } = await signIn(email, password);
         if (error) {
-          if (error.message.includes('Invalid login credentials')) {
-            toast({
-              title: 'Erreur de connexion',
-              description: 'Email ou mot de passe incorrect.',
-              variant: 'destructive',
-            });
-          } else {
-            toast({
-              title: 'Erreur',
-              description: error.message,
-              variant: 'destructive',
-            });
-          }
-        } else {
           toast({
-            title: 'Bienvenue !',
-            description: 'Vous êtes connecté avec succès.',
+            title: 'Erreur',
+            description: 'Email ou mot de passe incorrect.',
+            variant: 'destructive',
           });
         }
       } else {
-        const { error } = await signUp(email, password, firstName, lastName);
+        // Split name into first and last name for the backend
+        const nameParts = name.trim().split(' ');
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ');
+
+        const { error } = await signUp(email, password, firstName, lastName, phone);
         if (error) {
-          if (error.message.includes('User already registered')) {
-            toast({
-              title: 'Compte existant',
-              description: 'Un compte existe déjà avec cet email.',
-              variant: 'destructive',
-            });
-          } else {
-            toast({
-              title: 'Erreur',
-              description: error.message,
-              variant: 'destructive',
-            });
-          }
+          toast({
+            title: 'Erreur',
+            description: error.message,
+            variant: 'destructive',
+          });
         } else {
           toast({
             title: 'Compte créé !',
-            description: 'Votre compte a été créé avec succès.',
+            description: 'Bienvenue chez Rayova.',
           });
         }
       }
@@ -128,45 +117,76 @@ const Auth = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-32 pb-24">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="max-w-md mx-auto"
           >
-            <div className="bg-card border border-border/50 rounded-lg p-8 shadow-lg">
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-playfair font-bold text-foreground mb-2">
-                  {isLogin ? 'Connexion' : 'Inscription'}
+            <div className="bg-card border border-border/50 rounded-[2rem] p-10 shadow-2xl backdrop-blur-sm relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
+              
+              <div className="text-center mb-10">
+                <h1 className="text-4xl font-playfair font-black text-foreground mb-3 tracking-tight">
+                  {isLogin ? 'Authentification' : 'Rejoindre Rayova'}
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest opacity-70">
                   {isLogin
-                    ? 'Connectez-vous à votre compte Rayova'
-                    : 'Créez votre compte Rayova'}
+                    ? 'L\'élégance commence ici'
+                    : 'Créez votre signature olfactive'}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {!isLogin && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest ml-1">Nom Complet</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Jean Dupont"
+                        className="bg-muted/30 border-border/50 rounded-xl h-12"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-widest ml-1">Téléphone</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="06 12 34 56 78"
+                        className="bg-muted/30 border-border/50 rounded-xl h-12"
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest ml-1">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="votre@email.com"
-                    className="bg-background"
+                    className="bg-muted/30 border-border/50 rounded-xl h-12"
                     required
                   />
                   {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email}</p>
+                    <p className="text-[10px] text-destructive font-bold uppercase">{errors.email}</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
+                  <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest ml-1">Mot de passe</Label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -174,38 +194,71 @@ const Auth = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="bg-background pr-10"
+                      className="bg-muted/30 border-border/50 rounded-xl h-12 pr-10"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password}</p>
+                    <p className="text-[10px] text-destructive font-bold uppercase">{errors.password}</p>
                   )}
                 </div>
 
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-widest ml-1">Confirmer</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="bg-muted/30 border-border/50 rounded-xl h-12"
+                      required
+                    />
+                    {errors.confirmPassword && (
+                      <p className="text-[10px] text-destructive font-bold uppercase">{errors.confirmPassword}</p>
+                    )}
+                  </div>
+                )}
+
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full h-12 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02]"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Connexion...
+                      Patientez...
                     </>
                   ) : (
-                    'Se connecter'
+                    isLogin ? 'Se connecter' : 'S\'inscrire'
                   )}
                 </Button>
               </form>
 
+              <div className="mt-8 pt-8 border-t border-border/30 text-center">
+                <button
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setErrors({});
+                  }}
+                  className="text-sm font-bold text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2"
+                >
+                  {isLogin ? (
+                    <>Pas encore de compte ? <span className="text-primary underline underline-offset-4 decoration-primary/30">S'inscrire</span></>
+                  ) : (
+                    <>Déjà membre ? <span className="text-primary underline underline-offset-4 decoration-primary/30">Se connecter</span></>
+                  )}
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>

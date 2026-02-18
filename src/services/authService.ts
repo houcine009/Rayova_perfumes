@@ -41,6 +41,7 @@ export interface RegisterData {
     password_confirmation: string;
     first_name?: string;
     last_name?: string;
+    phone?: string;
 }
 
 export interface LoginData {

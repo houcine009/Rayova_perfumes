@@ -20,6 +20,7 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
         ]);
 
         $user = User::create([
@@ -34,6 +35,7 @@ class AuthController extends Controller
             'user_id' => $user->id,
             'first_name' => $validated['first_name'] ?? null,
             'last_name' => $validated['last_name'] ?? null,
+            'phone' => $validated['phone'] ?? null,
         ]);
 
         $token = $user->createToken('auth-token')->plainTextToken;

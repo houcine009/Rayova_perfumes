@@ -124,7 +124,7 @@ export function Navbar() {
                 <Link
                   key={link.name}
                   to={link.href}
-                  className={`text-sm font-medium tracking-wide uppercase transition-colors duration-300 ${location.pathname === link.href
+                  className={`text-sm font-black tracking-widest uppercase transition-all duration-300 ${location.pathname === link.href
                     ? "text-primary"
                     : "text-foreground/70 hover:text-primary"
                     }`}
@@ -135,16 +135,26 @@ export function Navbar() {
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden sm:flex" aria-label={isDarkMode ? "Activer le mode clair" : "Activer le mode sombre"}>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="hidden sm:flex text-muted-foreground hover:text-primary transition-colors"
+                aria-label={isDarkMode ? "Activer le mode clair" : "Activer le mode sombre"}
+              >
                 {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
-              <div className={`relative flex items-center transition-all duration-300 ${isSearchOpen ? 'w-48 sm:w-64' : 'w-10'}`}>
+
+              <div
+                className={`relative flex items-center bg-muted/30 rounded-full border border-border/50 transition-all duration-300 ${isSearchOpen ? "w-48 sm:w-64 px-3" : "w-10"
+                  }`}
+              >
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 hover:bg-transparent"
                   aria-label="Rechercher"
                 >
                   <Search className="h-5 w-5" />
@@ -155,7 +165,7 @@ export function Navbar() {
                       initial={{ width: 0, opacity: 0 }}
                       animate={{ width: "100%", opacity: 1 }}
                       exit={{ width: 0, opacity: 0 }}
-                      className="absolute left-10 right-0 overflow-hidden"
+                      className="absolute left-10 right-3 overflow-hidden"
                     >
                       <input
                         type="text"
@@ -163,12 +173,12 @@ export function Navbar() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             navigate(`/boutique?search=${searchQuery}`);
                             setIsSearchOpen(false);
                           }
                         }}
-                        className="w-full bg-transparent border-none focus:ring-0 text-sm py-1"
+                        className="w-full bg-transparent border-none focus:ring-0 text-xs font-bold py-1 placeholder:text-muted-foreground/50"
                         autoFocus
                       />
                     </motion.div>
@@ -179,60 +189,96 @@ export function Navbar() {
               {user && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="hidden sm:flex" aria-label="Menu utilisateur">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hidden sm:flex hover:text-primary transition-colors"
+                      aria-label="Menu utilisateur"
+                    >
                       <User className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-popover border border-border">
-                    <DropdownMenuItem className="text-muted-foreground text-sm">
-                      {user.email}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate("/mes-commandes")}>
-                      <ShoppingBag className="mr-2 h-4 w-4" />
-                      Mes Commandes
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 bg-popover/80 backdrop-blur-xl border border-border/50 overflow-hidden rounded-[1.5rem] shadow-2xl p-2 mt-2"
+                  >
+                    <div className="px-4 py-3 bg-muted/30 rounded-xl mb-1">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1">
+                        Session Active
+                      </p>
+                      <p className="text-xs font-bold truncate opacity-80">{user.email}</p>
+                    </div>
+                    <DropdownMenuSeparator className="bg-border/30 my-2" />
+                    <DropdownMenuItem
+                      onClick={() => navigate("/mes-commandes")}
+                      className="gap-3 p-3 cursor-pointer hover:bg-primary/10 rounded-xl transition-all group"
+                    >
+                      <ShoppingBag className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="font-bold text-[10px] uppercase tracking-widest">
+                        Mes Commandes
+                      </span>
                     </DropdownMenuItem>
                     {isAdmin && (
-                      <DropdownMenuItem onClick={() => navigate("/admin")}>
-                        <Settings className="mr-2 h-4 w-4" />
-                        Administration
+                      <DropdownMenuItem
+                        onClick={() => navigate("/admin")}
+                        className="gap-3 p-3 cursor-pointer hover:bg-primary/10 rounded-xl transition-all group"
+                      >
+                        <Settings className="h-4 w-4 text-primary group-hover:rotate-45 transition-transform" />
+                        <span className="font-bold text-[10px] uppercase tracking-widest">
+                          Administration
+                        </span>
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Déconnexion
+                    <DropdownMenuSeparator className="bg-border/30 my-2" />
+                    <DropdownMenuItem
+                      onClick={handleSignOut}
+                      className="gap-3 p-3 cursor-pointer text-destructive hover:bg-destructive/10 rounded-xl transition-all group"
+                    >
+                      <LogOut className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                      <span className="font-bold text-[10px] uppercase tracking-widest">
+                        Déconnexion
+                      </span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
 
-
+              {!user && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:flex rounded-full px-6 font-black uppercase text-[10px] tracking-widest border-primary/20 hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/5"
+                  asChild
+                >
+                  <Link to="/auth">Connexion</Link>
+                </Button>
+              )}
 
               <Link to="/panier">
-                <Button variant="ghost" size="icon" className="relative" aria-label="Voir le panier">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative hover:text-primary transition-colors"
+                  aria-label="Voir le panier"
+                >
                   <ShoppingBag className="h-5 w-5" />
                   {itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground text-[10px] font-black rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
                       {itemCount}
                     </span>
                   )}
                 </Button>
-
               </Link>
 
               {/* Mobile Menu Button */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden hover:text-primary transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
               >
-                {isMobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </Button>
             </div>
           </div>
@@ -294,20 +340,30 @@ export function Navbar() {
                     {isAdmin && (
                       <Button
                         variant="outline"
-                        className="w-full"
+                        className="w-full text-left justify-start"
                         onClick={() => navigate("/admin")}
                       >
                         <Settings className="mr-2 h-4 w-4" />
                         Administration
                       </Button>
                     )}
-                    <Button variant="outline" className="w-full" onClick={handleSignOut}>
+                    <Button
+                      variant="outline"
+                      className="w-full text-left justify-start text-destructive hover:text-destructive hover:bg-destructive/5"
+                      onClick={handleSignOut}
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       Déconnexion
                     </Button>
                   </div>
                 ) : (
-                  null
+                  <Button
+                    variant="primary"
+                    className="w-full"
+                    onClick={() => navigate("/auth")}
+                  >
+                    Connexion / Inscription
+                  </Button>
                 )}
               </div>
             </nav>

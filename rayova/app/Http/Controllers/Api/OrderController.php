@@ -18,7 +18,7 @@ class OrderController extends Controller
         try {
             $user = $request->user();
             
-            $query = Order::with('items.product', 'user.profile');
+            $query = Order::with('items.product.media', 'user.profile');
 
             // Non-admin users can only see their own orders
             if (!$user->isAdmin()) {
